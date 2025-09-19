@@ -283,7 +283,7 @@ make mount
 ```
 <img width="1857" height="287" alt="image" src="https://github.com/user-attachments/assets/fc7310f6-450d-47a1-a9ac-7cfdaa105967" />
 
-## Reference
+## References
 - https://github.com/YosysHQ/yosys.git
 - https://github.com/steveicarus/iverilog.git
 - https://sourceforge.net/projects/ngspice/files/
