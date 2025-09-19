@@ -1,12 +1,16 @@
 <details>
-  <summary>Week 0 - SoC Flow and Tool Installation</summary>
-
+  <summary>Week 0 - VLSI Design Flow and Tool Installation</summary>
+<br>
 
   <details>
-    <summary>Task 1: SoC Design Flow</summary>
-    - Write a summary of the documentation
+    <summary>Task 1: VLSI Design Flow</summary>
+ <br>
     
-    - Highlight key points
+<p align="center">
+  <img width="685" height="672" alt="image" src="https://github.com/user-attachments/assets/749ddf91-d86c-4aaa-b005-23e02fb32769" />
+</p>
+
+
   </details>
 
 <details>
