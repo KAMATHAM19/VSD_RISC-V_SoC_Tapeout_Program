@@ -1,14 +1,15 @@
 <details>
-  <summary>Week 0 - VLSI Design Flow and Tool Installation</summary>
+  <summary>Week 0 - VLSI SoC Design Flow and Tool Installation</summary>
 <br>
 
   <details>
-    <summary>Task 1: VLSI Design Flow</summary>
+    <summary>Task 1: VLSI SoC Design Flow</summary>
  <br>
     
 <p align="center">
-  <img width="685" height="672" alt="image" src="https://github.com/user-attachments/assets/749ddf91-d86c-4aaa-b005-23e02fb32769" />
+  <img width="1906" height="1072" alt="image" src="https://github.com/user-attachments/assets/25776a4a-b95c-4fbe-a7a4-322a1f8b11bf" />
 </p>
+
 
 
   </details>
