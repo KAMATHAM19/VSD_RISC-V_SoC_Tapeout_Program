@@ -8,7 +8,7 @@ Hands-on SoC design journey from RTL to GDSII using open-source EDA. Part of the
 
 | Week   | Topics Covered | Status |
 |--------|----------------|--------|
-| **Week 0** | [Tool Installation](https://github.com/KAMATHAM19/VSD-RISC-V-SoC-Tapeout/tree/main/Week_0_Tool_Installation) | ✅ Done |
+| **Week 0** | [VLSI SoC Design Flow and Tool Installation](https://github.com/KAMATHAM19/VSD-RISC-V-SoC-Tapeout/tree/main/Week_0_Tool_Installation) | ✅ Done |
 | **Week 1** | ...| 🔜 Planned|
 | **Week 2** | ... | 🔜 Planned |
 | **Week 3** | ... | 🔜 Planned |
@@ -34,6 +34,8 @@ Hands-on SoC design journey from RTL to GDSII using open-source EDA. Part of the
 
 ## Program Outcomes  
 
+> This section will be updated after each **week’s section** is completed.
+
 .....
 
 .....
@@ -50,7 +52,7 @@ Hands-on SoC design journey from RTL to GDSII using open-source EDA. Part of the
 
 ## Status / Progress Tracking
 
-- [x] Week 0 – Environment setup complete  
+- [x] Week 0 – Environment setup completed 
 
 
 > Stay tuned as I document each week with **logs, screenshots, and results**!  
