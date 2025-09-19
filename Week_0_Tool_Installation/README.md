@@ -1,13 +1,24 @@
 <details>
-  <summary>Week 0 - Tool Installation</summary>
+  <summary>Week 0 - SoC Flow and Tool Installation</summary>
+
+
+  <details>
+    <summary>Task 1: SoC Design Flow</summary>
+    - Write a summary of the documentation
+    
+    - Highlight key points
+  </details>
+
+<details>
+  <summary>Task 2 - Tool Installation</summary>
   
-# 📘 Week 0 – Tool Installation  
+# Week 0 – Tool Installation  
 
 Setup guide for the **VSD RISC-V Tapeout Program**. Follow the steps below to prepare your environment.  
 
 
 
-## 🔗 Required Downloads  
+## Required Downloads  
 
 -  Download and install **Oracle VirtualBox**:  
   > [VirtualBox Downloads](https://www.virtualbox.org/wiki/Downloads)  
@@ -24,7 +35,7 @@ Setup guide for the **VSD RISC-V Tapeout Program**. Follow the steps below to pr
 
 
 
-## 🖥️ System Requirements  
+## System Requirements  
 
 Ensure your host system meets these requirements:  
 
@@ -36,7 +47,7 @@ Ensure your host system meets these requirements:
 | ⚡ CPU   | 4 vCPUs                 |
 
 
-## 🔄 Update Ubuntu  
+## Update Ubuntu  
 
 Once Ubuntu is installed, update and clean the system by running:  
 
@@ -46,5 +57,15 @@ sudo apt upgrade
 sudo apt autoclean
 sudo apt autoremove
 ```
+
+## Reference
+
+....
+
+....
+
+...
+
+</details>
 
 </details>
