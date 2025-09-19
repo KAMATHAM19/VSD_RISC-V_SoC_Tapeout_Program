@@ -1,5 +1,5 @@
-# VSD RISC-V SoC Tapeout
-Hands-on SoC design journey from RTL to GDSII using open-source EDA. Part of the VSD RISC-V Reference SoC Tapeout Program, covering RTL sim, synthesis, GLS, STA, floorplan, placement, routing, and timing closure — building a unique RISC-V SoC ready for tapeout
+# VSD RISC-V SoC Tapeout Program
+Hands-on SoC design journey from RTL to GDSII using open-source EDA. Part of the VSD RISC-V Reference SoC Tapeout Program, covering RTL simulation, synthesis, gate level simulation (GLS), STA, floorplan, placement, routing, and timing closure — building a unique RISC-V SoC ready for tapeout
 
 ## Links to Detailed Logs  
 
@@ -8,7 +8,7 @@ Hands-on SoC design journey from RTL to GDSII using open-source EDA. Part of the
 
 | Week   | Topics Covered | Status |
 |--------|----------------|--------|
-| **Week 0** | [VLSI SoC Design Flow and Tool Installation](https://github.com/KAMATHAM19/VSD-RISC-V-SoC-Tapeout/tree/main/Week_0_Tool_Installation) | ✅ Done |
+| **Week 0** | [Chip Modelling](https://github.com/KAMATHAM19/VSD-RISC-V-SoC-Tapeout/tree/main/Week_0_Tool_Installation) | ✅ Done |
 | **Week 1** | ...| 🔜 Planned|
 | **Week 2** | ... | 🔜 Planned |
 | **Week 3** | ... | 🔜 Planned |
