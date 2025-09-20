@@ -98,9 +98,9 @@ This stage, known as **tape-in**, marks the point where the chip is ready to be 
   </details>
 
 <details>
-  <summary>Task 2 - Tool Installation</summary>
+  <summary>Task 2: Tool Installation</summary>
   
-# Week 0 – Tool Installation  
+# Task 2 – Tool Installation  
 
 Setup guide for the **VSD RISC-V Tapeout Program**. Follow the steps below to prepare your environment.  
 
@@ -278,7 +278,7 @@ cd OpenLane
 make
 make test
 
-# To enter the dockerized OpenLane environment
+# To enter the Dockerized OpenLane environment
 make mount
 ```
 <img width="1857" height="287" alt="image" src="https://github.com/user-attachments/assets/fc7310f6-450d-47a1-a9ac-7cfdaa105967" />
