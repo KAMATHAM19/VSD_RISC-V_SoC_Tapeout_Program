@@ -392,6 +392,72 @@ endmodule
 <details>
   <summary>Day 2: Timing libs, hierarchical vs flat synthesis and efficient flop coding styles</summary>
 
+## Introduction to a library file (.lib)
+
+A **`.lib` file** (Liberty file) is a **text-based standard cell library file** used in digital IC design.  
+It contains **timing, power, and functional information** about standard logic cells like:
+
+- **Basic gates** → AND, OR, NOT  
+- **Sequential cells** → Flip-Flops, Latches  
+- **Complex cells** → Multiplexers, Adders  
+
+### Why Multiple Versions of the Same Gate?
+Each logic gate is available in **different flavours**:
+
+-  **High-Speed Version** → Works faster but consumes more power  
+-  **Low-Power Version** → Saves energy but works slower  
+-  **Balanced Version** → Trade-off between speed & power  
+
+### PVT Corners in `.lib`
+
+**PVT = Process, Voltage, Temperature**
+
+- **Process:** Variations during chip fabrication (transistors may be slightly faster or slower).  
+- **Voltage:** Supply voltage may change (e.g., 1.8V, 1.62V, 1.98V).  
+- **Temperature:** Chips may run in different environments (e.g., -40°C in space, 125°C in cars).  
+
+That’s why libraries provide different operating conditions (called **corners**) such as:
+
+- `tt_025C_1v80` → Typical process, 25°C, 1.8V  
+- `ss_125C_1v62` → Slow process, 125°C, 1.62V  
+- `ff_n40C_1v98` → Fast process, -40°C, 1.98V  
+
+
+### Lab 4: Introduction to .lib
+
+<img width="926" height="429" alt="image" src="https://github.com/user-attachments/assets/57c12542-1d18-4edb-8e6d-a89441260c12" />
+
+```
+sky130_fd_sc_hd__tt_025C_1v80 
+```
+- sky130 → Refers to the SkyWater 130nm technology node.
+- fd → "Foundry Design" (cells are designed for foundry use).
+- sc → "Standard Cell" (these are logic cells like AND, OR, FF, etc.).
+- hd → "High Density" variant (optimised for area, smaller cell size).
+- tt_025C_1v80 → This part describes the PVT corner:
+- tt → Typical process (transistors behave as expected, no fast/slow variation).
+- 025C → Temperature = 25°C.
+- 1v80 → Voltage = 1.80V.
+  
+```liberty
+library ("sky130_fd_sc_hd__tt_025C_1v80") {
+    technology("cmos");                  # CMOS technology
+    delay_model : "table_lookup";        # Timing values stored as lookup tables
+    time_unit : "1ns";                   # Timing measured in nanoseconds
+    voltage_unit : "1V";                 # Voltage in volts
+    leakage_power_unit : "1nW";          # Leakage in nanowatts
+    capacitive_load_unit(1.0, "pf");     # Capacitance in picofarads
+
+    default_operating_conditions : "tt_025C_1v80"; # Default PVT corner
+
+    operating_conditions ("tt_025C_1v80") {
+        voltage : 1.8000000000;          # Supply voltage
+        process : 1.0000000000;          # Typical process
+        temperature : 25.000000000;      # 25°C environment
+        tree_type : "balanced_tree";     # Clock tree balancing method
+    }
+}
+```
 
 
 
