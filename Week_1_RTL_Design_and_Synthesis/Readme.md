@@ -458,7 +458,87 @@ library ("sky130_fd_sc_hd__tt_025C_1v80") {
     }
 }
 ```
+### GVim: Searching for "cell" in Large Files
 
+```vim
+## 1. Search for the word `cell`
+In GVim, use:
+/cell
+- Press n to go to the next occurrence.
+- Press N to go to the previous occurrence.
+
+## 2. Turn on/off syntax highlighting
+:syntax on
+:syntax off
+
+## 3. List all lines containing cell
+:g/cell/p
+
+## 4. Search for a specific pattern
+/cell .*
+/cell .*and
+
+## 4. Highlight all matches and turn off
+:set hlsearch
+:noh
+
+## 
+:sp → shorthand for :split
+:vsp [filename] → opens a vertical split of the current window
+```
+
+<img width="917" height="417" alt="image" src="https://github.com/user-attachments/assets/65740a05-e397-4c98-9fb1-edaba84c3d1e" />
+
+### AND2 Gates in the .lib File
+
+The `.lib` file defines three types of AND2 gates used in digital circuits: `and2_0`, `and2_1`, and `and2_2`. Each type represents a different "flavour" with distinct drive strength, speed, area, and leakage characteristics.
+
+### Matching Description to the above picture
+
+| Gate Name                     | Area  | Leakage Power Range | Speed / Type                   | Notes |
+|--------------------------------|-------|-------------------|--------------------------------|-------|
+| `sky130_fd_sc_hd__and2_0`      | 2.256 | ~0.0018–0.0021    | Slowest, smallest cell         | Small area, low leakage, narrow transistors, higher delay. Used on non-critical nets. |
+| `sky130_fd_sc_hd__and2_1`      | 6.256 | ~0.0015–0.0031    | Medium cell                    | Moderate area and leakage. Balances delay, power, and area. Used where moderate speed is needed. |
+| `sky130_fd_sc_hd__and2_2`      | 7.507 | ~0.0018–0.0039    | Fastest, largest cell          | Large area, high leakage, wide transistors, low delay. Used where timing is critical. |
+
+### Key Points
+
+- **Area vs Speed:**  
+  Wider transistors → faster switching → larger area and higher leakage.  
+
+- **Leakage Power:**  
+  Varies depending on input conditions (A, B). Switching activity affects power.  
+
+- **Cell Delay:**  
+  Determined by how quickly capacitance can be charged/discharged, which depends on the transistor width.  
+
+- **Cell Selection in Synthesis:**  
+  - **Fast cells (`and2_2`)**: for critical paths requiring low delay.  
+  - **Medium cells (`and2_1`)**: trade-off between speed, power, and area.  
+  - **Slow cells (`and2_0`)**: for non-critical paths, saving area and power.  
+
+> These three gates demonstrate how a cell library allows digital designers to **balance speed, power, and area** in real VLSI chips.
+
+## Hierarchical vs Flat Synthesis
+
+### Multiple Modules
+
+```verilog
+module sub_module2 (input a, input b, output y);
+	assign y = a | b;
+endmodule
+
+module sub_module1 (input a, input b, output y);
+	assign y = a&b;
+endmodule
+
+
+module multiple_modules (input a, input b, input c , output y);
+	wire net1;
+	sub_module1 u1(.a(a),.b(b),.y(net1));  //net1 = a&b
+	sub_module2 u2(.a(net1),.b(c),.y(y));  //y = net1|c ,ie y = a&b + c;
+endmodule
+```
 
 
 
