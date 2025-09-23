@@ -521,6 +521,14 @@ The `.lib` file defines three types of AND2 gates used in digital circuits: `and
 
 ## Hierarchical vs Flat Synthesis
 
+### Hierarchical Synthesis
+
+A hierarchical design means building a circuit by dividing it into smaller sub-modules, which are all connected inside one main top module.
+
+This method is very useful for large designs because it follows the divide-and-conquer idea. Instead of handling one huge design (which is hard for tools to optimise), the design is split into smaller blocks that tools can process more efficiently.
+
+Using a hierarchical design makes better use of computer resources, speeds up the design process, and also makes debugging easier and faster.
+
 ### Multiple Modules
 
 ```verilog
@@ -540,10 +548,68 @@ module multiple_modules (input a, input b, input c , output y);
 endmodule
 ```
 
+#### Lab 5: Hierarchical flow
+
+```bash
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog multiple_modules.v
+```
+<img width="929" height="265" alt="image" src="https://github.com/user-attachments/assets/fa22c682-1aed-4ca6-888f-27b617d9dad7" />
+
+```
+synth -top multiple_modules
+```
+<div align="center">
+
+| | |
+|:------------:|:------------:|
+| <img width="241" height="353" alt="image" src="https://github.com/user-attachments/assets/a2493aa6-8675-40d4-a44d-5b7ce66ef136" /> | <img width="327" height="386" alt="image" src="https://github.com/user-attachments/assets/8a97bc28-63d4-4a47-aac8-e2ac109b5e31" /> |
+
+</div>
 
 
+```
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+```
+<img width="929" height="82" alt="image" src="https://github.com/user-attachments/assets/8700f6ad-30df-4e8a-b0ed-ae5eef7c9634" />
 
+```
+show multiple_modules
+```
+<img width="923" height="266" alt="image" src="https://github.com/user-attachments/assets/99671124-b05f-4075-99d3-28a75c95bf0c" />
 
+```
+write_verilog -noattr multiple_modules_hier.v
+```
+<div align="center">
+
+| | |
+|:------------:|:------------:|
+| <img width="224" height="366" alt="image" src="https://github.com/user-attachments/assets/0609f31c-1a2f-45b4-9b57-c971e1ed632c" /> | <img width="221" height="365" alt="image" src="https://github.com/user-attachments/assets/a3290148-2759-4e5d-8264-1de0167c69e4" /> |
+
+</div>
+
+### Flat Synthesis
+A flat design is used when the circuit is small enough for the tool to optimise quickly and efficiently within a reasonable time.
+
+```
+flatten
+show
+write_verilog -noattr multiple_modules_flat.v
+```
+
+<img width="924" height="145" alt="image" src="https://github.com/user-attachments/assets/69d573db-0c19-4b7b-8f08-bd0b35343cd8" />
+
+<div align="center">
+
+| | |
+|:------------:|:------------:|
+| <img width="227" height="373" alt="image" src="https://github.com/user-attachments/assets/c5b97b1e-01a3-4b24-91c3-17b32b69bb92" /> | <img width="199" height="272" alt="image" src="https://github.com/user-attachments/assets/de91bc6b-efb8-49dd-aef5-eda9c7bd74cf" /> |
+
+</div>
+
+## Various Flop Coding Styles and optimization
 
 
 
