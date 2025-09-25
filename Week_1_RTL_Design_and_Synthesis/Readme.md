@@ -458,7 +458,7 @@ library ("sky130_fd_sc_hd__tt_025C_1v80") {
     }
 }
 ```
-### GVim: Searching for "cell" in Large Files
+### GVim: Commands
 
 ```vim
 ## 1. Search for the word `cell`
@@ -609,29 +609,254 @@ write_verilog -noattr multiple_modules_flat.v
 
 </div>
 
-## Various Flop Coding Styles and optimization
+## Various Flop Coding Styles and Optimisation
+
+### 1. Combinational Circuit
+
+- A combinational circuit is made up of logic gates (AND, OR, NOT, etc.).
+- The output depends only on the current inputs.
+> Example: if inputs are a, b, and c, the output y is computed instantly based on the logic equation.
+
+<div align="center">
+<img width="358" height="186" alt="image" src="https://github.com/user-attachments/assets/c6c1472e-6cd4-4e4d-b26f-f54d869a0fed" />
+</div>
+
+### 2. Propagation Delay (Tpd)
+
+- In real circuits, logic gates do not switch outputs instantly.
+- Each gate takes a small amount of time (like 1 ns, 2 ns, etc.) to produce the correct output after the input changes.
+- This time is called Propagation Delay (Tpd).
+> Because of Tpd, the output may not be correct immediately; it updates only after the delay.
+
+### 3. Glitch
+- A glitch is a small, unwanted pulse at the output of a circuit.
+
+> Why does it happen?
+- Different inputs may reach the gate at slightly different times (due to different propagation delays).
+- For a short moment, the circuit produces a wrong output before stabilising.
+- Example: If a and b change at the same time but reach the gate at different times (2 ns apart), the output can go HIGH for a moment and then go LOW again → this is a glitch.
+
+<div align="center">
+<img width="296" height="300" alt="image" src="https://github.com/user-attachments/assets/cfa6f502-56b0-44d2-b71b-2378e1921ed5" />
+</div>
+
+### 4. Why Do We Need Flip-Flops?
+
+- Flip-flops (flops) are used to store and stabilise outputs.
+- They sample the combinational circuit output only at the clock edge (rising or falling edge).
+- This ensures that glitches or short unwanted pulses do not affect the system, because the flop only captures the stable value after propagation delays are settled.
+
+## Difference between Synchronous and Asynchronous Circuits
+
+### Synchronous Circuits
+- **Definition**: Circuits where all operations are controlled by a **clock signal**.  
+- **Behavior**: Data changes (inputs/outputs) happen only at clock edges (rising or falling).  
+- **Examples**: Flip-flop based counters, registers, processors.  
+- **Advantages**:
+  - Predictable timing.  
+  - Easy to design and debug.  
+  - Glitches are avoided because outputs are sampled only on the clock edge.  
+- **Disadvantages**:
+  - Require clock distribution.  
+  - May be slower due to waiting for the clock.  
+
+### Asynchronous Circuits
+- **Definition**: Circuits that do **not use a global clock**. Output changes immediately when inputs change (only depends on propagation delay).  
+- **Behavior**: No clock – operations happen "asynchronously."  
+- **Examples**: Simple combinational logic, ripple counters.  
+- **Advantages**:
+  - Faster response (no waiting for clock).  
+  - Power efficient (no clock switching).  
+- **Disadvantages**:
+  - Hard to design and test.  
+  - Sensitive to glitches and races (timing hazards).  
+  - Less reliable in large systems.  
 
 
+| Feature              | Synchronous Circuit       | Asynchronous Circuit      |
+|----------------------|---------------------------|---------------------------|
+| **Clock**            | Required                 | Not required              |
+| **Output changes**   | On clock edge            | Anytime input changes     |
+| **Design**           | Easier, predictable      | Complex, harder           |
+| **Speed**            | Slower (depends on clock)| Faster (no clock wait)    |
+| **Glitches**         | Avoided by flops         | More prone to glitches    |
+| **Examples**         | CPUs, Registers          | Ripple counters, Logic gates |
 
 
+ **In short**:  
+- **Synchronous = stable, clocked, reliable.**  
+- **Asynchronous = fast, but tricky and glitch-prone.**
 
+1: Flip-flop with asynchronous reset
 
+```verilog
+module dff_asyncres ( input clk ,  input async_reset , input d , output reg q );
+always @ (posedge clk , posedge async_reset)
+begin
+	if(async_reset)
+		q <= 1'b0; // Immediately reset to 0
+	else	
+		q <= d;  // Otherwise capture input d on clock edge
+end
+endmodule
+```
 
+- Simulation
+```
+iverilog dff_asyncres.v tb_dff_asyncres.v
+./a.out
+gtkwave tb_dff_asyncres.vcd
+```
 
+<img width="928" height="278" alt="image" src="https://github.com/user-attachments/assets/c8b26446-93a8-4a31-ab97-83adc8dd024f" />
 
+2. Flip-flop with asynchronous set
 
+```verilog
+module dff_async_set ( input clk ,  input async_set , input d , output reg q );
+always @ (posedge clk , posedge async_set)
+begin
+	if(async_set)
+		q <= 1'b1;
+	else	
+		q <= d;
+end
+endmodule
+```
 
+- Simulation
+```
+iverilog dff_async_set.v tb_dff_async_set.v
+./a.out
+gtkwave tb_dff_async_set.vcd
+```
 
+<img width="929" height="260" alt="image" src="https://github.com/user-attachments/assets/17464d70-868c-47d5-aea2-82a91af2c63d" />
 
+3. Flip-flop with synchronous reset
+   
+```verilog
+module dff_syncres ( input clk , input async_reset , input sync_reset , input d , output reg q );
+always @ (posedge clk )
+begin
+	if (sync_reset)
+		q <= 1'b0;
+	else	
+		q <= d;
+end
+endmodule
+```
 
+- Simulation
+```
+iverilog dff_syncres.v tb_dff_syncres.v 
+./a.out
+gtkwave tb_dff_syncres.vcd
+```
 
+<img width="926" height="269" alt="image" src="https://github.com/user-attachments/assets/88a2a4ab-bc0f-4a3e-9104-8701d5dee589" />
 
+4: Flip-Flop with Asynchronous Reset and Synchronous Reset
 
+```verilog
+module dff_asyncres_syncres ( input clk , input async_reset , input sync_reset , input d , output reg q );
+always @ (posedge clk , posedge async_reset)
+begin
+	if(async_reset)
+		q <= 1'b0;
+	else if (sync_reset)
+		q <= 1'b0;
+	else	
+		q <= d;
+end
+endmodule
+```
 
+- Simulation
+```
+iverilog dff_asyncres_syncres.v tb_dff_asyncres_syncres.v
+./a.out
+gtkwave tb_dff_asyncres_syncres.vcd
+```
 
+<img width="926" height="272" alt="image" src="https://github.com/user-attachments/assets/09ad8cc3-418a-4977-acbb-f94718fe6544" />
 
+#### Key Differences Between Flip-Flops
 
+| Code No. | Flip-Flop Type                | Control Signal(s)        | Type of Control | When it Takes Effect          | Output Behavior        | Observation |
+|----------|--------------------------|--------------------------|-----------------|-------------------------------|------------------------|-------------|
+| 1        | **Async Reset**           | `async_reset`            | Asynchronous    | Immediately (anytime)         | `q = 0`                | Output resets to 0 instantly when `async_reset=1`, independent of clock. Useful for fast reset but may cause metastability if not synchronized. |
+| 2        | **Async Set**          | `async_set`              | Asynchronous    | Immediately (anytime)         | `q = 1`                | Output sets to 1 instantly when `async_set=1`, independent of clock. Often used when system must start in logic HIGH state. |
+| 3        | **Sync Reset**            | `sync_reset`             | Synchronous     | Only on rising clock edge     | `q = 0`                | Reset happens only with clock edge, making it predictable and glitch-free. But reset is not immediate (must wait for clock). |
+| 4        | **Async + Sync Reset**   | `async_reset`, `sync_reset` | Mixed        | Async = immediate, Sync = on clk | `q = 0`              | Asynchronous reset has highest priority (instant reset). If not active, synchronous reset works at clock edge. Provides both flexibility and safety. |
 
+- Synthesis
+
+1: Flip-flop with asynchronous reset
+
+```
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog dff_asyncres.v 
+synth -top dff_asyncres
+dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+
+<img width="925" height="169" alt="image" src="https://github.com/user-attachments/assets/aec11097-41f8-4c3e-abf8-17c2d586fed2" />
+
+2. Flip-flop with asynchronous set
+   
+```
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog dff_async_set.v
+synth -top dff_async_set
+dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+<img width="926" height="177" alt="image" src="https://github.com/user-attachments/assets/9dc1f942-7af8-4d5d-be1c-d284794513a9" />
+
+3. Flip-flop with synchronous reset
+   
+```
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog dff_syncres.v 
+synth -top dff_syncres
+dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+
+<img width="925" height="206" alt="image" src="https://github.com/user-attachments/assets/fd395c0e-e345-4d8e-83ff-8fd8b5d25c61" />
+
+4: Flip-Flop with Asynchronous Reset and Synchronous Reset
+
+```
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog dff_asyncres_syncres.v
+synth -top dff_asyncres_syncres
+dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+
+<img width="919" height="179" alt="image" src="https://github.com/user-attachments/assets/a7794e14-9fbb-4a07-a876-c467b4f2b336" />
+
+## Optimization
+
+Optimisation in synthesis means making the RTL design simpler and more efficient.
+
+During this process, Yosys:
+- Removes extra or unused logic,
+- Simplifies logic equations, and
+- Reduces the number of gates.
+
+> The important point: functionality stays the same, but the circuit becomes smaller and faster.
 
 
 
