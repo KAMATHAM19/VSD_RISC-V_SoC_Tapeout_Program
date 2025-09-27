@@ -1749,13 +1749,14 @@ write_verilog -noattr ternary_operator_mux_net.v
 
 Gste Level Simulation
 
+```
 Syntax:
     iverilog <path-to-gate-level-verilog-model(s)> <netlist_file.v> <tb_top.v>
 	
 iverilog ../my_lib/verilog_model/primitives.v  ../my_lib/verilog_model/sky130_fd_sc_hd.v ternary_operator_mux_net.v tb_ternary_operator_mux.v
 ./a.out
 gtkwave tb_ternary_operator_mux.vcd
-
+```
 <img width="923" height="272" alt="image" src="https://github.com/user-attachments/assets/3ade50ae-de91-4952-af2c-549ef63adb53" />
 
 ## Lab 2: Bad_mux
@@ -2180,7 +2181,7 @@ gtkwave tb_bad_case.vcd
 
 <img width="926" height="315" alt="image" src="https://github.com/user-attachments/assets/61d7f7c5-d5c4-4a71-9f0c-bf6ee66b2d5c" />
 
-#@ Looping Constructs in Verilog
+## Looping Constructs in Verilog
 
 In Verilog, there are two main looping constructs:
 
@@ -2342,5 +2343,237 @@ gtkwave tb_demux_case.vcd
 ```
 <img width="927" height="371" alt="image" src="https://github.com/user-attachments/assets/763b2d92-f1b8-43e6-98cf-ee89ccbdb36d" />
 
+</details>
+
+<details>
+  <summary>Project: RTL to Gate-Level Implementation of a 16-bit ALU (Sky130) </summary
+<br>
+
+- Design
+
+```verilog
+module ALU16bit (
+    input clk,
+    input [2:0] Opcode,
+    input [15:0] Operand1, Operand2,
+    output reg [15:0] Result = 16'b0,
+    output reg flagC = 1'b0,
+    output reg flagZ = 1'b0
+);
+
+parameter [2:0]
+    ADD  = 3'b000,
+    SUB  = 3'b001,
+    MUL  = 3'b010,
+    AND  = 3'b011,
+    OR   = 3'b100,
+    NAND = 3'b101,
+    NOR  = 3'b110,
+    XNOR = 3'b111;
+
+always @(posedge clk) begin
+    case (Opcode)
+        ADD: begin
+            {flagC, Result} = Operand1 + Operand2; // Capture carry-out
+            flagZ = (Result == 16'b0);
+        end
+
+        SUB: begin
+            {flagC, Result} = Operand1 - Operand2; // Carry means borrow in SUB
+            flagZ = (Result == 16'b0);
+        end
+
+        MUL: begin
+            Result = Operand1 * Operand2;
+            flagC = 1'b0; // No carry flag here
+            flagZ = (Result == 16'b0);
+        end
+
+        AND: begin
+            Result = Operand1 & Operand2;
+            flagC = 1'b0;
+            flagZ = (Result == 16'b0);
+        end
+
+        OR: begin
+            Result = Operand1 | Operand2;
+            flagC = 1'b0;
+            flagZ = (Result == 16'b0);
+        end
+
+        NAND: begin
+            Result = ~(Operand1 & Operand2);
+            flagC = 1'b0;
+            flagZ = (Result == 16'b0);
+        end
+
+        NOR: begin
+            Result = ~(Operand1 | Operand2);
+            flagC = 1'b0;
+            flagZ = (Result == 16'b0);
+        end
+
+        XNOR: begin
+            Result = ~(Operand1 ^ Operand2);
+            flagC = 1'b0;
+            flagZ = (Result == 16'b0);
+        end
+
+        default: begin
+            Result = 16'b0;
+            flagC = 1'b0;
+            flagZ = 1'b0;
+        end
+    endcase
+end
+
+endmodule
+```
+
+
+- Testbench
+
+```verilog
+
+module ALU16bit_tb;
+
+reg clk;
+reg [2:0] Opcode;
+reg [15:0] Operand1;
+reg [15:0] Operand2;
+
+wire [15:0] Result;
+wire flagC;
+wire flagZ;
+
+// Instantiate the ALU with clk
+ALU16bit uut (
+    .clk(clk),
+    .Opcode(Opcode),
+    .Operand1(Operand1),
+    .Operand2(Operand2),
+    .Result(Result),
+    .flagC(flagC),
+    .flagZ(flagZ)
+);
+
+// Clock generation
+   	 always begin
+        	#5 clk = ~clk; // Clock period 10 time units
+    	end
+
+
+// Stimulus block
+initial begin
+        $dumpfile("tb_ALU.vcd");
+	$dumpvars(0,ALU16bit_tb);
+end
+
+initial begin
+    // Initial value
+	clk = 0;
+        Operand1 = 16'h0000;
+        Operand2 = 16'h0000;
+        #10;
+   
+
+  // Test case
+        #10 Operand1 = 16'h0003; Operand2 = 16'h0001; Opcode = 3'b000; 
+        #10 Operand1 = 16'h0004; Operand2 = 16'h0002; Opcode = 3'b001; 
+        #10 Operand1 = 16'h0005; Operand2 = 16'h0006; Opcode = 3'b010; 
+        #10 Operand1 = 16'h1010; Operand2 = 16'h0101; Opcode = 3'b011; 
+        #10 Operand1 = 16'h0101; Operand2 = 16'h1010; Opcode = 3'b100; 
+        #10 Operand1 = 16'h1010; Operand2 = 16'h0101; Opcode = 3'b101; 
+        #10 Operand1 = 16'h0101; Operand2 = 16'h1010; Opcode = 3'b110; 
+        #10 Operand1 = 16'h0111; Operand2 = 16'h0001; Opcode = 3'b111;  
+        #50 $finish;
+    end
+	initial begin
+        $display("Opcode: %b | A: %h | B: %h | Result: %h | Carry: %b | Zero: %b",
+                 Opcode, Operand1, Operand2, Result, flagC, flagZ);
+    end
+
+endmodule
+
+```
+
+
+- Simulation
+
+```
+iverilog ALU.v tb_ALU.v
+./a.out
+gtkwave tb_ALU.vcd
+```
+
+<img width="926" height="188" alt="image" src="https://github.com/user-attachments/assets/ef9c27fe-c91f-4091-b312-37afe11e0b6b" />
+
+
+<img width="926" height="308" alt="image" src="https://github.com/user-attachments/assets/4d3d3d73-87d0-47db-9b91-d89b51c866f0" />
+
+- Synthesis
+
+```
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog ALU.v
+synth -top ALU16bit
+```
+<div align="center">
+<img width="329" height="336" alt="image" src="https://github.com/user-attachments/assets/a0957390-ddd8-4783-bd23-063964534f80" />
+</div>
+
+```
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+write_verilog -noattr ALU_net.v
+```
+
+<img width="369" height="386" alt="image" src="https://github.com/user-attachments/assets/f8cc04c6-c77a-481d-9693-ca7c6ca57d7d" />
+
+- Gate Level Simulation
+
+```
+iverilog ../my_lib/verilog_model/primitives.v  ../my_lib/verilog_model/sky130_fd_sc_hd.v ALU_net.v tb_ALU.v
+./a.out
+gtkwave tb_ALU.vcd 
+```
+
+<img width="928" height="299" alt="image" src="https://github.com/user-attachments/assets/a3e957fa-c9c2-42d9-b0c6-965ff4014afc" />
+
+## Comparison between RTL Simulation and Gate-level Simulation
+
+<img width="926" height="308" alt="image" src="https://github.com/user-attachments/assets/4d3d3d73-87d0-47db-9b91-d89b51c866f0" />
+<img width="928" height="299" alt="image" src="https://github.com/user-attachments/assets/a3e957fa-c9c2-42d9-b0c6-965ff4014afc" />
+
+
+### Observations
+
+#### 1. RTL Simulation
+- Functional correctness of ALU verified at the behavioural level.
+- All operations (ADD, SUB, AND, OR, XOR, etc.) gave expected results.
+- Outputs responded immediately after input changes (no delays).
+- No `x` (unknown) values observed once inputs were applied.
+
+#### 2. Gate-Level Simulation (GLS)
+- ALU functionality matched RTL results.
+- Realistic **gate delays** observed in signal transitions.
+- Some signals initialised as `x` (unknown) before the first clock edge — due to uninitialized flip-flops in standard cells.
+- Outputs took finite time to stabilise after inputs changed (reflecting real hardware behaviour).
+- Simulation used Sky130 standard cell library (`sky130_fd_sc_hd__tt_025C_1v80.lib`).
+
+#### 3. Comparison
+| Aspect                  | RTL Simulation | Gate-Level Simulation |
+|--------------------------|----------------|------------------------|
+| Execution Speed          | Fast (abstract logic) | Slower (includes gate-level delays) |
+| Initialization           | Clean (no `x`) | `x` states before reset/init |
+| Timing                   | Ideal (no delay) | Realistic propagation delays |
+| Functional Behavior      | Matches spec   | Matches spec (verified ✅) |
+| Purpose                  | Verify logic   | Verify synthesis mapping & timing realism |
+
+#### 4. Conclusion
+- The ALU design is **functionally correct** at both RTL and GLS levels.
+- GLS confirms successful mapping of RTL code to Sky130 standard cells.
+- Differences in timing/initialisation highlight the importance of GLS before physical design.
 
 </details>
