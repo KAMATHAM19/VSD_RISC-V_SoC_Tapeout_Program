@@ -858,8 +858,411 @@ During this process, Yosys:
 
 > The important point: functionality stays the same, but the circuit becomes smaller and faster.
 
-
-
-
-
 </details>
+
+
+<details>
+  <summary>Day 3: Logic Optimisation </summary>
+	
+## Logic Optimisation in Digital Design
+
+Logic optimisation is the process of **squeezing and simplifying logic** to achieve a more efficient design.  
+The main goals are:
+- **Reduced area** (less hardware usage)  
+- **Lower power consumption**  
+
+### Combinational Logic Optimisation
+
+### Techniques
+1. **Constant Propagation**  
+   - Simplifies logic when inputs are fixed constants.  
+   - Example: If `A=0`, then `A AND B = 0`.  
+
+2. **Boolean Logic Optimization**  
+   - Simplifying expressions using mathematical logic techniques.  
+   - Methods include:  
+     - **Karnaugh Maps (K-Maps)** – visual simplification method.  
+     - **Quine-McCluskey Algorithm** – tabular method for systematic minimisation.  
+
+
+### Sequential Logic Optimisation
+
+### Basic Techniques
+- **Sequential Constant Propagation**  
+  - Similar to constant propagation in combinational logic, but applied across clock cycles.  
+
+### Advanced Techniques
+1. **State Optimization**  
+   - Remove or simplify **unused states** in finite state machines.
+
+<img width="1024" height="1024" alt="state" src="https://github.com/user-attachments/assets/ac5ef879-355c-4d43-8410-8e2374c7257c" />
+
+# 🔄 State Optimization in FSM (Simple Terms)
+
+### 🎯 Goal
+Make the FSM smaller and faster by **reducing states/logic** without changing its input-output behavior.
+
+---
+
+### 🧹 Two Main Cleanups
+1. **Remove unreachable states**  
+   - States you can never reach from reset under any input.  
+   - They just waste flip-flops and logic.  
+
+2. **Merge equivalent states**  
+   - If two states always give the **same outputs** and move to the **same next states** for every input → they’re identical.  
+   - Merge them into one.  
+
+---
+
+### 🖼️ Before → After (Example)
+Before: S0 → S1 → S2 → S3
+(S3 unreachable, S1 ≡ S2)
+
+After: S0 → S1
+(smaller FSM, same behavior)
+
+
+---
+
+### 🚀 Why It Helps
+- Fewer states → fewer flip-flops.  
+- Simpler logic → less area, less power, faster timing.  
+- Easier verification → smaller state space.  
+
+---
+
+### ⚖️ Practical Notes
+- State encoding (binary / one-hot / Gray) can be re-optimized after reduction.  
+- Resets and don’t-care inputs must be defined so tools can safely remove/merge states.  
+- Behavior at **FSM boundaries stays the same** → only the internal state map shrinks.  
+
+---
+
+### 💡 Quick Intuition
+Think of an FSM as a **map of cities (states)**:  
+- 🚫 A city with **no roads leading to it** → remove it.  
+- 🟰 Two cities with the **same roads and same view** → merge them.  
+
+The **traveler’s journey (I/O behavior)** doesn’t change, but the map is smaller and easier to follow.  
+
+
+2. **Retiming**  
+   - Move registers across logic gates to balance delays.  
+   - Helps improve **timing performance**.
+
+<img width="1024" height="1024" alt="remiting" src="https://github.com/user-attachments/assets/df5e82f4-d617-44e8-9a75-3a896ffe0951" />
+
+# ⏱️ Retiming in Simple Terms
+
+### ❌ Problem
+- A **register-to-register path** has too much logic/wiring.  
+- The **critical path** is too long → can’t finish in one clock cycle.  
+- Limits the **max clock frequency**.  
+
+---
+
+### ✅ What Retiming Does
+- **Move registers** across logic.  
+- Splits one long path into **two or more shorter paths**.  
+- Function at inputs/outputs stays the same.  
+
+---
+
+### 🖼️ Before vs After
+
+Before:
+FF → [Big Logic Block] → FF ⏱️ too slow
+
+After:
+FF → [Logic A] → FF (moved) → [Logic B] → FF ✅ meets timing
+
+
+---
+
+### 🔒 What Stays the Same
+- **Cycle behavior unchanged** → same results, same latency.  
+- Only **pipeline register positions** change, not the logic itself.  
+
+---
+
+### 🚀 Why It Helps
+- Shorter delays per stage → run at **higher clock speed**.  
+- Can lower **power** by reducing fanout and wire length.  
+
+---
+
+### ⚖️ Guardrails
+- Respect **reset/enable** of registers.  
+- Don’t cross **multi-cycle/false paths** or **clock-domain boundaries**.  
+- Works best when new register locations also **shorten wires physically**.  
+
+---
+
+### 📌 When to Use
+- **Deep logic cones** between registers.  
+- **Datapaths** (add/multiply chains).  
+- **Long mux trees** where delays need balancing.  
+
+---
+
+👉 **One-line intuition:**  
+Retiming is like **sliding pipeline registers left or right** through the logic so each stage fits in the clock period—while keeping the design’s external behavior identical.  
+
+
+
+
+3. **Sequential Logic Cloning (Floorplan-Aware Synthesis)**  
+   - Duplicate logic in specific locations.  
+   - Helps meet **timing** and **reduce congestion** in large designs.  
+
+<img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/e187de27-6664-43f1-be0d-e87481c41c13" />
+
+## Problem Before Cloning
+- One register (source flop) drives **far-away logic** across the floorplan.  
+- This creates **long wires**, adding:
+  - Delay (harder to meet timing)  
+  - Capacitance (higher dynamic power)  
+
+## What Cloning Does
+- Duplicate the source register → now **two identical flops** on the same clock.  
+- Place each clone **close to its consumers** (e.g., Block X and Block Y).  
+
+## Why It Helps
+- **Shorter wires** → less delay, lower power.  
+- Each local net can be **optimised independently**.  
+- Functionality stays **unchanged**:
+  - Both flops hold the same value (same `D` input and clock).  
+  - Downstream logic works the same.  
+
+## Trade-Offs
+- Slightly more **area** (extra flops).  
+- Extra **clock-tree load**.  
+- Must control **clock skew** to keep clones equivalent.  
+
+## When to Use
+- Large chips where **wire delay dominates** gate delay.  
+- **Cross-die / cross-partition** signals with poor timing slack.  
+- **High-fanout control/status signals** spread across regions.  
+- **Late-stage physical optimisation** (when placement info is known).  
+
+## Quick Picture
+- **Before:** `1 flop → long wire → distant logic → timing violation ❌`  
+- **After:** `2 cloned flops near consumers → short wires → better timing & lower power ✅`  
+
+lab 1: 
+module opt_check (input a , input b , output y);
+	assign y = a?b:0;
+endmodule
+
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog opt_check.v 
+synth -top opt_check
+opt_clean -purge # Removes unused or redundant logic #
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+
+<img width="924" height="221" alt="image" src="https://github.com/user-attachments/assets/30e3533b-6e58-49e6-bbf6-b22c35239305" />
+
+lab 2:
+
+module opt_check (input a , input b , output y);
+	assign y = a?1:b;
+endmodule
+
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog opt_check2.v 
+synth -top opt_check2
+opt_clean -purge
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+<img width="922" height="215" alt="image" src="https://github.com/user-attachments/assets/81c5ab4a-c6f7-4953-9d08-9f10bb524cd7" />
+
+lab 3:
+
+module opt_check3 (input a , input b, input c , output y);
+	assign y = a?(c?b:0):0;
+endmodule
+
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog opt_check3.v 
+synth -top opt_check3
+opt_clean -purge
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+
+<img width="925" height="316" alt="image" src="https://github.com/user-attachments/assets/4b77ff84-8b88-44b4-88ae-d20528e81d46" />
+
+lab 4: 
+
+module opt_check4 (input a , input b , input c , output y);
+ assign y = a?(b?(a & c ):c):(!c);
+ endmodule
+
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog opt_check4.v 
+synth -top opt_check4
+opt_clean -purge
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+
+ <img width="925" height="302" alt="image" src="https://github.com/user-attachments/assets/70b035e6-c11c-4009-aa7c-0cf3e71a721b" />
+
+lab 5: 
+
+module sub_module1(input a , input b , output y);
+ assign y = a & b;
+endmodule
+
+
+module sub_module2(input a , input b , output y);
+ assign y = a^b;
+endmodule
+
+
+module multiple_module_opt(input a , input b , input c , input d , output y);
+wire n1,n2,n3;
+
+sub_module1 U1 (.a(a) , .b(1'b1) , .y(n1));
+sub_module2 U2 (.a(n1), .b(1'b0) , .y(n2));
+sub_module2 U3 (.a(b), .b(d) , .y(n3));
+
+assign y = c | (b & n1); 
+
+endmodule
+
+# 🚀 RTL Flattening & Optimization using Yosys
+
+This guide shows how to **flatten a hierarchical RTL design** and then **optimize the flattened netlist** using [Yosys](https://yosyshq.net/yosys/).
+
+---
+
+## -------- Phase 1: Flatten the Hierarchical RTL Design --------
+
+```tcl
+# Invoke yosys
+yosys
+
+# Load standard cell library (Liberty format)
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+# Read hierarchical RTL design
+read_verilog multiple_module_opt.v
+
+# Synthesize top module
+synth -top multiple_module_opt
+
+# Map to standard cells using ABC
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+# Flatten design hierarchy 
+# 🔸 Essential before performing optimization on multi-module RTLs
+flatten
+
+# Write out the flattened netlist
+write_verilog -noattr multiple_module_opt_flat.v
+
+-------- Phase 2: Optimize the Flattened Netlist --------
+
+# Invoke yosys
+yosys
+
+# Load standard cell library (Liberty format)
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+# Read the flattened netlist for further optimization
+read_verilog multiple_module_opt_flat.v
+
+# Synthesize top module
+synth -top multiple_module_opt
+
+# Remove unused logic and clean netlist
+opt_clean -purge   # Cleans up redundant gates and wires after flattening
+
+# Map to standard cells using ABC
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+# Visualize optimized gate-level netlist
+show
+
+
+<img width="927" height="293" alt="image" src="https://github.com/user-attachments/assets/7077953f-042d-46df-bcfd-0ed1aa8273f6" />
+
+```
+lab 6:
+
+module sub_module(input a , input b , output y);
+ assign y = a & b;
+endmodule
+
+module multiple_module_opt2(input a , input b , input c , input d , output y);
+wire n1,n2,n3;
+
+sub_module U1 (.a(a) , .b(1'b0) , .y(n1));
+sub_module U2 (.a(b), .b(c) , .y(n2));
+sub_module U3 (.a(n2), .b(d) , .y(n3));
+sub_module U4 (.a(n3), .b(n1) , .y(y));
+
+endmodule
+
+# --------Phase 1: Flatten the hierarchical RTL design---------------
+
+# Invoke yosys
+yosys
+
+# Load standard cell library (Liberty format)
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+# Read hierarchical RTL design
+read_verilog multiple_module_opt2.v
+
+# Synthesize top module
+synth -top multiple_module_opt2
+
+# Map to standard cells using ABC
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+# Flatten design hierarchy 
+# 🔸Essential before performing optimization on multi-module RTLs
+flatten
+
+# Write out the flattened netlist
+write_verilog -noattr multiple_module_opt2_flat.v
+
+
+# ----------Phase 2: Optimize the flattened netlist-------------
+
+# Invoke yosys
+yosys
+
+# Load standard cell library (Liberty format)
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+# Read the flattened netlist for further optimization
+read_verilog multiple_module_opt2_flat.v
+
+# Synthesize top module
+synth -top multiple_module_opt2
+
+# Remove unused logic and clean netlist
+opt_clean -purge   # Cleans up redundant gates and wires after flattening
+
+# Map to standard cells using ABC
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+# Visualize optimized gate-level netlist
+show
+
+
+<img width="925" height="200" alt="image" src="https://github.com/user-attachments/assets/266d7502-0b99-4bb3-8393-d38f7a0e5bea" />
+
+
+# sequential labs
+
+
+
+  </details>
