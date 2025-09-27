@@ -2347,6 +2347,7 @@ gtkwave tb_demux_case.vcd
 
 <details>
   <summary>Project: RTL to Gate-Level Implementation of a 16-bit ALU (Sky130) </summary
+																				  
 <br>
 
 - Design
@@ -2497,7 +2498,6 @@ endmodule
 
 ```
 
-
 - Simulation
 
 ```
@@ -2528,8 +2528,9 @@ abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
 show
 write_verilog -noattr ALU_net.v
 ```
-
+<div align="center">
 <img width="369" height="386" alt="image" src="https://github.com/user-attachments/assets/f8cc04c6-c77a-481d-9693-ca7c6ca57d7d" />
+</div>
 
 - Gate Level Simulation
 
@@ -2568,7 +2569,7 @@ gtkwave tb_ALU.vcd
 | Execution Speed          | Fast (abstract logic) | Slower (includes gate-level delays) |
 | Initialization           | Clean (no `x`) | `x` states before reset/init |
 | Timing                   | Ideal (no delay) | Realistic propagation delays |
-| Functional Behavior      | Matches spec   | Matches spec (verified ✅) |
+| Functional Behavior      | Matches spec   | Matches spec (verified) |
 | Purpose                  | Verify logic   | Verify synthesis mapping & timing realism |
 
 #### 4. Conclusion
