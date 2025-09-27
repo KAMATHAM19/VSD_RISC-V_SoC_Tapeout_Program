@@ -1861,6 +1861,323 @@ gtkwave tb_blocking_caveat.vcd
 
 
 <details>
-  <summary>Day 1: Introduction to Verilog RTL design and Synthesis</summary>
+  <summary>Day 5:  Optimization in synthesis</summary>
+
+## Conditional Statements in Verilog
+
+### `if` Statement – Priority Logic
+The `if` statement is used when you want **priority-based decisions**.  
+Example:
+
+```verilog
+if (cond) begin
+    // Executes when cond is true
+    out = 1'b1;
+end else begin
+    // Executes when cond is false
+    out = 1'b0;
+end
+```
+> Here, the if statement has higher priority than the else statement.
+
+if-else if Statement – Multiple Conditions
+
+Use if-else if when you have more than one condition to check:
+
+```verilog
+if (cond1) begin
+    y = a;
+end else if (cond2) begin
+    y = b;
+end else begin
+    y = c;   // default case
+end
+```
+> Caution: If you don’t cover all possibilities (missing else), the synthesiser may create an inferred latch (bad coding style).
+
+- Example of bad code (causes latch):
+```verilog
+if (cond1)
+    y = a;
+else if (cond2)
+    y = b;
+// Missing else -> y holds previous value -> latch inferred
+```
+case Statement – Parallel Logic
+
+The case statement is used inside an always block to handle multiple choices (like a multiplexer).
+Unlike if, it does not have priority (parallel evaluation).
+
+```verilog
+reg [1:0] sel;
+reg x, y;
+
+always @(*) begin
+    case (sel)
+        2'b00: begin
+            x = a;
+            y = b;
+        end
+        2'b01: begin
+            x = c;
+            y = d;
+        end
+        default: begin
+            x = 0;
+            y = 0;
+        end
+    endcase
+end
+```
+
+> Always include a default case to avoid inferred latches.
+
+> Make sure all outputs are assigned in every case branch.
+
+> Avoid overlapping cases (e.g., two branches covering the same condition).
+
+## Lab 1: Incomplete If Statement
+
+```verilog
+module incomp_if (input i0 , input i1 , input i2 , output reg y);
+always @ (*)
+begin
+	if(i0)
+		y <= i1;
+end
+endmodule
+```
+- Simulation
+
+```tcl
+iverilog incomp_if.v tb_incomp_if.v
+./a.out
+gtkwave tb_incomp_if.vcd
+```
+<img width="923" height="262" alt="image" src="https://github.com/user-attachments/assets/975c37b8-b347-462f-bcdf-27f3cc812eff" />
+
+- Synthesis
+
+```tcl
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog incomp_if.v
+synth -top incomp_if
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+write_verilog -noattr incomp_if_net.v
+```
+
+<img width="895" height="377" alt="image" src="https://github.com/user-attachments/assets/8f88e377-28b1-4ee5-8e02-5c24e4015b5a" />
+
+## Lab 2: 
+
+```verilog
+module incomp_if2 (input i0 , input i1 , input i2 , input i3, output reg y);
+always @ (*)
+begin
+	if(i0)
+		y <= i1;
+	else if (i2)
+		y <= i3;
+
+end
+endmodule
+```
+
+- Simulation
+  
+```tcl
+iverilog incomp_if2.v tb_incomp_if2.v
+./a.out
+gtkwave tb_incomp_if2.vcd 
+```
+<img width="925" height="266" alt="image" src="https://github.com/user-attachments/assets/e30585c6-844c-483f-bb45-cc4d19b7a701" />
+
+- Synthesis
+
+```tcl
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog incomp_if2.v
+synth -top incomp_if2
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+write_verilog -noattr incomp_if2_net.v
+```
+
+<img width="925" height="227" alt="image" src="https://github.com/user-attachments/assets/3b2aa5ca-ca6b-4d6f-8e25-6faf1ddc6c12" />
+
+## Lab 3: Incomplete Case Statement
+
+```verilog
+module incomp_case (input i0 , input i1 , input i2 , input [1:0] sel, output reg y);
+always @ (*)
+begin
+	case(sel)
+		2'b00 : y = i0;
+		2'b01 : y = i1;
+	endcase
+end
+endmodule
+```
+
+- Simulation
+  
+```tcl
+iverilog incomp_case.v tb_incomp_case.v
+./a.out
+gtkwave tb_incomp_case.vcd 
+```
+<img width="926" height="293" alt="image" src="https://github.com/user-attachments/assets/32a9c588-f2cd-42d7-953c-d265b9e800d0" />
+
+- Synthesis
+  
+```tcl
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog incomp_case.v
+synth -top incomp_case
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+write_verilog -noattr incomp_case_net.v
+```
+
+<img width="922" height="178" alt="image" src="https://github.com/user-attachments/assets/1221b9af-69c0-4ad5-a889-0dcfaa487dff" />
+
+## Lab 4: Complete Case
+
+```verilog
+module comp_case (input i0 , input i1 , input i2 , input [1:0] sel, output reg y);
+always @ (*)
+begin
+	case(sel)
+		2'b00 : y = i0;
+		2'b01 : y = i1;
+		default : y = i2;
+	endcase
+end
+endmodule
+```
+
+- Simulation
+
+```tcl
+iverilog comp_case.v tb_comp_case.v
+./a.out
+gtkwave tb_comp_case.vcd 
+```
+<img width="926" height="308" alt="image" src="https://github.com/user-attachments/assets/be88cc89-94f6-46ad-9857-afd6e0860c72" />
+
+- Synthesis
+
+```tcl
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog comp_case.v
+synth -top comp_case
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+write_verilog -noattr comp_case_net.v
+```
+
+<img width="923" height="182" alt="image" src="https://github.com/user-attachments/assets/08dc50bb-4d8e-4d9e-8daf-7296d2551c53" />
+
+## Lab 5: Partial Case Assign
+
+```verilog
+module partial_case_assign (input i0 , input i1 , input i2 , input [1:0] sel, output reg y , output reg x);
+always @ (*)
+begin
+	case(sel)
+		2'b00 : begin
+			y = i0;
+			x = i2;
+			end
+		2'b01 : y = i1;
+		default : begin
+		           x = i1;
+			   y = i2;
+			  end
+	endcase
+end
+endmodule
+```
+
+- Simulation
+
+```tcl
+iverilog partial_case_assign.v tb_partial_case_assign.v
+./a.out
+gtkwave tb_partial_case_assign.vcd 
+```
+
+<img width="927" height="314" alt="image" src="https://github.com/user-attachments/assets/452b6717-5481-4847-87b6-88dc36880257" />
+
+- Synthesis
+
+```tcl
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog partial_case_assign.v
+synth -top partial_case_assign
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+write_verilog -noattr partial_case_assign_net.v
+```
+<img width="921" height="308" alt="image" src="https://github.com/user-attachments/assets/04de0efd-abe6-4d07-8353-0ef4b58b71c4" />
+
+## Lab 6: Bad case
+
+```verilog
+module bad_case (input i0 , input i1, input i2, input i3 , input [1:0] sel, output reg y);
+always @(*)
+begin
+	case(sel)
+		2'b00: y = i0;
+		2'b01: y = i1;
+		2'b10: y = i2;
+		2'b1?: y = i3;
+		//2'b11: y = i3;
+	endcase
+end
+
+endmodule
+```
+
+- Simulation
+
+```tcl
+iverilog bad_case.v tb_bad_case.v
+./a.out
+gtkwave tb_bad_case.vcd 
+```
+
+<img width="925" height="308" alt="image" src="https://github.com/user-attachments/assets/55a0eecf-f7df-4fb5-bf3f-6b06c21a09b8" />
+
+- Synthesis
+
+```tcl
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog bad_case.v
+synth -top bad_case
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+write_verilog -noattr bad_case_net.v
+```
+
+<img width="806" height="380" alt="image" src="https://github.com/user-attachments/assets/fe11abdc-d447-4cb8-9388-8cd2e4a1816e" />
+
+- Gate level Simulation
+  
+```tcl
+iverilog ../my_lib/verilog_model/primitives.v  ../my_lib/verilog_model/sky130_fd_sc_hd.v bad_case_net.v tb_bad_case.v
+./a.out
+gtkwave tb_bad_case.vcd
+```
+
+<img width="926" height="315" alt="image" src="https://github.com/user-attachments/assets/61d7f7c5-d5c4-4a71-9f0c-bf6ee66b2d5c" />
+
 
 </details>
