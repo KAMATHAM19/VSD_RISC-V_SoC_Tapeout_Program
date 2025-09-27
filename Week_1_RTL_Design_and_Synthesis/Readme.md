@@ -1511,3 +1511,221 @@ show
 <img width="924" height="216" alt="image" src="https://github.com/user-attachments/assets/08ccfdb8-f086-48c4-be70-61039d5ca8d4" />
 
  </details>
+
+
+
+
+<details>
+  <summary>Day 4: GLS, blocking vs non-blocking and Synthesis-Simulation mismatch</summary>
+
+# Gate Level Simulation (GLS)
+
+## What is GLS?
+
+Gate Level Simulation (GLS) is a type of simulation where we **run the testbench using the synthesised netlist** as the design under test (DUT).  
+
+- **Netlist**: A netlist is the output of synthesis. It is **logically equivalent to the RTL code**, meaning it behaves the same way as your original RTL design.  
+- **Testbench alignment**: The same testbench used for RTL simulation can be reused because the netlist performs the same logical functions.  
+
+### What actually happens in GLS?
+
+1. **Netlist is loaded**: The synthesised netlist (gate-level representation) replaces the RTL as the design under test.  
+2. **Delays are included**: GLS can include real gate and wire delays through **delay annotation** (SDF files).  
+3. **Testbench execution**: The RTL testbench drives inputs and monitors outputs against expected results.  
+4. **Logic verification**: The simulator checks if the netlist behaves correctly, just like the RTL.  
+5. **Timing checks**: If delays are included, GLS ensures signals propagate correctly and the design meets timing requirements.  
+
+## Why do we do GLS?
+
+1. **Verify logical correctness**:  
+   - Ensure the netlist still performs the same functions as the original RTL.  
+
+2. **Ensure timing correctness**:  
+   - Real delays are applied to gates and nets, verifying that the design works correctly **within timing constraints**.  
+   - Delay annotation (SDF files) is essential for this check.  
+
+## Key Points
+
+- GLS uses **netlist instead of RTL**.  
+- The **same testbench** can be reused.  
+- Essential for **post-synthesis validation**.  
+- Delay annotation ensures **timing correctness**.  
+- Helps catch **synthesis or timing-related issues** before tape-out.
+
+<img width="1472" height="704" alt="image" src="https://github.com/user-attachments/assets/5662b862-3014-415b-b3e8-3e3e4cdcbf41" />
+
+# Synthesis–Simulation Mismatch
+
+When writing RTL code, it is important to remember that **simulation behaviour** and **synthesised hardware behaviour** may not always match.  
+This is referred to as a **Synthesis–Simulation Mismatch**.
+
+Below are some common causes, examples, and best practices.
+
+## 1) Missing Sensitivity List
+
+### How Simulator Works
+- In simulation, an `always` block executes **only when signals in its sensitivity list change**.
+- If signals are missing from the sensitivity list, the simulation result may not match the synthesised hardware behaviour.
+
+### Example – Wrong Code
+```verilog
+module mux (
+    input i0, input i1, input sel,
+    output reg y
+);
+    always @(sel) begin
+        if (sel)
+            y = i1;
+        else
+            y = i0;
+    end
+endmodule
+```
+> Problem: The block triggers only when sel changes
+> If i0 or i1 changes, the output y will not update in simulation (but hardware will!).
+
+Correct Way
+
+```
+module mux (
+    input i0, input i1, input sel,
+    output reg y
+);
+    always @(*) begin
+        if (sel)
+            y = i1;
+        else
+            y = i0;
+    end
+endmodule
+```
+> @(*) tells the simulator: re-evaluate whenever any input changes.
+> This matches the actual hardware behaviour.
+
+
+2) Blocking vs. Non-Blocking Assignments
+
+Inside always blocks, assignments can be blocking (=) or non-blocking (<=).
+Understanding the difference is key to avoiding mismatches.
+
+Blocking Assignment (=)
+
+Executes statements in order, like software.
+
+The next line sees the updated value immediately.
+
+Example 1 – Wrong Usage in Sequential Logic
+
+```
+module code (
+    input clk, input reset, input d,
+    output reg q
+);
+    reg q0;
+
+    always @(posedge clk, posedge reset) begin
+        if (reset) begin
+            q0 = 1'b0;
+            q  = 1'b0;
+        end else begin
+            q  = q0;  // uses old q0
+            q0 = d;   // updates q0
+        end
+    end
+endmodule
+
+```
+> Here, due to blocking assignments, q is updated using the old value of q0, not the one assigned in the same cycle.
+
+Example 2 – Different Order, Different Behavior
+
+```
+module code (
+    input clk, input reset, input d,
+    output reg q
+);
+    reg q0;
+
+    always @(posedge clk, posedge reset) begin
+        if (reset) begin
+            q0 = 1'b0;
+            q  = 1'b0;
+        end else begin
+            q0 = d;   // q0 gets new value first
+            q  = q0;  // now q uses the new value
+        end
+    end
+endmodule
+```
+> Same logic, but order changes meaning!
+> Synthesis may still infer only one flip-flop, but simulation can be misleading.
+
+example: 
+Wrong (Blocking can cause unintended effects):
+```
+module code (input a, b, c, output reg y);
+    reg q0;
+    always @(*) begin
+        y  = q0 & c;   // uses old q0
+        q0 = a | b;    // updates q0 afterwards
+    end
+endmodule
+```
+Correct (Order fixed or use proper assignments):
+```
+module code (input a, b, c, output reg y);
+    reg q0;
+    always @(*) begin
+        q0 = a | b;    // update first
+        y  = q0 & c;   // now uses new q0
+    end
+endmodule
+```
+
+
+
+Non-Blocking Assignment (<=)
+
+All RHS values are evaluated first, then assigned in parallel at the end of the time step.
+
+Models true hardware flip-flop behavior.
+
+Correct Way – Sequential Logic
+
+```
+module code (
+    input clk, input reset, input d,
+    output reg q
+);
+    reg q0;
+
+    always @(posedge clk, posedge reset) begin
+        if (reset) begin
+            q0 <= 1'b0;
+            q  <= 1'b0;
+        end else begin
+            q0 <= d;   // updates at clock edge
+            q  <= q0;  // uses old q0 (as in hardware)
+        end
+    end
+endmodule
+```
+> This now matches real hardware behaviour.
+
+✅ Best Practice:
+
+Use = (blocking) for combinational logic.
+
+Use <= (non-blocking) for sequential logic (flops).
+
+
+
+
+</details>
+
+
+
+<details>
+  <summary>Day 1: Introduction to Verilog RTL design and Synthesis</summary>
+
+</details>
