@@ -876,13 +876,33 @@ The main goals are:
 ### Techniques
 1. **Constant Propagation**  
    - Simplifies logic when inputs are fixed constants.  
-   - Example: If `A=0`, then `A AND B = 0`.  
+   - Example: If `A=0`, then `A AND B = 0`.
+  
+     <img width="1536" height="672" alt="image" src="https://github.com/user-attachments/assets/8b292cd6-55fb-4550-93a6-84046e9a441b" />
+
 
 2. **Boolean Logic Optimization**  
    - Simplifying expressions using mathematical logic techniques.  
    - Methods include:  
      - **Karnaugh Maps (K-Maps)** – visual simplification method.  
      - **Quine-McCluskey Algorithm** – tabular method for systematic minimisation.  
+
+```
+assign y = a ? (b ? c : (c ? a : 0)):(!c)
+```
+
+<img width="640" height="400" alt="12" src="https://github.com/user-attachments/assets/9f4c7399-76c2-463f-a441-8465669bd16e" />
+
+```
+for 1 mux from left to right = ac + c`0 = ac
+for 2 mux from left to right = b`ac + bc
+for 3 mux from left to right output y =
+= a`b` + a (b`ac+bc)
+= a`c` + ab`c + abc // aa = a
+= a`c` + ac (b+b`) // b+b`=1
+= a`c` + ac
+= a ⊙ c
+```
 
 
 ### Sequential Logic Optimisation
@@ -897,14 +917,10 @@ The main goals are:
 
 <img width="1024" height="1024" alt="state" src="https://github.com/user-attachments/assets/ac5ef879-355c-4d43-8410-8e2374c7257c" />
 
-# 🔄 State Optimization in FSM (Simple Terms)
+#### Goal
+Make the FSM smaller and faster by **reducing states/logic** without changing its input-output behaviour.
 
-### 🎯 Goal
-Make the FSM smaller and faster by **reducing states/logic** without changing its input-output behavior.
-
----
-
-### 🧹 Two Main Cleanups
+#### Two Main Cleanups
 1. **Remove unreachable states**  
    - States you can never reach from reset under any input.  
    - They just waste flip-flops and logic.  
@@ -913,36 +929,28 @@ Make the FSM smaller and faster by **reducing states/logic** without changing it
    - If two states always give the **same outputs** and move to the **same next states** for every input → they’re identical.  
    - Merge them into one.  
 
----
-
-### 🖼️ Before → After (Example)
+#### Before → After (Example)
+```
 Before: S0 → S1 → S2 → S3
 (S3 unreachable, S1 ≡ S2)
 
 After: S0 → S1
-(smaller FSM, same behavior)
-
-
----
-
-### 🚀 Why It Helps
+(smaller FSM, same behaviour)
+```
+#### Why It Helps
 - Fewer states → fewer flip-flops.  
 - Simpler logic → less area, less power, faster timing.  
 - Easier verification → smaller state space.  
 
----
-
-### ⚖️ Practical Notes
+#### Practical Notes
 - State encoding (binary / one-hot / Gray) can be re-optimized after reduction.  
 - Resets and don’t-care inputs must be defined so tools can safely remove/merge states.  
 - Behavior at **FSM boundaries stays the same** → only the internal state map shrinks.  
 
----
-
-### 💡 Quick Intuition
+#### Quick Intuition
 Think of an FSM as a **map of cities (states)**:  
-- 🚫 A city with **no roads leading to it** → remove it.  
-- 🟰 Two cities with the **same roads and same view** → merge them.  
+- A city with **no roads leading to it** → remove it.  
+- Two cities with the **same roads and same view** → merge them.  
 
 The **traveler’s journey (I/O behavior)** doesn’t change, but the map is smaller and easier to follow.  
 
@@ -953,64 +961,44 @@ The **traveler’s journey (I/O behavior)** doesn’t change, but the map is sma
 
 <img width="1024" height="1024" alt="remiting" src="https://github.com/user-attachments/assets/df5e82f4-d617-44e8-9a75-3a896ffe0951" />
 
-# ⏱️ Retiming in Simple Terms
-
-### ❌ Problem
+#### Problem
 - A **register-to-register path** has too much logic/wiring.  
 - The **critical path** is too long → can’t finish in one clock cycle.  
 - Limits the **max clock frequency**.  
 
----
-
-### ✅ What Retiming Does
+#### What Retiming Does
 - **Move registers** across logic.  
 - Splits one long path into **two or more shorter paths**.  
-- Function at inputs/outputs stays the same.  
+- Function at inputs/outputs stays the same.
+  
+#### Before vs After
 
----
-
-### 🖼️ Before vs After
-
+```
 Before:
-FF → [Big Logic Block] → FF ⏱️ too slow
+FF → [Big Logic Block] → FF too slow
 
 After:
-FF → [Logic A] → FF (moved) → [Logic B] → FF ✅ meets timing
-
-
----
-
-### 🔒 What Stays the Same
+FF → [Logic A] → FF (moved) → [Logic B] → FF meets timing
+```
+#### What Stays the Same
 - **Cycle behavior unchanged** → same results, same latency.  
 - Only **pipeline register positions** change, not the logic itself.  
 
----
-
-### 🚀 Why It Helps
+#### Why It Helps
 - Shorter delays per stage → run at **higher clock speed**.  
 - Can lower **power** by reducing fanout and wire length.  
 
----
-
-### ⚖️ Guardrails
+#### Guardrails
 - Respect **reset/enable** of registers.  
 - Don’t cross **multi-cycle/false paths** or **clock-domain boundaries**.  
 - Works best when new register locations also **shorten wires physically**.  
 
----
-
-### 📌 When to Use
+###3 When to Use
 - **Deep logic cones** between registers.  
 - **Datapaths** (add/multiply chains).  
 - **Long mux trees** where delays need balancing.  
 
----
-
-👉 **One-line intuition:**  
-Retiming is like **sliding pipeline registers left or right** through the logic so each stage fits in the clock period—while keeping the design’s external behavior identical.  
-
-
-
+> Retiming is like **sliding pipeline registers left or right** through the logic so each stage fits in the clock period—while keeping the design’s external behavior identical.  
 
 3. **Sequential Logic Cloning (Floorplan-Aware Synthesis)**  
    - Duplicate logic in specific locations.  
@@ -1018,43 +1006,51 @@ Retiming is like **sliding pipeline registers left or right** through the logic 
 
 <img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/e187de27-6664-43f1-be0d-e87481c41c13" />
 
-## Problem Before Cloning
+#### Problem Before Cloning
 - One register (source flop) drives **far-away logic** across the floorplan.  
 - This creates **long wires**, adding:
   - Delay (harder to meet timing)  
   - Capacitance (higher dynamic power)  
 
-## What Cloning Does
+#### What Cloning Does
 - Duplicate the source register → now **two identical flops** on the same clock.  
 - Place each clone **close to its consumers** (e.g., Block X and Block Y).  
 
-## Why It Helps
+#### Why It Helps
 - **Shorter wires** → less delay, lower power.  
 - Each local net can be **optimised independently**.  
 - Functionality stays **unchanged**:
   - Both flops hold the same value (same `D` input and clock).  
   - Downstream logic works the same.  
 
-## Trade-Offs
+#### Trade-Offs
 - Slightly more **area** (extra flops).  
 - Extra **clock-tree load**.  
 - Must control **clock skew** to keep clones equivalent.  
 
-## When to Use
+#### When to Use
 - Large chips where **wire delay dominates** gate delay.  
 - **Cross-die / cross-partition** signals with poor timing slack.  
 - **High-fanout control/status signals** spread across regions.  
 - **Late-stage physical optimisation** (when placement info is known).  
 
-## Quick Picture
-- **Before:** `1 flop → long wire → distant logic → timing violation ❌`  
-- **After:** `2 cloned flops near consumers → short wires → better timing & lower power ✅`  
+#### Quick Picture
+- **Before:** `1 flop → long wire → distant logic → timing violation`  
+- **After:** `2 cloned flops near consumers → short wires → better timing & lower power`  
 
-lab 1: 
+# Combinational Logic Optimisation Labs
+
+## Lab 1: 
+
+```verilog
 module opt_check (input a , input b , output y);
 	assign y = a?b:0;
 endmodule
+```
 
+- Synthesis
+  
+```
 yosys
 read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
 read_verilog opt_check.v 
@@ -1062,15 +1058,20 @@ synth -top opt_check
 opt_clean -purge # Removes unused or redundant logic #
 abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
 show
-
+```
 <img width="924" height="221" alt="image" src="https://github.com/user-attachments/assets/30e3533b-6e58-49e6-bbf6-b22c35239305" />
 
-lab 2:
+## Lab 2:
 
+```verilog
 module opt_check (input a , input b , output y);
 	assign y = a?1:b;
 endmodule
+```
 
+- Synthesis
+  
+```
 yosys
 read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
 read_verilog opt_check2.v 
@@ -1078,14 +1079,21 @@ synth -top opt_check2
 opt_clean -purge
 abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
 show
+```
+
 <img width="922" height="215" alt="image" src="https://github.com/user-attachments/assets/81c5ab4a-c6f7-4953-9d08-9f10bb524cd7" />
 
-lab 3:
+## Lab 3:
 
+```verilog
 module opt_check3 (input a , input b, input c , output y);
 	assign y = a?(c?b:0):0;
 endmodule
+```
 
+- Synthesis
+  
+```
 yosys
 read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
 read_verilog opt_check3.v 
@@ -1093,15 +1101,20 @@ synth -top opt_check3
 opt_clean -purge
 abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
 show
-
+```
 <img width="925" height="316" alt="image" src="https://github.com/user-attachments/assets/4b77ff84-8b88-44b4-88ae-d20528e81d46" />
 
-lab 4: 
+## Lab 4: 
 
+```verilog
 module opt_check4 (input a , input b , input c , output y);
  assign y = a?(b?(a & c ):c):(!c);
  endmodule
+```
 
+- Synthesis
+  
+```
 yosys
 read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
 read_verilog opt_check4.v 
@@ -1109,20 +1122,20 @@ synth -top opt_check4
 opt_clean -purge
 abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
 show
+```
 
  <img width="925" height="302" alt="image" src="https://github.com/user-attachments/assets/70b035e6-c11c-4009-aa7c-0cf3e71a721b" />
 
-lab 5: 
+## Lab 5: 
 
+```verilog
 module sub_module1(input a , input b , output y);
  assign y = a & b;
 endmodule
 
-
 module sub_module2(input a , input b , output y);
  assign y = a^b;
 endmodule
-
 
 module multiple_module_opt(input a , input b , input c , input d , output y);
 wire n1,n2,n3;
@@ -1132,69 +1145,39 @@ sub_module2 U2 (.a(n1), .b(1'b0) , .y(n2));
 sub_module2 U3 (.a(b), .b(d) , .y(n3));
 
 assign y = c | (b & n1); 
-
 endmodule
+```
 
-# 🚀 RTL Flattening & Optimization using Yosys
-
-This guide shows how to **flatten a hierarchical RTL design** and then **optimize the flattened netlist** using [Yosys](https://yosyshq.net/yosys/).
-
----
-
-## -------- Phase 1: Flatten the Hierarchical RTL Design --------
+## Phase 1: Flatten the Hierarchical RTL Design 
 
 ```tcl
-# Invoke yosys
+
 yosys
-
-# Load standard cell library (Liberty format)
 read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
-
-# Read hierarchical RTL design
 read_verilog multiple_module_opt.v
-
-# Synthesize top module
 synth -top multiple_module_opt
-
-# Map to standard cells using ABC
 abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
-
-# Flatten design hierarchy 
-# 🔸 Essential before performing optimization on multi-module RTLs
-flatten
-
-# Write out the flattened netlist
+flatten # Flatten design hierarchy 
 write_verilog -noattr multiple_module_opt_flat.v
+```
 
--------- Phase 2: Optimize the Flattened Netlist --------
+## Phase 2: Optimise the Flattened Netlist 
 
-# Invoke yosys
+```tcl
 yosys
-
-# Load standard cell library (Liberty format)
 read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
-
-# Read the flattened netlist for further optimization
 read_verilog multiple_module_opt_flat.v
-
-# Synthesize top module
 synth -top multiple_module_opt
-
-# Remove unused logic and clean netlist
 opt_clean -purge   # Cleans up redundant gates and wires after flattening
-
-# Map to standard cells using ABC
 abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
-
-# Visualize optimized gate-level netlist
 show
-
+```
 
 <img width="927" height="293" alt="image" src="https://github.com/user-attachments/assets/7077953f-042d-46df-bcfd-0ed1aa8273f6" />
 
-```
-lab 6:
+## Lab 6:
 
+```verilog
 module sub_module(input a , input b , output y);
  assign y = a & b;
 endmodule
@@ -1208,61 +1191,323 @@ sub_module U3 (.a(n2), .b(d) , .y(n3));
 sub_module U4 (.a(n3), .b(n1) , .y(y));
 
 endmodule
+```
 
-# --------Phase 1: Flatten the hierarchical RTL design---------------
+## Phase 1: Flatten the hierarchical RTL design
 
-# Invoke yosys
+```tcl
 yosys
-
-# Load standard cell library (Liberty format)
 read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
-
-# Read hierarchical RTL design
 read_verilog multiple_module_opt2.v
-
-# Synthesize top module
 synth -top multiple_module_opt2
-
-# Map to standard cells using ABC
 abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
-
-# Flatten design hierarchy 
-# 🔸Essential before performing optimization on multi-module RTLs
 flatten
-
-# Write out the flattened netlist
 write_verilog -noattr multiple_module_opt2_flat.v
+```
 
+## Phase 2: Optimise the flattened netlist
 
-# ----------Phase 2: Optimize the flattened netlist-------------
-
-# Invoke yosys
+```tcl
 yosys
-
-# Load standard cell library (Liberty format)
 read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
-
-# Read the flattened netlist for further optimization
 read_verilog multiple_module_opt2_flat.v
-
-# Synthesize top module
 synth -top multiple_module_opt2
-
-# Remove unused logic and clean netlist
-opt_clean -purge   # Cleans up redundant gates and wires after flattening
-
-# Map to standard cells using ABC
+opt_clean -purge  
 abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
-
-# Visualize optimized gate-level netlist
 show
-
-
+```
 <img width="925" height="200" alt="image" src="https://github.com/user-attachments/assets/266d7502-0b99-4bb3-8393-d38f7a0e5bea" />
 
 
-# sequential labs
+# Sequential Logic Optimisation Labs
+
+## Lab 7:
+
+```verilog
+module dff_const1(input clk, input reset, output reg q);
+always @(posedge clk, posedge reset)
+begin
+	if(reset)
+		q <= 1'b0;
+	else
+		q <= 1'b1;
+end
+endmodule
+```
+- Simulation
+  
+```
+iverilog dff_const1.v tb_dff_const1.v
+./a.out 
+gtkwave tb_dff_const1.vcd
+```
+<img width="925" height="257" alt="image" src="https://github.com/user-attachments/assets/d4fe053a-97fd-4758-a10b-2638ede8f591" />
+
+- Synthesis
+
+```
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog dff_const1.v
+synth -top dff_const1
+dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+
+<img width="923" height="179" alt="image" src="https://github.com/user-attachments/assets/1d004451-88c3-4f2a-86db-d515d0be7529" />
+
+## Lab 8:
+
+```verilog
+module dff_const2(input clk, input reset, output reg q);
+always @(posedge clk, posedge reset)
+begin
+	if(reset)
+		q <= 1'b1;
+	else
+		q <= 1'b1;
+end
+
+endmodule
+```
+- Simulation
+
+```
+iverilog dff_const2.v tb_dff_const2.v
+./a.out 
+gtkwave tb_dff_const2.vcd
+```
+<img width="929" height="255" alt="image" src="https://github.com/user-attachments/assets/895a56bf-6b91-40fc-9d45-a7de11078e3b" />
+
+- Synthesis
+
+```
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog dff_const2.v
+synth -top dff_const2
+dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+
+<img width="501" height="374" alt="image" src="https://github.com/user-attachments/assets/9b739d48-b6ae-4b52-8d9d-848fa82ba5a0" />
+
+## Lab 9:
+
+```verilog
+module dff_const3(input clk, input reset, output reg q);
+reg q1;
+
+always @(posedge clk, posedge reset)
+begin
+	if(reset)
+	begin
+		q <= 1'b1;
+		q1 <= 1'b0;
+	end
+	else
+	begin
+		q1 <= 1'b1;
+		q <= q1;
+	end
+end
+
+endmodule
+```
+
+- Simulation
+
+```
+iverilog dff_const3.v tb_dff_const3.v 
+./a.out
+gtkwave tb_dff_const3.vcd
+```
+<img width="926" height="244" alt="image" src="https://github.com/user-attachments/assets/bd9d53be-3ad6-4378-8b19-2d0490baec8a" />
+
+- Synthesis
+
+```
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog dff_const3.v
+synth -top dff_const3
+dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+<img width="917" height="163" alt="image" src="https://github.com/user-attachments/assets/74d5b064-fdfe-449c-98a7-0ba0da13828d" />
+
+## Lab 10:
+
+```verilog
+module dff_const4(input clk, input reset, output reg q);
+reg q1;
+
+always @(posedge clk, posedge reset)
+begin
+	if(reset)
+	begin
+		q <= 1'b1;
+		q1 <= 1'b1;
+	end
+	else
+	begin
+		q1 <= 1'b1;
+		q <= q1;
+	end
+end
+
+endmodule
+```
+- Simulation
+
+```
+iverilog dff_const4.v tb_dff_const4.v 
+./a.out
+gtkwave tb_dff_const4.vcd
+```
+<img width="926" height="247" alt="image" src="https://github.com/user-attachments/assets/0f154a61-6a70-402e-acda-f53430ed5830" />
+
+- Synthesis
+```
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog dff_const4.v
+synth -top dff_const4
+dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+<img width="434" height="374" alt="image" src="https://github.com/user-attachments/assets/8f0f13d4-a149-47fc-a0a5-ad433bd632ab" />
+
+## Lab 11:
+
+```verilog
+module dff_const5(input clk, input reset, output reg q);
+reg q1;
+
+always @(posedge clk, posedge reset)
+begin
+	if(reset)
+	begin
+		q <= 1'b0;
+		q1 <= 1'b0;
+	end
+	else
+	begin
+		q1 <= 1'b1;
+		q <= q1;
+	end
+end
+
+endmodule
+```
+
+- Simulation
+
+```
+iverilog dff_const5.v tb_dff_const5.v
+./a.out
+gtkwave tb_dff_const5.vcd
+```
+<img width="925" height="251" alt="image" src="https://github.com/user-attachments/assets/a81bae2a-2db3-4ce7-91dc-3617542f3267" />
+
+- Synthesis
+
+```
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog dff_const5.v
+synth -top dff_const5
+dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+<img width="920" height="157" alt="image" src="https://github.com/user-attachments/assets/f1d16014-f3a0-4a5e-91d8-37f8a64f3108" />
+
+# Unused Outputs
+
+## Lab 12:
+
+```verilog
+module counter_opt (input clk , input reset , output q);
+reg [2:0] count;
+assign q = count[0];
+
+always @(posedge clk ,posedge reset)
+begin
+	if(reset)
+		count <= 3'b000;
+	else
+		count <= count + 1;
+end
+
+endmodule
+```
+
+- Simulation
+
+```
+iverilog counter_opt.v tb_counter_opt.v
+./a.out
+gtkwave tb_counter_opt.vcd
+```
 
 
+- Synthesis
+```
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog counter_opt.v
+synth -top counter_opt
+```
+<div align="center">
+<img width="245" height="191" alt="image" src="https://github.com/user-attachments/assets/107d189d-bc3c-4957-aae2-b62400c67059" />
+</div>
 
-  </details>
+```
+dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+<img width="925" height="139" alt="image" src="https://github.com/user-attachments/assets/ebb54a89-91d9-4756-b0c1-3a4b3a44d978" />
+
+## Lab 13:
+
+```verilog
+module counter_opt (input clk , input reset , output q);
+reg [2:0] count;
+assign q = (count[2:0] == 3'b100);
+
+always @(posedge clk ,posedge reset)
+begin
+	if(reset)
+		count <= 3'b000;
+	else
+		count <= count + 1;
+end
+
+endmodule
+```
+
+- Synthesis
+```
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog counter_opt2.v
+synth -top counter_opt
+```
+<div align="center">
+<img width="235" height="232" alt="image" src="https://github.com/user-attachments/assets/2c8c9394-e35a-4563-a47b-47e8f37ca844" />
+</div>
+
+```
+dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+<img width="924" height="216" alt="image" src="https://github.com/user-attachments/assets/08ccfdb8-f086-48c4-be70-61039d5ca8d4" />
+
+ </details>
