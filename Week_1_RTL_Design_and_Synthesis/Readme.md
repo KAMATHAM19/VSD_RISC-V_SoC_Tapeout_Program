@@ -1518,16 +1518,16 @@ show
 <details>
   <summary>Day 4: GLS, blocking vs non-blocking and Synthesis-Simulation mismatch</summary>
 
-# Gate Level Simulation (GLS)
+## Gate Level Simulation (GLS)
 
-## What is GLS?
+### What is GLS?
 
 Gate Level Simulation (GLS) is a type of simulation where we **run the testbench using the synthesised netlist** as the design under test (DUT).  
 
 - **Netlist**: A netlist is the output of synthesis. It is **logically equivalent to the RTL code**, meaning it behaves the same way as your original RTL design.  
 - **Testbench alignment**: The same testbench used for RTL simulation can be reused because the netlist performs the same logical functions.  
 
-### What actually happens in GLS?
+#### What actually happens in GLS?
 
 1. **Netlist is loaded**: The synthesised netlist (gate-level representation) replaces the RTL as the design under test.  
 2. **Delays are included**: GLS can include real gate and wire delays through **delay annotation** (SDF files).  
@@ -1535,7 +1535,7 @@ Gate Level Simulation (GLS) is a type of simulation where we **run the testbench
 4. **Logic verification**: The simulator checks if the netlist behaves correctly, just like the RTL.  
 5. **Timing checks**: If delays are included, GLS ensures signals propagate correctly and the design meets timing requirements.  
 
-## Why do we do GLS?
+### Why do we do GLS?
 
 1. **Verify logical correctness**:  
    - Ensure the netlist still performs the same functions as the original RTL.  
@@ -1544,7 +1544,7 @@ Gate Level Simulation (GLS) is a type of simulation where we **run the testbench
    - Real delays are applied to gates and nets, verifying that the design works correctly **within timing constraints**.  
    - Delay annotation (SDF files) is essential for this check.  
 
-## Key Points
+### Key Points
 
 - GLS uses **netlist instead of RTL**.  
 - The **same testbench** can be reused.  
@@ -1554,20 +1554,20 @@ Gate Level Simulation (GLS) is a type of simulation where we **run the testbench
 
 <img width="1472" height="704" alt="image" src="https://github.com/user-attachments/assets/5662b862-3014-415b-b3e8-3e3e4cdcbf41" />
 
-# Synthesis–Simulation Mismatch
+## Synthesis–Simulation Mismatch
 
 When writing RTL code, it is important to remember that **simulation behaviour** and **synthesised hardware behaviour** may not always match.  
 This is referred to as a **Synthesis–Simulation Mismatch**.
 
 Below are some common causes, examples, and best practices.
 
-## 1) Missing Sensitivity List
+### 1) Missing Sensitivity List
 
-### How Simulator Works
+#### How Simulator Works
 - In simulation, an `always` block executes **only when signals in its sensitivity list change**.
 - If signals are missing from the sensitivity list, the simulation result may not match the synthesised hardware behaviour.
 
-### Example – Wrong Code
+#### Example – Wrong Code
 ```verilog
 module mux (
     input i0, input i1, input sel,
@@ -1584,7 +1584,7 @@ endmodule
 > Problem: The block triggers only when sel changes
 > If i0 or i1 changes, the output y will not update in simulation (but hardware will!).
 
-Correct Way
+- Correct Way
 
 ```
 module mux (
@@ -1603,18 +1603,17 @@ endmodule
 > This matches the actual hardware behaviour.
 
 
-2) Blocking vs. Non-Blocking Assignments
+### 2) Blocking vs. Non-Blocking Assignments
 
-Inside always blocks, assignments can be blocking (=) or non-blocking (<=).
-Understanding the difference is key to avoiding mismatches.
+- Inside always blocks, assignments can be blocking (=) or non-blocking (<=).
+- Understanding the difference is key to avoiding mismatches.
 
-Blocking Assignment (=)
+#### Blocking Assignment (=)
 
-Executes statements in order, like software.
+- Executes statements in order, like software.
+- The next line sees the updated value immediately.
 
-The next line sees the updated value immediately.
-
-Example 1 – Wrong Usage in Sequential Logic
+##### Example 1 – Wrong Usage in Sequential Logic
 
 ```
 module code (
@@ -1637,7 +1636,7 @@ endmodule
 ```
 > Here, due to blocking assignments, q is updated using the old value of q0, not the one assigned in the same cycle.
 
-Example 2 – Different Order, Different Behavior
+##### Example 2 – Different Order, Different Behaviour
 
 ```
 module code (
@@ -1660,8 +1659,8 @@ endmodule
 > Same logic, but order changes meaning!
 > Synthesis may still infer only one flip-flop, but simulation can be misleading.
 
-example: 
-Wrong (Blocking can cause unintended effects):
+##### example: Wrong (Blocking can cause unintended effects):
+
 ```
 module code (input a, b, c, output reg y);
     reg q0;
@@ -1671,7 +1670,9 @@ module code (input a, b, c, output reg y);
     end
 endmodule
 ```
-Correct (Order fixed or use proper assignments):
+
+- Correct (Order fixed or use proper assignments):
+  
 ```
 module code (input a, b, c, output reg y);
     reg q0;
@@ -1682,15 +1683,12 @@ module code (input a, b, c, output reg y);
 endmodule
 ```
 
+#### Non-Blocking Assignment (<=)
 
+- All RHS values are evaluated first, then assigned in parallel at the end of the time step.
+- Models true hardware flip-flop behaviour.
 
-Non-Blocking Assignment (<=)
-
-All RHS values are evaluated first, then assigned in parallel at the end of the time step.
-
-Models true hardware flip-flop behavior.
-
-Correct Way – Sequential Logic
+##### Correct Way – Sequential Logic
 
 ```
 module code (
@@ -1712,14 +1710,151 @@ endmodule
 ```
 > This now matches real hardware behaviour.
 
-✅ Best Practice:
+Best Practice:
 
-Use = (blocking) for combinational logic.
+> Use = (blocking) for combinational logic.
 
-Use <= (non-blocking) for sequential logic (flops).
+> Use <= (non-blocking) for sequential logic (flops).
+
+## Lab 1: Ternary Operator MUX
+
+```verilog
+module ternary_operator_mux (input i0 , input i1 , input sel , output y);
+	assign y = sel?i1:i0;
+	endmodule
+```
+- Simulation
+  
+```
+iverilog ternary_operator_mux.v tb_ternary_operator_mux.v
+./a.out
+gtkwave tb_ternary_operator_mux.vcd
+```
+<img width="926" height="255" alt="image" src="https://github.com/user-attachments/assets/247ad63d-c0e6-4dfc-8081-2a5987f6945f" />
+
+- Synthesis
+
+```tcl
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog ternary_operator_mux.v
+synth -top ternary_operator_mux
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+write_verilog -noattr ternary_operator_mux_net.v
+```
+
+<img width="922" height="298" alt="image" src="https://github.com/user-attachments/assets/675b74ef-f92f-49de-b786-bc8bd6b42c0f" />
+
+Gste Level Simulation
+
+Syntax:
+    iverilog <path-to-gate-level-verilog-model(s)> <netlist_file.v> <tb_top.v>
+	
+iverilog ../my_lib/verilog_model/primitives.v  ../my_lib/verilog_model/sky130_fd_sc_hd.v ternary_operator_mux_net.v tb_ternary_operator_mux.v
+./a.out
+gtkwave tb_ternary_operator_mux.vcd
+
+<img width="923" height="272" alt="image" src="https://github.com/user-attachments/assets/3ade50ae-de91-4952-af2c-549ef63adb53" />
+
+## Lab 2: Bad_mux
+
+```verilog
+module bad_mux (input i0 , input i1 , input sel , output reg y);
+always @ (sel)
+begin
+	if(sel)
+		y <= i1;
+	else 
+		y <= i0;
+end
+endmodule
+```
+- Simulation
+
+```
+iverilog bad_mux.v tb_bad_mux.v
+./a.out
+gtkwave tb_bad_mux.vcd
+```
+<img width="926" height="258" alt="image" src="https://github.com/user-attachments/assets/bec2b842-4ce9-4b08-b6dd-ed769b47ae19" />
+
+- Synthesis
+
+```
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog bad_mux.v
+```
+<img width="926" height="110" alt="image" src="https://github.com/user-attachments/assets/648bfe76-2f31-49df-9505-f0dd2430417b" />
+
+```
+synth -top bad_mux
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+write_verilog -noattr bad_mux_net.v
+```
+
+<img width="925" height="309" alt="image" src="https://github.com/user-attachments/assets/a4486c66-7227-4c61-9143-92a5505fec48" />
+
+- Gate level Simulation
+```
+iverilog ../my_lib/verilog_model/primitives.v  ../my_lib/verilog_model/sky130_fd_sc_hd.v bad_mux_net.v tb_bad_mux.v
+./a.out
+gtkwave tb_bad_mux.vcd
+```
+<img width="928" height="248" alt="image" src="https://github.com/user-attachments/assets/c8790f75-8b17-4258-abf5-ef42e883c082" />
 
 
+### Synthesis Mismatch Reports
 
+  <img src="https://github.com/user-attachments/assets/bec2b842-4ce9-4b08-b6dd-ed769b47ae19" width="45%" />
+  <img src="https://github.com/user-attachments/assets/c8790f75-8b17-4258-abf5-ef42e883c082" width="45%" />
+
+## Lab 4: Blocking
+
+```verilog
+module blocking_caveat (input a , input b , input  c, output reg d); 
+reg x;
+always @ (*)
+begin
+	d = x & c;
+	x = a | b;
+end
+endmodule
+```
+
+- Simulation
+```
+iverilog blocking_caveat.v tb_blocking_caveat.v
+./a.out
+gtkwave tb_blocking_caveat.vcd
+```
+
+<img width="929" height="258" alt="image" src="https://github.com/user-attachments/assets/507435c0-99cd-4b2b-8573-fc19f5f99db4" />
+
+- Synthesis
+
+```
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog blocking_caveat.v
+synth -top blocking_caveat
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+write_verilog -noattr blocking_caveat_net.v
+```
+<img width="922" height="299" alt="image" src="https://github.com/user-attachments/assets/c84cb7e2-9dab-4930-9373-bd02989e6b7f" />
+
+- Gate level Simulation
+  
+```
+iverilog ../my_lib/verilog_model/primitives.v  ../my_lib/verilog_model/sky130_fd_sc_hd.v blocking_caveat_net.v tb_blocking_caveat.v
+./a.out
+gtkwave tb_blocking_caveat.vcd
+```
+
+<img width="929" height="254" alt="image" src="https://github.com/user-attachments/assets/3120b94b-0adc-4348-ab6c-ec2b53c8d520" />
 
 </details>
 
