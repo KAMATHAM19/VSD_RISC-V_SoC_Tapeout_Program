@@ -85,7 +85,7 @@ Open the VCD file in GTKWave to see the waveforms:
 ```
 gtkwave dump.vcd
 ```
-### multiplexer
+### Multiplexer
 
 ```
 gvim good_mux.v -o tb_good_mux.v
@@ -390,7 +390,7 @@ endmodule
 </details>
 
 <details>
-  <summary>Day 2: Timing libs, hierarchical vs flat synthesis and efficient flop coding styles</summary>
+  <summary>Day 2: Timing libs, Hierarchical vs Flat synthesis and Efficient flop coding styles</summary>
 
 ## Introduction to a library file (.lib)
 
@@ -1457,6 +1457,7 @@ gtkwave tb_counter_opt.vcd
 
 
 - Synthesis
+  
 ```
 yosys
 read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
@@ -1516,7 +1517,7 @@ show
 
 
 <details>
-  <summary>Day 4: GLS, blocking vs non-blocking and Synthesis-Simulation mismatch</summary>
+  <summary>Day 4: GLS, Blocking vs Non-blocking and Synthesis-Simulation mismatch</summary>
 
 ## Gate Level Simulation (GLS)
 
@@ -1861,7 +1862,7 @@ gtkwave tb_blocking_caveat.vcd
 
 
 <details>
-  <summary>Day 5:  Optimization in synthesis</summary>
+  <summary>Day 5:  Optimization in Synthesis</summary>
 
 ## Conditional Statements in Verilog
 
@@ -2178,6 +2179,168 @@ gtkwave tb_bad_case.vcd
 ```
 
 <img width="926" height="315" alt="image" src="https://github.com/user-attachments/assets/61d7f7c5-d5c4-4a71-9f0c-bf6ee66b2d5c" />
+
+#@ Looping Constructs in Verilog
+
+In Verilog, there are two main looping constructs:
+
+- **`for` loop**
+- **`generate for` loop**
+
+
+### 1. `for` loop
+
+- Used **inside `always` blocks**.  
+- Used for **evaluating expressions** or repetitive logic.
+
+### Examples:
+
+#### 2x1 MUX
+```verilog
+always @(*) begin
+    case(sel)
+        1'b0: y = i0;
+        1'b1: y = i1;
+    endcase
+end
+```
+
+#### 4x1 MUX
+```verilog
+always @(*) begin
+    case(sel)
+        2'b00: y = i0;
+        2'b01: y = i1;
+        2'b10: y = i2;
+        2'b11: y = i3;
+    endcase
+end
+```
+#### 32x1 MUX (Using for loop)
+
+- Instead of writing long case statements:
+  
+```verilog
+integer i;
+always @(*) begin
+    for(i = 0; i < 32; i = i + 1) begin
+        if(i == sel)
+            y = in[i];
+    end
+end
+```
+#### 1x8 DEMUX
+
+```verilog
+integer i;
+always @(*) begin
+    op_bus[7:0] = 8'b0;
+    for(i = 0; i < 8; i = i + 1) begin
+        if(i == sel)
+            op_bus[i] = input;
+    end
+end
+```
+
+### 2. generate for loop
+
+- Used outside always blocks.
+- Used for instantiating hardware multiple times.
+
+#### 8-bit AND gates
+
+```verilog
+genvar i;
+generate 
+    for(i = 0; i < 8; i = i + 1) begin : gen_and
+        and u_and (.a(in1[i]), .b(in2[i]), .y(y[i]));
+    end
+endgenerate
+```
+## Lab 7: For Loop
+
+```verilog
+module mux_generate (input i0 , input i1, input i2 , input i3 , input [1:0] sel  , output reg y);
+wire [3:0] i_int;
+assign i_int = {i3,i2,i1,i0};
+integer k;
+always @ (*)
+begin
+for(k = 0; k < 4; k=k+1) begin
+	if(k == sel)
+		y = i_int[k];
+end
+end
+endmodule
+```
+- Simulation
+
+```tcl
+iverilog mux_generate.v tb_mux_generate.v
+./a.out
+gtkwave tb_mux_generate.vcd
+```
+<img width="926" height="319" alt="image" src="https://github.com/user-attachments/assets/f8e78ce0-9dfa-4c6c-aac8-bf8476f8a17e" />
+
+## Lab 8: DeMux
+
+```verilog
+module demux_case (output o0 , output o1, output o2 , output o3, output o4, output o5, output o6 , output o7 , input [2:0] sel  , input i);
+reg [7:0]y_int;
+assign {o7,o6,o5,o4,o3,o2,o1,o0} = y_int;
+integer k;
+always @ (*)
+begin
+y_int = 8'b0;
+	case(sel)
+		3'b000 : y_int[0] = i;
+		3'b001 : y_int[1] = i;
+		3'b010 : y_int[2] = i;
+		3'b011 : y_int[3] = i;
+		3'b100 : y_int[4] = i;
+		3'b101 : y_int[5] = i;
+		3'b110 : y_int[6] = i;
+		3'b111 : y_int[7] = i;
+	endcase
+
+end
+endmodule
+```
+- Simulation
+
+```tcl
+iverilog demux_case.v tb_demux_case.v
+./a.out
+gtkwave tb_demux_case.vcd
+```
+<img width="925" height="381" alt="image" src="https://github.com/user-attachments/assets/164c3e6d-4ade-4757-94bc-ea4042fb9f72" />
+
+## Lab 9: Demux with for loop
+
+```verilog
+module demux_generate (output o0 , output o1, output o2 , output o3, output o4, output o5, output o6 , output o7 , input [2:0] sel  , input i);
+reg [7:0]y_int;
+assign {o7,o6,o5,o4,o3,o2,o1,o0} = y_int;
+integer k;
+always @ (*)
+begin
+y_int = 8'b0;
+for(k = 0; k < 8; k++) begin
+	if(k == sel)
+		y_int[k] = i;
+end
+end
+endmodule
+```
+
+- Simulation
+  
+```tcl
+iverilog demux_case.v tb_demux_case.v
+./a.out
+gtkwave tb_demux_case.vcd
+```
+<img width="927" height="371" alt="image" src="https://github.com/user-attachments/assets/763b2d92-f1b8-43e6-98cf-ee89ccbdb36d" />
 
 
 </details>
