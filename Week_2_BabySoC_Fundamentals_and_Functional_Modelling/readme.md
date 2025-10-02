@@ -90,4 +90,39 @@ tree
 
 
 include
+
 <img width="929" height="91" alt="image" src="https://github.com/user-attachments/assets/70046fc9-d0db-4756-b448-795189f81fef" />
+
+
+## pre-synthesis Simulation
+
+```
+mkdir -p output/pre_synth_sim
+
+
+iverilog -o ./output/pre_synth_sim/pre_synth_sim.out \
+  -DPRE_SYNTH_SIM \
+  -I ./src/include \
+  -I ./src/module \
+  ./src/module/testbench.v
+
+cd output/pre_synth_sim
+./pre_synth_sim.out
+gtkwave pre_synth_sim.vcd
+```
+
+iverilog → invokes the Icarus Verilog compiler.
+
+-o ./output/pre_synth_sim/pre_synth_sim.out → specifies the output executable file.
+
+-DPRE_SYNTH_SIM → defines the macro PRE_SYNTH_SIM (used in your testbench for conditional code).
+
+-I ./src/include → tells the compiler where to look for header/include files.
+
+-I ./src/module → tells the compiler where to look for module source files.
+
+./src/module/testbench.v → top-level testbench that ties the design and simulation together.
+
+
+<img width="926" height="425" alt="image" src="https://github.com/user-attachments/assets/c797a9fb-33d8-4e4a-9068-28a7e0e3482b" />
+
