@@ -126,3 +126,76 @@ iverilog → invokes the Icarus Verilog compiler.
 
 <img width="926" height="425" alt="image" src="https://github.com/user-attachments/assets/c797a9fb-33d8-4e4a-9068-28a7e0e3482b" />
 
+
+
+# yosys 
+
+read_verilog ./src/module/vsdbabysoc.v
+
+<img width="933" height="86" alt="image" src="https://github.com/user-attachments/assets/321db736-1659-4290-a794-0e8b28090058" />
+
+read_verilog -I ./src/include/ ./src/module/rvmyth.v
+
+<img width="926" height="113" alt="image" src="https://github.com/user-attachments/assets/7ae1d4b6-6047-4fb4-a087-08dd43ff9129" />
+
+
+read_verilog -I ./src/include/ ./src/module/clk_gate.v
+
+<img width="917" height="83" alt="image" src="https://github.com/user-attachments/assets/39f55b94-d898-4cac-9ceb-276ac581d05c" />
+
+
+read_liberty -lib ./src/lib/avsdpll.lib
+read_liberty -lib ./src/lib/avsddac.lib
+read_liberty -lib ./src/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+<img width="926" height="171" alt="image" src="https://github.com/user-attachments/assets/ed27ca72-e2b5-4862-92ad-b77a3bcadca4" />
+
+synth -top vsdbabysoc
+
+clockgate
+<img width="227" height="147" alt="image" src="https://github.com/user-attachments/assets/c2e0fb56-8bd0-4ef0-beec-15f5eb4099a3" />
+
+rvmyth
+<img width="224" height="304" alt="image" src="https://github.com/user-attachments/assets/a9cf19ec-3a6e-4369-8685-0b0419256621" />
+
+vsdbabysoc
+<img width="226" height="173" alt="image" src="https://github.com/user-attachments/assets/16ac9661-0ab5-4be2-9605-b7dd47f494b0" />
+
+design hier
+<img width="236" height="364" alt="image" src="https://github.com/user-attachments/assets/ac254241-a53b-4c0e-b7b2-466ff23062a2" />
+
+dfflibmap -liberty ~/VLSI/VSDBabySoC/src/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+<img width="919" height="359" alt="image" src="https://github.com/user-attachments/assets/1c95146d-7c24-4d78-90b8-d8ce0c20cfd5" />
+
+opt
+
+<img width="927" height="359" alt="image" src="https://github.com/user-attachments/assets/5ed07f4b-a65f-4f75-8804-b55b19ac40d7" />
+
+abc -liberty ./src/lib/sky130_fd_sc_hd__tt_025C_1v80.lib -script +strash;scorr;ifraig;retime;{D};strash;dch,-f;map,-M,1,{D}
+
+<img width="926" height="400" alt="image" src="https://github.com/user-attachments/assets/418ee250-7fec-4426-96c1-c9de4f15a98e" />
+
+flatten
+setundef -zero
+clean -purge
+rename -enumerate
+
+<img width="928" height="182" alt="image" src="https://github.com/user-attachments/assets/2ead8890-553a-4783-8c51-222f5d8e4229" />
+
+stat
+<img width="274" height="374" alt="image" src="https://github.com/user-attachments/assets/79da2ba2-6b38-4629-95a6-8343962455b0" />
+<img width="284" height="292" alt="image" src="https://github.com/user-attachments/assets/9b6a8a5b-7d18-4c7f-942f-a86bbfc2c075" />
+
+
+write_verilog -noattr ./output/post_synth_sim/vsdbabysoc.synth.v
+<img width="927" height="101" alt="image" src="https://github.com/user-attachments/assets/9c5dd8ed-bac2-45fd-9be4-d9a21bcca869" />
+
+
+
+
+
+
+
+
+
