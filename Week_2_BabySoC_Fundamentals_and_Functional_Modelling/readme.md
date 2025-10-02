@@ -193,9 +193,30 @@ write_verilog -noattr ./output/post_synth_sim/vsdbabysoc.synth.v
 
 
 
+cd /home/venkatkamatham/Desktop/SoC/VSDBabySoC/src/module
+
+cp -r ../../../../RTL/sky130RTLDesignAndSynthesisWorkshop/my_lib/verilog_model/primitives.v .
+
+cp -r ../../../../RTL/sky130RTLDesignAndSynthesisWorkshop/my_lib/verilog_model/sky130_fd_sc_hd.v .
+
+cp -r ../../output/post_synth_sim/vsdbabysoc.synth.v .
+
+cd Desktop/SoC/VSDBabySoC/
+iverilog -o ./output/post_synth_sim/post_synth_sim.out -DPOST_SYNTH_SIM -DFUNCTIONAL -DUNIT_DELAY=#1 -I ./src/include -I ./src/module ./src/module/testbench.v
+
+<img width="928" height="47" alt="image" src="https://github.com/user-attachments/assets/8d9812ab-ad09-4b65-a11e-d089900f9c42" />
+
+To resolve this: Update the syntax in the file sky130_fd_sc_hd.v at or around line 74452.
+
+Change:
+`endif SKY130_FD_SC_HD__LPFLOW_BLEEDER_FUNCTIONAL_V
+To:
+`endif // SKY130_FD_SC_HD__LPFLOW_BLEEDER_FUNCTIONAL_V
+
+<img width="926" height="425" alt="image" src="https://github.com/user-attachments/assets/67777a00-b9e3-44e1-89bc-62cc74f214a1" />
 
 
-
-
-
+- waveform
+  
+<img width="926" height="428" alt="image" src="https://github.com/user-attachments/assets/5b086481-b392-46a2-8dc7-51f8534e0488" />
 
