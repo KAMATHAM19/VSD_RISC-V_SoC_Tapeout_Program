@@ -1,4 +1,149 @@
-# BabySoC Fundamentals & Functional Modelling
+# System-on-Chip and BabySoC Functional Modelling
+
+## System-on-Chip (SoC): Architecture, Design, Challenges, and Applications
+
+### Abstract
+
+A System-on-Chip (SoC) is a single chip that combines a complete electronic system, including processors, memory, interconnects, analogue/mixed-signal components, and peripherals. Compared to multi-chip systems, SoCs are smaller, cheaper, faster, and more energy-efficient. This repo provides an overview of SoC basics, types, architecture, design flow, verification methods, challenges, emerging trends, and applications. A case study of VSDBabySoC, a small RISC-V-based open-source SoC, demonstrates practical design and verification techniques.
+
+
+### I. Introduction
+
+A System-on-Chip (SoC) integrates computing, communication, and control on a single chip. Typical components include a processor, memory, hardware accelerators, analog/RF interfaces, and input/output (I/O) peripherals [1][2].
+
+SoCs are popular due to:
+- Higher integration and smaller chip size.
+- Reuse of pre-designed IP blocks.
+- Faster development and support for product variants using platform-based design [2].
+
+> Figure 1 here: High-level block diagram of a typical SoC.
+
+### II. Key Parts of an SoC 
+
+| Component        | Function                                                                                   |
+|-----------------|--------------------------------------------------------------------------------------------|
+| CPU             | The brain of the SoC; executes instructions and handles data processing.                   |
+| Memory          | RAM for temporary storage, ROM/Flash for permanent storage.                                 |
+| I/O Ports       | Connects the SoC to external devices like cameras, USBs, or headphones.                    |
+| GPU             | Handles graphics and visuals for games, videos, or other visual tasks.                     |
+| DSP             | Specialised for audio/video processing (e.g., noise reduction or video enhancement).       |
+| Power Management| Controls energy usage and extends battery life.                                             |
+| Special Features| Optional modules like Wi-Fi, Bluetooth, and security, depending on the application.            |
+
+*Note: Data for this table adapted from [13].*
+
+### III. Main SoC Types
+
+1) **General-purpose/Mobile SoCs**: CPU, GPU, ISP, connectivity, and power management; used in smartphones and tablets [3].
+
+2) **Heterogeneous/MPSoCs**: Multiple core types (CPU, DSP, ASIP, accelerators) for parallel workloads [4].
+
+3) **Mixed-Signal SoCs**: Combine digital cores with analogue IPs (PLLs, ADC/DACs, sensors); need careful design [5], [6].
+
+4) **Chiplet-based SoCs**: Multiple small dies in one package; improve yield and support AI/IoT [7].
+
+> Figure 2 here: Comparison of SoC types.
+
+
+###  IV. Architecture and Interconnects
+
+SoC design uses platform-based architecture, where cores, buses, and memory form a fixed kernel, and additional IP blocks are added around it [2]. Traditional buses struggle with many cores; Networks-on-Chip (NoC) provide distributed routing and arbitration for higher bandwidth and scalability [4].
+
+> Figure 3 here: NoC-based SoC interconnect architecture.
+
+### V. Design Flow and IP Reuse
+
+Modern SoCs reuse IP blocks at higher levels (interfaces, codecs, memory). Software is integrated early with APIs and RTOS support [2]. Analogue IP hardening converts behavioural models into manufacturable layouts, ensuring reuse across technology nodes [5].
+
+> Figure 4 here: SoC design flow diagram highlighting IP reuse.
+
+### VI. Verification and Sign-Off
+
+Verification ensures correct SoC operation. Mixed-signal SoCs require:
+- Verilog-AMS and real-number modelling
+- Connectivity validation
+- Power-intent verification (CPF/UPF)
+- Selective transistor-level simulations [6]
+Hierarchical testbenches and reusable strategies help cover multiple products and mixed-power domains [2].
+
+### VII. Key Challenges
+
+- **Power and Thermal Management**: DVFS, clock/power gating, thermal-aware design [1][3].
+- **Interconnect Latency**: On-chip memory, NoC, and floorplanning [1].
+- **Variability and Reliability**: Error-tolerant design to counter process variations and ageing [1].
+- **Verification and Testing***: Complex multi-power and mixed-signal designs need advanced testing [6].
+
+### VIII. Emerging Directions
+
+- **Open-Source SoC Tools**: FASoC automates analogue IP generation and digital integration [8].
+- **Chiplets and Advanced Packaging**: 2.5D/3D integration allows modular, fast SoC designs [7].
+- **Education**: Engineers need cross-disciplinary skills in HW/SW/AMS/RF design [9].
+
+### IX. Representative Applications
+
+- **Consumer Devices**: Smartphones, tablets, wearables [3].
+- **IoT/Embedded Systems**: Low-power RISC-V SoCs for sensors [10].
+- **Healthcare**: Implantables, diagnostics, secure telemedicine devices [11].
+- **Industrial/Automotive Systems**: Control systems, ADAS, and safety-critical applications [6].
+
+### X. Case Study: VSDBabySoC
+
+The VSDBabySoC is a small yet powerful RISC-V-based SoC designed primarily to test three open-source IP cores together for the first time and calibrate the analogue portions of the system. Despite its modest size, this SoC demonstrates critical design and verification practices for educational and research purposes [12]. This SoC illustrates practical applications of key SoC concepts, including IP reuse, integration of analogue and digital components, low-power design techniques, and verification workflows. Built using Sky130 technology, the VSDBabySoC is fully open-source and well-documented, which makes it ideal for teaching, research, and prototyping.
+
+Key Features:
+- **Processor**: RVMYTH microprocessor (lightweight RISC-V core)
+- **Clock Generator**: 8x PLL for stable timing
+- **Analogue Interface**: 10-bit DAC for audio/video output
+- **Memory**: On-chip SRAM and ROM
+- **Peripherals**: UART, GPIO, SPI
+- **Power Optimisation**: Clock/power gating for microwatt-level operation
+- **Verification**: RTL and mixed-signal AMS simulation
+
+<img width="2270" height="1260" alt="vsdbabysoc_block_diagram" src="https://github.com/user-attachments/assets/d3501270-7d19-4b3a-97f3-ddad5ec6d800" />
+
+**Discussion**: The VSDBabySoC uses a Phase-Locked Loop (PLL) as its clock generator and controller, along with a DAC for analogue output. This design shows how a small, open-source SoC can connect digital and analogue domains, providing a hands-on platform for learning mixed-signal SoC design in practical and educational settings.
+
+### XI. Takeaways for Practitioners
+
+- Choose SoC type and interconnect based on workload, scalability, and power [4][7].
+- Integrate analogue IP early with reusable models [5].
+- Use comprehensive verification for multi-power and mixed-signal designs [6].
+- Explore automation and open-source frameworks for edge-focused SoCs [8].
+
+### References
+
+[1] A. Chopde et al., “System On Chip Design Challenges and its Solutions,” Proc. IEEE sources cited within, 2024.
+
+[2] G. Martin and H. Chang, “System-on-Chip Design,” IEEE Tutorial Paper, 2001.
+
+[3] M. Gupta et al., “Comprehensive Analysis of System on Chips: Architecture, Applications, and Future Trends,” preprint, 2024.
+
+[4] D. N. Kumar and G. Mohan, “Design and Optimization of System-on-chip (SOC),” JETIR, 2015.
+
+[5] M. Hamour et al., “Analog IP Design Flow for SoC Applications,” IEEE, 2003.
+
+[6] C. Liang, “Mixed-Signal Verification Methods for Multi-Power Mixed-Signal SoC Design,” IEEE, 2013.
+
+[7] M. P. C. Mok et al., “Chiplet-based System-on-Chip for Edge Artificial Intelligence,” IEEE EDTM, 2021.
+
+[8] T. Ajayi et al., “An Open-source Framework for Autonomous SoC Design with Analog Block Generation,” IFIP/IEEE VLSI-SoC, 2020.
+
+[9] H. De Man, “System-on-chip design: impact on education and research,” IEEE Design & Test of Computers, 1999.
+
+[10] R. Serrano et al., “A Low-Power Low-Area SoC based in RISC-V Processor for IoT Applications,” ISOCC, 2021.
+
+[11] W. Y. Leong et al., “System-on-Chip (SoC) Medicine,” IEEE Int. Workshop on Electromagnetics Applications and Student Innovation Competition (iWEM), 2024.
+
+[12] M. Manili, "VSDBabySoC: A small mixed-signal SoC including PLL, DAC, and a RISCV-based processor named RVMYTH," GitHub, Available: https://github.com/manili/VSDBabySoC
+. Accessed: Oct. 4, 2025.
+
+[13] H. Kumar DM, "11. Fundamentals of SoC Design," SFAL-VSD-SoC-Journey, GitHub, Available: https://github.com/hemanthkumardm/SFAL-VSD-SoC-Journey/tree/main/11.%20Fundamentals%20of%20SoC%20Design
+. Accessed: Oct. 4, 2025.
+
+
+
+
+
 
 
 ## rvmyth core
