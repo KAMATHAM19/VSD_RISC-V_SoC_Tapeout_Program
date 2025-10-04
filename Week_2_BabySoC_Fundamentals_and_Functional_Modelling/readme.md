@@ -46,9 +46,6 @@ SoCs are popular due to:
 
 <img width="1024" height="478" alt="soc 1" src="https://github.com/user-attachments/assets/a9111f0d-bce7-45f9-a180-00106ac77ce6" />
 
-
-
-
 ###  IV. Architecture and Interconnects
 
 SoC design uses platform-based architecture, where cores, buses, and memory form a fixed kernel, and additional IP blocks are added around it [2]. Traditional buses struggle with many cores; Networks-on-Chip (NoC) provide distributed routing and arbitration for higher bandwidth and scalability [4].
@@ -146,7 +143,11 @@ Key Features:
 [13] H. Kumar DM, "11. Fundamentals of SoC Design," SFAL-VSD-SoC-Journey, GitHub, Available: https://github.com/hemanthkumardm/SFAL-VSD-SoC-Journey/tree/main/11.%20Fundamentals%20of%20SoC%20Design
 . Accessed: Oct. 4, 2025.
 
+<br>
 
+<details>
+  <summary>BabySoC Functional Modelling</summary>
+ 
 ## BabySoC Functional Modelling
 
 VSDBabySoC is a small but powerful System on Chip (SoC) based on the RISC-V design. It was created to test three open-source IP cores at the same time and to fine-tune its analog components. The SoC includes an RVMYTH processor, an 8x phase-locked loop (PLL) to create a stable clock, and a 10-bit DAC (digital-to-analog converter) that allows it to work with analog devices.
@@ -208,6 +209,9 @@ A **PLL (Phase-Locked Loop)** creates a clean and steady clock by copying the ti
 
 #### avsdpll_1v8 PLL Core Specifications
 
+You can check the projects here: [Introduction](https://github.com/ireneann713/PLL.git) and [avsdpll](https://github.com/lakshmi-sathi/avsdpll_1v8.git).
+
+
 | **Parameter** | **Specification / Notes** |
 |---------------|---------------------------|
 | **Summary** | 8× clock multiplier PLL for SkyWater 130 nm, delivering 40–100 MHz output from 5–12.5 MHz reference at 1.8 V supply (typical corner, room temperature). |
@@ -235,6 +239,9 @@ This allows mixed-signal SoCs to drive real-world loads like **sensors, audio pa
 
 #### avsddac Specifications 
 
+You can find the project at the [avsddac](https://github.com/vsdip/rvmyth_avsddac_interface.git).
+
+
 | **Parameter**       | **Description**            | **Typical/Example**     | **Unit** | **Notes** |
 |----------------------|----------------------------|--------------------------|----------|-----------|
 | **Resolution**      | Number of bits             | 10                       | bits     | 1024 codes |
@@ -247,6 +254,10 @@ This allows mixed-signal SoCs to drive real-world loads like **sensors, audio pa
 
     
 ### 4. VSDBabySoC
+
+You can find the project at the [VSDBabySoC](https://github.com/manili/VSDBabySoC.git).
+
+<img width="1024" height="464" alt="vsdb" src="https://github.com/user-attachments/assets/8d7a2d08-1c17-4f1a-92a9-48cfa3c4155f" />
 
 #### How VSDBabySoC Works  
 
@@ -273,6 +284,7 @@ This allows mixed-signal SoCs to drive real-world loads like **sensors, audio pa
 
 > **PLL makes the clock → RVMYTH generates 10-bit data → DAC converts it into analog output.**
 
+### Functional Modelling
 
 ```
 mkdir SoC
@@ -396,6 +408,27 @@ gtkwave pre_synth_sim.vcd
 
 <img width="926" height="425" alt="image" src="https://github.com/user-attachments/assets/c797a9fb-33d8-4e4a-9068-28a7e0e3482b" />
 
+- **CLK** and **reset** feed the **RVMYTH core** from the top level (PLL and external source).  
+- **RV_TO_DAC[9:0]** is the core’s 10-bit output, driving the **DAC input**.  
+- **VSDBabySoC OUT** is the DAC’s top-level output (digital representation in this simulation).  
+- Inside the DAC, a **real OUT** net models the **analog output**.
+
+##### Clock and Reset
+- **CLK**: The RVMYTH core clock, normally sourced from the on-chip PLL. In simulation, it is a stable periodic input.  
+- **reset**: Controlled by the top-level stimulus or external source. It initialises the pipeline and register states when asserted/deasserted.
+
+##### Core-to-DAC Interface
+- **RV_TO_DAC[9:0]**: The 10-bit output bus from **RVMYTH register 17**. Each cycle, it provides the digital sample code to the DAC.  
+- **VSDBabySoC OUT**: Represents the DAC’s top-level output. In this simulation, it is displayed as a logic waveform, not a continuous analog value.
+
+##### Analog Modeling
+- **DAC internal OUT**: A `real`-typed net that models the analog output.  
+- **GTKWave** can display it as a real-valued trace, giving an approximate analog waveform, even in a mostly digital testbench.
+
+##### Practical Checks
+- Ensure **reset deassertion** happens before meaningful `RV_TO_DAC` activity.  
+- Verify that the DAC **real OUT** tracks the code changes with expected **settling and scaling**.  
+- Differences between digital `OUT` and real `OUT` usually indicate **quantization or interface timing issues** in the mixed-signal stub.
 
 #### Synthesis 
 
@@ -514,3 +547,4 @@ To:
   
 <img width="926" height="428" alt="image" src="https://github.com/user-attachments/assets/5b086481-b392-46a2-8dc7-51f8534e0488" />
 
+</details>
