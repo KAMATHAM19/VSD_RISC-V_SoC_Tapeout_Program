@@ -229,13 +229,38 @@ You can check the projects here: [Introduction](https://github.com/ireneann713/P
 | **Datasheet Summary** | SKY130, 1.8 V, 5–12.5 MHz in, 40–100 MHz out (8×), ~50% duty, lock ~22–37 µs post-layout, third-order loop filter. |
 
 
-### 3. Digital-to-Analog-Converter
+### 3. Digital-to-Analog-Converter (DAC)
 
-   
-<img width="981" height="511" alt="dac" src="https://github.com/user-attachments/assets/4d1ee6e4-35b9-4af7-8789-0f26c0fab3a8" />
+A **Digital-to-Analog Converter (DAC)** is an electronic device that converts a **digital input** (binary code) into an **analog output** (continuous voltage or current).
+
+#### Digital Signal Representation
+- The input to a DAC is made of **bits**, which are 0s and 1s.  
+- These bits represent the digital information to be converted.
+
+#### Structure
+- A DAC usually has **multiple binary inputs** and **one analog output**.  
+- The number of inputs is typically a **power of two** (e.g., 2, 4, 8, 16 bits).  
+
+#### Types of DACs
+
+1. **Weighted Resistor DAC**  
+   - Uses resistors with different values (weights) to convert the binary input into an analog voltage.
+
+ <img width="600" height="556" alt="image" src="https://github.com/user-attachments/assets/cb6e6782-1756-4206-bee5-e5c0bd09bc45" />
+
+
+2. **R-2R Ladder DAC**  
+   - Uses a repeating network of resistors in an R-2R pattern.  
+   - Simplifies design and makes it easy to scale to higher bit resolutions.
+
+<img width="1536" height="1086" alt="image" src="https://github.com/user-attachments/assets/d8a6f59a-2514-4378-8f60-a1a9c8da5d4f" />
 
 A **10-bit DAC (Digital-to-Analog Converter)** turns binary codes into an analog voltage.  
 This allows mixed-signal SoCs to drive real-world loads like **sensors, audio paths, or measurement circuits**.
+
+<img width="981" height="511" alt="dac" src="https://github.com/user-attachments/assets/4d1ee6e4-35b9-4af7-8789-0f26c0fab3a8" />
+
+
 
 #### avsddac Specifications 
 
@@ -501,7 +526,7 @@ rename -enumerate
 - **setundef -zero** → replace undefined signals with 0  
 - **clean -purge** → remove unused logic  
 - **rename -enumerate** → rename signals/modules in order
-- 
+  
 <img width="928" height="182" alt="image" src="https://github.com/user-attachments/assets/2ead8890-553a-4783-8c51-222f5d8e4229" />
 
 ```
