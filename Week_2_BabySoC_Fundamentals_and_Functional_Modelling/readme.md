@@ -443,6 +443,19 @@ opt
 ```
 abc -liberty ./src/lib/sky130_fd_sc_hd__tt_025C_1v80.lib -script +strash;scorr;ifraig;retime;{D};strash;dch,-f;map,-M,1,{D}
 ```
+
+
+| Command         | Purpose / Description                                                                 | Effect / Notes |
+|-----------------|--------------------------------------------------------------------------------------|----------------|
+| `strash`        | Structural hashing: converts the logic network into an **AIG (And-Inverter Graph)** | Efficient processing and simplified logic representation |
+| `scorr`         | SAT-based equivalence checking and redundancy removal                               | Removes logic that does not affect outputs |
+| `ifraig`        | Refines the AIG using SAT sweeping                                                  | Merges equivalent nodes, cleans up functionally identical logic |
+| `retime`        | Moves flip-flops across logic (forward or backward)                                 | Improves performance or area; helps meet timing constraints |
+| `{D}`           | Placeholder for design-specific commands                                             | May expand to clock definitions or other flow-specific steps |
+| `strash` (again)| Rebuilds the AIG after retiming and cleanup                                         | Ensures AIG is optimized post-retiming |
+| `dch,-f`        | Don’t-Care Hashing (`-f` forces aggressive optimization)                           | Exploits don't-care conditions to simplify logic |
+| `map,-M,1,{D}`  | Technology mapping into **Sky130 standard cells**                                   | `-M,1` optimizes for minimum depth (timing first); `{D}` is flow-specific parameters |
+
 <img width="926" height="400" alt="image" src="https://github.com/user-attachments/assets/418ee250-7fec-4426-96c1-c9de4f15a98e" />
 
 ```
@@ -451,6 +464,11 @@ setundef -zero
 clean -purge
 rename -enumerate
 ```
+- **flatten** → make design flat (no hierarchy)  
+- **setundef -zero** → replace undefined signals with 0  
+- **clean -purge** → remove unused logic  
+- **rename -enumerate** → rename signals/modules in order
+- 
 <img width="928" height="182" alt="image" src="https://github.com/user-attachments/assets/2ead8890-553a-4783-8c51-222f5d8e4229" />
 
 ```
@@ -471,6 +489,10 @@ cd /home/venkatkamatham/Desktop/SoC/VSDBabySoC/src/module
 cp -r ../../../../RTL/sky130RTLDesignAndSynthesisWorkshop/my_lib/verilog_model/primitives.v .
 cp -r ../../../../RTL/sky130RTLDesignAndSynthesisWorkshop/my_lib/verilog_model/sky130_fd_sc_hd.v .
 cp -r ../../output/post_synth_sim/vsdbabysoc.synth.v .
+```
+#### Post-Synthesis Simulation
+
+```
 cd Desktop/SoC/VSDBabySoC/
 iverilog -o ./output/post_synth_sim/post_synth_sim.out -DPOST_SYNTH_SIM -DFUNCTIONAL -DUNIT_DELAY=#1 -I ./src/include -I ./src/module ./src/module/testbench.v
 ```
