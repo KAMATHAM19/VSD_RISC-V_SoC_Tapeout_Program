@@ -163,9 +163,81 @@ RVMYTH is the main CPU of BabySoC. It uses a register called **r17** to store va
 
 You can find the module on GitHub: [rvmyth](https://github.com/kunalg123/rvmyth/)
 
-   <img width="940" height="478" alt="rvmyth" src="https://github.com/user-attachments/assets/1b754272-7fd0-4bf7-9528-c07b429e725a" />
+ <img width="940" height="478" alt="rvmyth" src="https://github.com/user-attachments/assets/1b754272-7fd0-4bf7-9528-c07b429e725a" />
 
-2. 
+2. Phase-Locked Loop
+
+A **PLL (Phase-Locked Loop)** creates a clean and steady clock by copying the timing of a known reference and continuously adjusting itself to stay in sync.
+
+
+<img width="1024" height="474" alt="pllb" src="https://github.com/user-attachments/assets/ad43eb4e-363f-4b06-92ae-f36fb04af233" />
+
+
+## How It Works
+
+1. **Compare:**  
+   A **phase/frequency detector (PFD)** checks how the PLL’s output clock differs from the reference clock in both timing (phase) and speed (frequency).
+
+2. **Correct:**  
+   A **charge pump** and **loop filter** turn this difference into a smooth control voltage that adjusts a **voltage-controlled oscillator (VCO)**. This keeps the output clock locked to the reference.  
+   A **feedback divider** allows the output to be a precise multiple of the reference frequency.
+
+## Phase/Frequency Detector (PFD)
+
+- Detects which clock is ahead and by how much.  
+- Produces digital **UP/DOWN pulses** representing the difference between the reference and output.  
+- Using a PFD (instead of a simple XOR) improves the lock range and prevents timing slips, which is important for SoCs.
+
+## Charge Pump and Loop Filter
+
+- Converts the PFD pulses into current (charge pump).  
+- The **low-pass filter** turns this current into a smooth control voltage for the VCO.  
+- Reduces ripple, controls lock speed, and keeps the clock stable with low jitter.  
+- A well-designed filter balances three things:  
+  1. Fast lock time  
+  2. Low jitter  
+  3. Stable operation without ringing  
+
+## Voltage-Controlled Oscillator (VCO) and Feedback Divider
+
+- The **VCO** generates the clock signal, with frequency controlled by the input voltage.  
+- The **feedback divider** sets the output frequency:  
+  - **Integer-N:** `output = N × reference frequency`  
+  - **Fractional-N:** allows finer frequency steps but requires spur-reduction techniques  
+- The VCO’s noise mainly determines the output clock quality once locked.
+
+## Why PLLs Matter in SoCs and RISC-V Cores
+
+- On-chip PLLs provide **low-jitter clocks** at the exact frequencies required by CPU, memory, and I/O.  
+- Avoids long off-chip clock paths, reduces timing skew, and enables multiple frequencies from a single crystal.  
+- Cleans up reference noise in-band and uses a low-noise VCO out-of-band, producing a **high-quality core clock** essential for reliable timing and performance in CPUs and SoCs.
+
+
+<img width="1018" height="551" alt="pll" src="https://github.com/user-attachments/assets/480cea1e-5a63-4cf3-8ff5-181c953504eb" />
+
+# avsdpll_1v8 PLL Core Specifications
+
+| **Parameter** | **Specification / Notes** |
+|---------------|---------------------------|
+| **Summary** | 8× clock multiplier PLL for SkyWater 130 nm, delivering 40–100 MHz output from 5–12.5 MHz reference at 1.8 V supply (typical corner, room temperature). |
+| **Technology / Process** | SkyWater SKY130 (130 nm) open-source PDK |
+| **Supply Voltage** | 1.8 V digital rail (VDD = 1.8 V at 27°C). |
+| **Reference Input Frequency (F_CLKREF)** | 5–12.5 MHz (typical, 27°C). |
+| **Output Frequency (F_CLKOUT)** | 40–100 MHz (8× multiplication via divide-by-8 feedback, typical, 27°C). |
+| **Duty Cycle (Pre-layout)** | ~46% at 40 MHz, ~40.6% at 100 MHz. |
+| **Duty Cycle (Post-layout)** | ~52.7% at 40 MHz, ~50% at 100 MHz. |
+| **Lock Time (Pre-layout)** | ~120 µs at 40 MHz, ~80 µs at 100 MHz. |
+| **Lock Time (Post-layout)** | ~37 µs at 40 MHz, ~22 µs at 100 MHz. |
+| **Loop Filter** | Third-order passive filter; example pre-layout: C1 ≈ 355 fF, C2 ≈ 350 fF, C3 ≈ 345 fF, R1–R3 ≈ 490 Ω; post-layout caps adjusted to 295–305 fF. |
+| **Functional Blocks / Areas (post-layout)** | Frequency divider: 29.92 µm², PFD: 49.09 µm², MUX: 12.12 µm², Charge Pump: 132.29 µm², VCO: 57.73 µm², Integrated PLL: 496.03 µm². |
+| **Jitter / Load** | RMS jitter and load capacitance placeholders; focus on frequency, duty cycle, and lock times. |
+| **Datasheet Summary** | SKY130, 1.8 V, 5–12.5 MHz in, 40–100 MHz out (8×), ~50% duty, lock ~22–37 µs post-layout, third-order loop filter. |
+
+
+4. DAC
+
+<img width="981" height="511" alt="dac" src="https://github.com/user-attachments/assets/4d1ee6e4-35b9-4af7-8789-0f26c0fab3a8" />
+
 ## rvmyth core
 
 ```
