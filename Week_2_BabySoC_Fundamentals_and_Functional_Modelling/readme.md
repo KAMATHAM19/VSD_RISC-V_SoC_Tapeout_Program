@@ -151,13 +151,7 @@ Key Features:
 
 VSDBabySoC is a small but powerful System on Chip (SoC) based on the RISC-V design. It was created to test three open-source IP cores at the same time and to fine-tune its analog components. The SoC includes an RVMYTH processor, an 8x phase-locked loop (PLL) to create a stable clock, and a 10-bit DAC (digital-to-analog converter) that allows it to work with analog devices.
 
-Starting Up and Clock Generation: When BabySoC receives an initial signal, the PLL turns on and creates a stable, synchronized clock. This clock keeps the processor and DAC in sync, making sure all parts of the system work together smoothly without errors.
-
-
-
-Creating Analog Signals with the DAC: The DAC takes the digital data from RVMYTH and converts it into analog signals. These signals are saved in a file called OUT and can be sent to devices like TVs or phones, which can turn them into sound or video. This shows how BabySoC can connect digital processing with real-world multimedia devices.
-
-1. RISC-V Core (rvmyth)
+### 1. RISC-V Core (rvmyth)
 
 RVMYTH is the main CPU of BabySoC. It uses a register called **r17** to store values sent to the DAC. As it runs, `r17` is continuously updated, producing a steady stream of data for analogue conversion. RVMYTH outputs a **10-bit digital signal (OUT)** for the DAC.
 
@@ -165,15 +159,13 @@ You can find the module on GitHub: [rvmyth](https://github.com/kunalg123/rvmyth/
 
  <img width="940" height="478" alt="rvmyth" src="https://github.com/user-attachments/assets/1b754272-7fd0-4bf7-9528-c07b429e725a" />
 
-2. Phase-Locked Loop
+### 2. Phase-Locked Loop
 
 A **PLL (Phase-Locked Loop)** creates a clean and steady clock by copying the timing of a known reference and continuously adjusting itself to stay in sync.
 
-
 <img width="1024" height="474" alt="pllb" src="https://github.com/user-attachments/assets/ad43eb4e-363f-4b06-92ae-f36fb04af233" />
 
-
-## How It Works
+#### How It Works
 
 1. **Compare:**  
    A **phase/frequency detector (PFD)** checks how the PLL’s output clock differs from the reference clock in both timing (phase) and speed (frequency).
@@ -182,13 +174,13 @@ A **PLL (Phase-Locked Loop)** creates a clean and steady clock by copying the ti
    A **charge pump** and **loop filter** turn this difference into a smooth control voltage that adjusts a **voltage-controlled oscillator (VCO)**. This keeps the output clock locked to the reference.  
    A **feedback divider** allows the output to be a precise multiple of the reference frequency.
 
-## Phase/Frequency Detector (PFD)
+#### Phase/Frequency Detector (PFD)
 
 - Detects which clock is ahead and by how much.  
 - Produces digital **UP/DOWN pulses** representing the difference between the reference and output.  
 - Using a PFD (instead of a simple XOR) improves the lock range and prevents timing slips, which is important for SoCs.
 
-## Charge Pump and Loop Filter
+#### Charge Pump and Loop Filter
 
 - Converts the PFD pulses into current (charge pump).  
 - The **low-pass filter** turns this current into a smooth control voltage for the VCO.  
@@ -198,7 +190,7 @@ A **PLL (Phase-Locked Loop)** creates a clean and steady clock by copying the ti
   2. Low jitter  
   3. Stable operation without ringing  
 
-## Voltage-Controlled Oscillator (VCO) and Feedback Divider
+#### Voltage-Controlled Oscillator (VCO) and Feedback Divider
 
 - The **VCO** generates the clock signal, with frequency controlled by the input voltage.  
 - The **feedback divider** sets the output frequency:  
@@ -206,16 +198,15 @@ A **PLL (Phase-Locked Loop)** creates a clean and steady clock by copying the ti
   - **Fractional-N:** allows finer frequency steps but requires spur-reduction techniques  
 - The VCO’s noise mainly determines the output clock quality once locked.
 
-## Why PLLs Matter in SoCs and RISC-V Cores
+#### Why PLLs Matter in SoCs and RISC-V Cores
 
 - On-chip PLLs provide **low-jitter clocks** at the exact frequencies required by CPU, memory, and I/O.  
 - Avoids long off-chip clock paths, reduces timing skew, and enables multiple frequencies from a single crystal.  
 - Cleans up reference noise in-band and uses a low-noise VCO out-of-band, producing a **high-quality core clock** essential for reliable timing and performance in CPUs and SoCs.
 
-
 <img width="1018" height="551" alt="pll" src="https://github.com/user-attachments/assets/480cea1e-5a63-4cf3-8ff5-181c953504eb" />
 
-# avsdpll_1v8 PLL Core Specifications
+#### avsdpll_1v8 PLL Core Specifications
 
 | **Parameter** | **Specification / Notes** |
 |---------------|---------------------------|
@@ -234,11 +225,54 @@ A **PLL (Phase-Locked Loop)** creates a clean and steady clock by copying the ti
 | **Datasheet Summary** | SKY130, 1.8 V, 5–12.5 MHz in, 40–100 MHz out (8×), ~50% duty, lock ~22–37 µs post-layout, third-order loop filter. |
 
 
-4. DAC
+### 3. Digital-to-Analog-Converter
 
+   
 <img width="981" height="511" alt="dac" src="https://github.com/user-attachments/assets/4d1ee6e4-35b9-4af7-8789-0f26c0fab3a8" />
 
-## rvmyth core
+A **10-bit DAC (Digital-to-Analog Converter)** turns binary codes into an analog voltage.  
+This allows mixed-signal SoCs to drive real-world loads like **sensors, audio paths, or measurement circuits**.
+
+#### avsddac Specifications 
+
+| **Parameter**       | **Description**            | **Typical/Example**     | **Unit** | **Notes** |
+|----------------------|----------------------------|--------------------------|----------|-----------|
+| **Resolution**      | Number of bits             | 10                       | bits     | 1024 codes |
+| **Digital input**   | Data bus                   | `D[9:0]`                 | —        | From RVMYTH |
+| **Enable**          | DAC enable                 | `EN`                     | —        | Digital control |
+| **Analog supply**   | Analog rail                | 3.3                      | V        | VDDA (analog domain) |
+| **Digital supply**  | Digital rail               | 1.8                      | V        | VDD (logic domain) |
+| **References**      | High/Low refs              | `VREFH` / `VREFL`        | V        | Example: VREFH=3.3V, VREFL=0V |
+| **Output pin**      | Analog output              | `OUT`                    | —        | Single-ended |
+
+    
+### 4. VSDBabySoC
+
+#### How VSDBabySoC Works  
+
+##### Step 1 – Starting Up and Clock Generation  
+- When BabySoC powers on, the **PLL (Phase-Locked Loop)** starts running.  
+- The PLL creates a **clean, stable clock signal**.  
+- This clock keeps the **processor (RVMYTH)** and the **DAC** working in sync, ensuring smooth operation without timing errors.  
+
+##### Step 2 – Data Processing in RVMYTH  
+- The **RVMYTH processor** uses a register called **r17** to hold data values.  
+- These values are continuously updated and sent to the **DAC**.  
+- RVMYTH produces a **10-bit digital signal (OUT)** - `rvmyth D[9:0]`, which represents the data stream for analog conversion.  
+
+##### Step 3 – Digital-to-Analog Conversion (DAC)  
+- The **10-bit DAC** converts the digital values from RVMYTH into an **analog voltage**.  
+- Each 10-bit code corresponds to one of **1024 voltage levels** between `VREFL` (low) and `VREFH` (high).  
+- Typical DAC designs use:  
+  - **R-2R resistor ladders**  
+  - **Weighted resistors**  
+- The **Sky130 version of the DAC** uses a **potentiometric architecture** with:  
+  - **3.3 V analog supply** and **1.8 V digital supply**  
+  - **External reference rails** (`VREFH` / `VREFL`)  
+  - **Standard pin naming** for better noise isolation and tool compatibility 
+
+> **PLL makes the clock → RVMYTH generates 10-bit data → DAC converts it into analog output.**
+
 
 ```
 mkdir SoC
@@ -255,7 +289,7 @@ cd src/module
 <img width="931" height="211" alt="image" src="https://github.com/user-attachments/assets/fa0ffc7e-dbce-4042-96f3-b442dd8b1e51" />
 
 
-## TLV to Verilog Conversion
+#### TLV to Verilog Conversion
 
 Step 1: Install Python venv
 ```
@@ -263,7 +297,9 @@ sudo apt update
 sudo apt install python3-venv python3-pip -y
 ```
 Step 2: Create and Activate a Virtual Environment
+
 This helps isolate SandPiper-SaaS and its dependencies.
+
 ```
 # Create venv
 python3 -m venv sp_env
@@ -271,16 +307,20 @@ python3 -m venv sp_env
 # Activate venv
 source sp_env/bin/activate
 ```
+
 Step 3: Install SandPiper-SaaS Inside the Virtual Environment
 ```
 pip install pyyaml click sandpiper-saas
 ```
+
 > This installs the SandPiper-SaaS TLV compiler along with required Python dependencies.
 
 Step 4: Prepare Your TLV Source
+
+```
 Place your .tlv files inside ./src/module/.
 Example: rvmyth.tlv
-
+```
 Step 5: Convert TLV to Verilog
 
 Run the compiler:
@@ -326,16 +366,15 @@ tree
 - testbench.rvmyth.post-routing.v → Post-routing testbench (for gate-level simulation after layout)
 
 
-include
+> include folder
 
 <img width="929" height="91" alt="image" src="https://github.com/user-attachments/assets/70046fc9-d0db-4756-b448-795189f81fef" />
 
 
-## pre-synthesis Simulation
+#### Pre-Synthesis Simulation
 
 ```
 mkdir -p output/pre_synth_sim
-
 
 iverilog -o ./output/pre_synth_sim/pre_synth_sim.out \
   -DPRE_SYNTH_SIM \
@@ -348,110 +387,106 @@ cd output/pre_synth_sim
 gtkwave pre_synth_sim.vcd
 ```
 
-iverilog → invokes the Icarus Verilog compiler.
-
--o ./output/pre_synth_sim/pre_synth_sim.out → specifies the output executable file.
-
--DPRE_SYNTH_SIM → defines the macro PRE_SYNTH_SIM (used in your testbench for conditional code).
-
--I ./src/include → tells the compiler where to look for header/include files.
-
--I ./src/module → tells the compiler where to look for module source files.
-
-./src/module/testbench.v → top-level testbench that ties the design and simulation together.
-
+- iverilog → invokes the Icarus Verilog compiler.
+- -o ./output/pre_synth_sim/pre_synth_sim.out → specifies the output executable file.
+- -DPRE_SYNTH_SIM → defines the macro PRE_SYNTH_SIM (used in your testbench for conditional code).
+- -I ./src/include → tells the compiler where to look for header/include files.
+- -I ./src/module → tells the compiler where to look for module source files.
+- ./src/module/testbench.v → top-level testbench that ties the design and simulation together.
 
 <img width="926" height="425" alt="image" src="https://github.com/user-attachments/assets/c797a9fb-33d8-4e4a-9068-28a7e0e3482b" />
 
 
+#### Synthesis 
 
-# yosys 
-
+```
+yosys
 read_verilog ./src/module/vsdbabysoc.v
-
+```
 <img width="933" height="86" alt="image" src="https://github.com/user-attachments/assets/321db736-1659-4290-a794-0e8b28090058" />
 
+```
 read_verilog -I ./src/include/ ./src/module/rvmyth.v
-
+```
 <img width="926" height="113" alt="image" src="https://github.com/user-attachments/assets/7ae1d4b6-6047-4fb4-a087-08dd43ff9129" />
 
-
+```
 read_verilog -I ./src/include/ ./src/module/clk_gate.v
-
+```
 <img width="917" height="83" alt="image" src="https://github.com/user-attachments/assets/39f55b94-d898-4cac-9ceb-276ac581d05c" />
 
-
+```
 read_liberty -lib ./src/lib/avsdpll.lib
 read_liberty -lib ./src/lib/avsddac.lib
 read_liberty -lib ./src/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
-
+```
 <img width="926" height="171" alt="image" src="https://github.com/user-attachments/assets/ed27ca72-e2b5-4862-92ad-b77a3bcadca4" />
 
+```
 synth -top vsdbabysoc
+```
 
-clockgate
-<img width="227" height="147" alt="image" src="https://github.com/user-attachments/assets/c2e0fb56-8bd0-4ef0-beec-15f5eb4099a3" />
+| **Clock Gate** | **RVMYTH** | **VSDBabySoC** | **Design Hierarchy** |
+|----------------|------------|----------------|----------------------|
+| <img width="227" height="147" alt="clockgate" src="https://github.com/user-attachments/assets/c2e0fb56-8bd0-4ef0-beec-15f5eb4099a3" /> | <img width="224" height="304" alt="rvmyth" src="https://github.com/user-attachments/assets/a9cf19ec-3a6e-4369-8685-0b0419256621" /> | <img width="226" height="173" alt="vsdbabysoc" src="https://github.com/user-attachments/assets/16ac9661-0ab5-4be2-9605-b7dd47f494b0" /> | <img width="236" height="364" alt="design-hier" src="https://github.com/user-attachments/assets/ac254241-a53b-4c0e-b7b2-466ff23062a2" /> |
 
-rvmyth
-<img width="224" height="304" alt="image" src="https://github.com/user-attachments/assets/a9cf19ec-3a6e-4369-8685-0b0419256621" />
-
-vsdbabysoc
-<img width="226" height="173" alt="image" src="https://github.com/user-attachments/assets/16ac9661-0ab5-4be2-9605-b7dd47f494b0" />
-
-design hier
-<img width="236" height="364" alt="image" src="https://github.com/user-attachments/assets/ac254241-a53b-4c0e-b7b2-466ff23062a2" />
-
+```
 dfflibmap -liberty ~/VLSI/VSDBabySoC/src/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
-
+```
 <img width="919" height="359" alt="image" src="https://github.com/user-attachments/assets/1c95146d-7c24-4d78-90b8-d8ce0c20cfd5" />
 
+```
 opt
-
+```
 <img width="927" height="359" alt="image" src="https://github.com/user-attachments/assets/5ed07f4b-a65f-4f75-8804-b55b19ac40d7" />
 
+```
 abc -liberty ./src/lib/sky130_fd_sc_hd__tt_025C_1v80.lib -script +strash;scorr;ifraig;retime;{D};strash;dch,-f;map,-M,1,{D}
-
+```
 <img width="926" height="400" alt="image" src="https://github.com/user-attachments/assets/418ee250-7fec-4426-96c1-c9de4f15a98e" />
 
+```
 flatten
 setundef -zero
 clean -purge
 rename -enumerate
-
+```
 <img width="928" height="182" alt="image" src="https://github.com/user-attachments/assets/2ead8890-553a-4783-8c51-222f5d8e4229" />
 
+```
 stat
+```
 <img width="274" height="374" alt="image" src="https://github.com/user-attachments/assets/79da2ba2-6b38-4629-95a6-8343962455b0" />
 <img width="284" height="292" alt="image" src="https://github.com/user-attachments/assets/9b6a8a5b-7d18-4c7f-942f-a86bbfc2c075" />
 
-
+```
 write_verilog -noattr ./output/post_synth_sim/vsdbabysoc.synth.v
+```
 <img width="927" height="101" alt="image" src="https://github.com/user-attachments/assets/9c5dd8ed-bac2-45fd-9be4-d9a21bcca869" />
 
+#### Copy the required files for Gate-level Simulation
 
-
+```
 cd /home/venkatkamatham/Desktop/SoC/VSDBabySoC/src/module
-
 cp -r ../../../../RTL/sky130RTLDesignAndSynthesisWorkshop/my_lib/verilog_model/primitives.v .
-
 cp -r ../../../../RTL/sky130RTLDesignAndSynthesisWorkshop/my_lib/verilog_model/sky130_fd_sc_hd.v .
-
 cp -r ../../output/post_synth_sim/vsdbabysoc.synth.v .
-
 cd Desktop/SoC/VSDBabySoC/
 iverilog -o ./output/post_synth_sim/post_synth_sim.out -DPOST_SYNTH_SIM -DFUNCTIONAL -DUNIT_DELAY=#1 -I ./src/include -I ./src/module ./src/module/testbench.v
-
+```
 <img width="928" height="47" alt="image" src="https://github.com/user-attachments/assets/8d9812ab-ad09-4b65-a11e-d089900f9c42" />
 
-To resolve this: Update the syntax in the file sky130_fd_sc_hd.v at or around line 74452.
+> To resolve this: Update the syntax in the file sky130_fd_sc_hd.v at or around line 74452.
 
 Change:
+
 `endif SKY130_FD_SC_HD__LPFLOW_BLEEDER_FUNCTIONAL_V
+
 To:
+
 `endif // SKY130_FD_SC_HD__LPFLOW_BLEEDER_FUNCTIONAL_V
 
 <img width="926" height="425" alt="image" src="https://github.com/user-attachments/assets/67777a00-b9e3-44e1-89bc-62cc74f214a1" />
-
 
 - waveform
   
