@@ -16,7 +16,9 @@ SoCs are popular due to:
 - Reuse of pre-designed IP blocks.
 - Faster development and support for product variants using platform-based design [2].
 
-> Figure 1 here: High-level block diagram of a typical SoC.
+<img width="980" height="921" alt="soc im1" src="https://github.com/user-attachments/assets/fa3b2f33-7ec4-4b4b-b413-97e75f0a0615" />
+
+
 
 ### II. Key Parts of an SoC 
 
@@ -38,24 +40,28 @@ SoCs are popular due to:
 
 2) **Heterogeneous/MPSoCs**: Multiple core types (CPU, DSP, ASIP, accelerators) for parallel workloads [4].
 
-3) **Mixed-Signal SoCs**: Combine digital cores with analogue IPs (PLLs, ADC/DACs, sensors); need careful design [5], [6].
+3) **Mixed-Signal SoCs**: Combine digital cores with analogue IPs (PLLs, ADC/DACs, sensors); need careful design [5][6].
 
 4) **Chiplet-based SoCs**: Multiple small dies in one package; improve yield and support AI/IoT [7].
 
-> Figure 2 here: Comparison of SoC types.
+<img width="1024" height="478" alt="soc 1" src="https://github.com/user-attachments/assets/a9111f0d-bce7-45f9-a180-00106ac77ce6" />
+
+
 
 
 ###  IV. Architecture and Interconnects
 
 SoC design uses platform-based architecture, where cores, buses, and memory form a fixed kernel, and additional IP blocks are added around it [2]. Traditional buses struggle with many cores; Networks-on-Chip (NoC) provide distributed routing and arbitration for higher bandwidth and scalability [4].
 
-> Figure 3 here: NoC-based SoC interconnect architecture.
+<img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/15f80728-dbcf-482c-ad40-a4fca483ca0f" />
+
 
 ### V. Design Flow and IP Reuse
 
 Modern SoCs reuse IP blocks at higher levels (interfaces, codecs, memory). Software is integrated early with APIs and RTOS support [2]. Analogue IP hardening converts behavioural models into manufacturable layouts, ensuring reuse across technology nodes [5].
 
-> Figure 4 here: SoC design flow diagram highlighting IP reuse.
+<img width="1024" height="1024" alt="flow1" src="https://github.com/user-attachments/assets/3aff467a-87b4-4e9a-bb45-42fddeb13ecc" />
+
 
 ### VI. Verification and Sign-Off
 
@@ -141,11 +147,25 @@ Key Features:
 . Accessed: Oct. 4, 2025.
 
 
+## BabySoC Functional Modelling
+
+VSDBabySoC is a small but powerful System on Chip (SoC) based on the RISC-V design. It was created to test three open-source IP cores at the same time and to fine-tune its analog components. The SoC includes an RVMYTH processor, an 8x phase-locked loop (PLL) to create a stable clock, and a 10-bit DAC (digital-to-analog converter) that allows it to work with analog devices.
+
+Starting Up and Clock Generation: When BabySoC receives an initial signal, the PLL turns on and creates a stable, synchronized clock. This clock keeps the processor and DAC in sync, making sure all parts of the system work together smoothly without errors.
 
 
 
+Creating Analog Signals with the DAC: The DAC takes the digital data from RVMYTH and converts it into analog signals. These signals are saved in a file called OUT and can be sent to devices like TVs or phones, which can turn them into sound or video. This shows how BabySoC can connect digital processing with real-world multimedia devices.
 
+1. RISC-V Core (rvmyth)
 
+RVMYTH is the main CPU of BabySoC. It uses a register called **r17** to store values sent to the DAC. As it runs, `r17` is continuously updated, producing a steady stream of data for analogue conversion. RVMYTH outputs a **10-bit digital signal (OUT)** for the DAC.
+
+You can find the module on GitHub: [rvmyth](https://github.com/kunalg123/rvmyth/)
+
+   <img width="940" height="478" alt="rvmyth" src="https://github.com/user-attachments/assets/1b754272-7fd0-4bf7-9528-c07b429e725a" />
+
+2. 
 ## rvmyth core
 
 ```
