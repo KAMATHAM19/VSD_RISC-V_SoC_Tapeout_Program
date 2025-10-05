@@ -150,7 +150,7 @@ Key Features:
  
 ## BabySoC Functional Modelling
 
-VSDBabySoC is a small but powerful System on Chip (SoC) based on the RISC-V design. It was created to test three open-source IP cores at the same time and to fine-tune its analog components. The SoC includes an RVMYTH processor, an 8x phase-locked loop (PLL) to create a stable clock, and a 10-bit DAC (digital-to-analog converter) that allows it to work with analog devices.
+VSDBabySoC is a small yet powerful System-on-Chip (SoC) based on the RISC-V design. It was created to test three open-source IP cores simultaneously and to fine-tune its analogue components. The SoC includes an RVMYTH processor, an 8x phase-locked loop (PLL) to create a stable clock, and a 10-bit DAC (digital-to-analog converter) that allows it to work with analog devices.
 
 ### 1. RISC-V Core (rvmyth)
 
@@ -160,7 +160,20 @@ You can find the module on GitHub: [rvmyth](https://github.com/kunalg123/rvmyth/
 
  <img width="940" height="478" alt="rvmyth" src="https://github.com/user-attachments/assets/1b754272-7fd0-4bf7-9528-c07b429e725a" />
 
-### 2. Phase-Locked Loop
+- Simulation
+
+```
+git clone https://github.com/kunalg123/rvmyth/
+cd rvmyth
+iverilog mythcore_test.v tb_mythcore_test.v
+./a.out
+gtkwave tb_mythcore_test.vcd
+```
+<img width="925" height="223" alt="image" src="https://github.com/user-attachments/assets/30f21866-e849-4dbe-8489-423a7f7ec8aa" />
+
+<img width="926" height="281" alt="image" src="https://github.com/user-attachments/assets/b8fb9a16-306e-4012-9eb5-e3b27b981905" />
+
+### 2. Phase-Locked Loop (avsdpll_1v8)
 
 A **PLL (Phase-Locked Loop)** creates a clean and steady clock by copying the timing of a known reference and continuously adjusting itself to stay in sync.
 
@@ -228,8 +241,19 @@ You can check the projects here: [Introduction](https://github.com/ireneann713/P
 | **Jitter / Load** | RMS jitter and load capacitance placeholders; focus on frequency, duty cycle, and lock times. |
 | **Datasheet Summary** | SKY130, 1.8 V, 5–12.5 MHz in, 40–100 MHz out (8×), ~50% duty, lock ~22–37 µs post-layout, third-order loop filter. |
 
+- Simulation
 
-### 3. Digital-to-Analog-Converter (DAC)
+```
+iverilog avsdpll.v avsdpll_test.v
+./a.out
+gtkwave avsdpll_tb_test.vcd
+```
+
+<img width="926" height="136" alt="image" src="https://github.com/user-attachments/assets/569a661f-3ce5-4798-918b-7c198eff915e" />
+<img width="923" height="323" alt="image" src="https://github.com/user-attachments/assets/8a009203-475b-46bf-b419-6e6c18600ded" />
+
+
+### 3. Digital-to-Analog-Converter (avsddac)
 
 A **Digital-to-Analog Converter (DAC)** is an electronic device that converts a **digital input** (binary code) into an **analog output** (continuous voltage or current).
 
@@ -277,7 +301,18 @@ You can find the project at the [avsddac](https://github.com/vsdip/rvmyth_avsdda
 | **References**      | High/Low refs              | `VREFH` / `VREFL`        | V        | Example: VREFH=3.3V, VREFL=0V |
 | **Output pin**      | Analog output              | `OUT`                    | —        | Single-ended |
 
-    
+- Simulation
+
+```
+iverilog avsddac.v avsddac_tb_test.v
+./a.out
+gtkwave avsddac_tb_test.vcd
+```
+
+<img width="925" height="155" alt="image" src="https://github.com/user-attachments/assets/345aa3b8-d97c-4c66-83cc-85802efbfe2f" />
+
+<img width="927" height="270" alt="image" src="https://github.com/user-attachments/assets/a57d3a8c-dbf0-4e62-94b2-40dd63ce3691" />
+
 ### 4. VSDBabySoC
 
 You can find the project at the [VSDBabySoC](https://github.com/manili/VSDBabySoC.git).
