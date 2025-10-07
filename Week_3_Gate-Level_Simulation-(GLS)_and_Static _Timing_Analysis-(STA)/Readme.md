@@ -250,6 +250,56 @@ report_units
 - **With SPEF**: Includes parasitic RC delays → **larger path delays**, **smaller slack**.  
 - SPEF-based slack is closer to real post-route timing and is critical for **final timing verification**.
 
+
+
+# VSDBabySoC
+
+```
+
+cd Desktop/SoC/VSDBabySoC
+
+sta
+
+# Load Liberty Libraries (standard cell + IPs)
+read_liberty  ./src/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_liberty  ./src/lib/avsdpll.lib
+
+<img width="925" height="35" alt="image" src="https://github.com/user-attachments/assets/f4d1c19c-d423-431b-8786-1135bf830cb7" />
+
+This error occurs because Liberty syntax does not support // for single-line comments, and more importantly, the { character appearing after // confuses the Liberty parser. Specifically, check around line 54 of avsdpll.lib and correct any syntax issues such as:
+
+//pin (GND#2) {
+//  direction : input;
+//  max_transition : 2.5;
+//  capacitance : 0.001;
+//}
+✔️ Replace with:
+
+/*
+pin (GND#2) {
+  direction : input;
+  max_transition : 2.5;
+  capacitance : 0.001;
+}
+*/
+```
+```
+This should allow OpenSTA to parse the Liberty file without throwing syntax errors.
+read_liberty ./src/lib/avsddac.lib
+
+# Read Synthesized Netlist
+read_verilog /data/VLSI/VSDBabySoC/OpenSTA/examples/BabySoC/vsdbabysoc.synth.v
+
+# Link the Top-Level Design
+link_design vsdbabysoc
+
+# Apply SDC Constraints
+read_sdc /data/VLSI/VSDBabySoC/OpenSTA/examples/BabySoC/vsdbabysoc_synthesis.sdc
+
+# Generate Timing Report
+report_checks
+
+```
 ## References
 
 https://github.com/The-OpenROAD-Project/OpenSTA.git
