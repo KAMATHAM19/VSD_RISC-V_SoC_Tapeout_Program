@@ -3,7 +3,7 @@
 
 ## Installation of OpenSTA
 
-```
+```bash
 sudo apt-get update
 sudo apt-get install build-essential tcl-dev tk-dev cmake git libeigen3-dev autoconf m4 perl automake 
 
@@ -15,7 +15,7 @@ cmake ..
 ```
 - if any errors occur
 
-```
+```bash
 cd
 git clone https://github.com/ivmai/cudd.git
 cd cudd
@@ -28,7 +28,7 @@ make install
 ```
 > CUDD is installed successfully
 
-```
+```bash
 cd OpenSTA
 cd build
 cmake .. -DUSE_CUDD=ON -DCUDD_DIR=$HOME/cudd
@@ -42,7 +42,7 @@ sta
 
 > Once you are in the OpenSTA interactive shell (indicated by the % prompt), you can execute the following inline commands to perform a basic static timing analysis:
 
-```
+```tcl
 # Change to directory
 cd OpenSTA/examples
 
@@ -66,7 +66,7 @@ set_input_delay -clock clk 0 {in1 in2}
 ```
 <img width="926" height="173" alt="image" src="https://github.com/user-attachments/assets/6eecc46f-091a-440e-b41a-30b0b2e4f704" />
 
-```
+```tcl
 # Generate a timing check report for the design
 report_checks
 
@@ -78,7 +78,7 @@ report_checks -path_delay max
 
 > report_check by default is setup/max checks
 
-```
+```tcl
 report_checks -path_delay min
 
 ```
@@ -99,7 +99,7 @@ module top (in1, in2, clk1, clk2, clk3, out);
   DFF_X1 r3 (.D(u2z), .CK(clk3), .Q(out));
 endmodule // top
 ```
-```
+```tcl
 cd /OpenSTA/examples/
 yosys
 read_liberty -lib nangate45_slow.lib.gz
@@ -138,7 +138,7 @@ Total arrival time  = 0.41 ns                       (trequired​=Tclk​−tset
 
 - For hold check, we consider the shortest path
   
-```
+```java
 Data arrival time = 0.00 ns (tarrivalmin​=tclk_q​+tcomb_min​)
 Data required time = 0.01 ns (trequiredhold​=thold​)
 -------------------------------------
@@ -152,7 +152,7 @@ Slack = Data arrival time − Data required time (Slackhold​=tarrivalmin​−
 
 ## SPEF-Based Timing Analysis
 
-```
+```tcl
 # Change to the directory containing OpenSTA examples
 cd OpenSTA/examples
 
@@ -254,7 +254,7 @@ report_units
 
 # VSDBabySoC
 
-```
+```tcl
 
 cd Desktop/SoC/VSDBabySoC
 
@@ -263,43 +263,232 @@ sta
 # Load Liberty Libraries (standard cell + IPs)
 read_liberty  ./src/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
 read_liberty  ./src/lib/avsdpll.lib
-
-<img width="925" height="35" alt="image" src="https://github.com/user-attachments/assets/f4d1c19c-d423-431b-8786-1135bf830cb7" />
-
-This error occurs because Liberty syntax does not support // for single-line comments, and more importantly, the { character appearing after // confuses the Liberty parser. Specifically, check around line 54 of avsdpll.lib and correct any syntax issues such as:
-
-//pin (GND#2) {
-//  direction : input;
-//  max_transition : 2.5;
-//  capacitance : 0.001;
-//}
-✔️ Replace with:
-
-/*
-pin (GND#2) {
-  direction : input;
-  max_transition : 2.5;
-  capacitance : 0.001;
-}
-*/
-```
-```
-This should allow OpenSTA to parse the Liberty file without throwing syntax errors.
 read_liberty ./src/lib/avsddac.lib
 
 # Read Synthesized Netlist
-read_verilog /data/VLSI/VSDBabySoC/OpenSTA/examples/BabySoC/vsdbabysoc.synth.v
+read_verilog ./src/module/vsdbabysoc.synth.v
 
 # Link the Top-Level Design
 link_design vsdbabysoc
 
 # Apply SDC Constraints
-read_sdc /data/VLSI/VSDBabySoC/OpenSTA/examples/BabySoC/vsdbabysoc_synthesis.sdc
+read_sdc ./src/sdc/vsdbabysoc_synthesis.sdc
+```
+```sdc
+set_units -time ns
+create_clock [get_pins {pll/CLK}] -name clk -period 11
+```
 
-# Generate Timing Report
-report_checks
+<img width="924" height="253" alt="image" src="https://github.com/user-attachments/assets/9eef44aa-1acf-4d25-ab55-c917487f9c07" />
 
 ```
+# Generate Timing Report
+report_checks
+```
+
+<img width="923" height="319" alt="image" src="https://github.com/user-attachments/assets/2d1e547e-d86a-449a-881e-00ba8de3d152" />
+
+```
+report_checks -path_delay min
+```
+<img width="929" height="307" alt="image" src="https://github.com/user-attachments/assets/1e528851-ee7b-4219-ae11-8b576d8bc537" />
+
+# PVT Corners and Timing Analysis
+
+### Timing Libraries
+
+Timing libraries required for this analysis can be downloaded from:
+
+**[SkyWater PDK – sky130_fd_sc_hd Timing Libraries](https://github.com/efabless/skywater-pdk-libs-sky130_fd_sc_hd/tree/master/timing)**
+
+
+script for downloading all lib files
+
+```
+#!/usr/bin/env tclsh
+
+# List of .lib files to download
+set files {
+    sky130_fd_sc_hd__ff_100C_1v65.lib
+    sky130_fd_sc_hd__ff_100C_1v95.lib
+    sky130_fd_sc_hd__ff_n40C_1v56.lib
+    sky130_fd_sc_hd__ff_n40C_1v65.lib
+    sky130_fd_sc_hd__ff_n40C_1v76.lib
+    sky130_fd_sc_hd__ff_n40C_1v95.lib
+    sky130_fd_sc_hd__ss_100C_1v40.lib
+    sky130_fd_sc_hd__ss_100C_1v60.lib
+    sky130_fd_sc_hd__ss_n40C_1v28.lib
+    sky130_fd_sc_hd__ss_n40C_1v35.lib
+    sky130_fd_sc_hd__ss_n40C_1v40.lib
+    sky130_fd_sc_hd__ss_n40C_1v44.lib
+    sky130_fd_sc_hd__ss_n40C_1v76.lib
+    sky130_fd_sc_hd__ss_n40C_1v60.lib 
+    sky130_fd_sc_hd__tt_025C_1v80.lib
+    sky130_fd_sc_hd__tt_100C_1v80.lib
+}
+
+# Base URL for the raw files
+set base_url "https://github.com/efabless/skywater-pdk-libs-sky130_fd_sc_hd/raw/master/timing"
+
+# Use existing folder 'lib'
+cd lib
+
+# Download each file (always overwrite)
+foreach file $files {
+    puts "Downloading $file..."
+    if {[catch {exec wget -O $file --quiet --show-progress $base_url/$file} err]} {
+        puts "Failed to download $file: $err" 
+    } else {
+        puts "Finished downloading $file"
+    }
+}
+
+puts "\n All downloads complete!"
+
+```
+chmod 777 pvt_corners_download.tcl
+tclsh pvt_corners_download.tcl
+
+
+<img width="929" height="169" alt="image" src="https://github.com/user-attachments/assets/f2c68f4b-f80e-4848-94ce-70b4c3d55b26" />
+
+- script to run sta for all pvt corners
+```
+ set list_of_lib_files(1) "sky130_fd_sc_hd__ff_n40C_1v95.lib"
+ set list_of_lib_files(2) "sky130_fd_sc_hd__ff_100C_1v65.lib"
+ set list_of_lib_files(3) "sky130_fd_sc_hd__ff_100C_1v95.lib"
+ set list_of_lib_files(4) "sky130_fd_sc_hd__ff_n40C_1v56.lib"
+ set list_of_lib_files(5) "sky130_fd_sc_hd__ff_n40C_1v65.lib"
+ set list_of_lib_files(6) "sky130_fd_sc_hd__ff_n40C_1v76.lib"
+ set list_of_lib_files(7) "sky130_fd_sc_hd__ss_100C_1v40.lib"
+ set list_of_lib_files(8) "sky130_fd_sc_hd__ss_100C_1v60.lib"
+ set list_of_lib_files(9) "sky130_fd_sc_hd__ss_n40C_1v28.lib"
+ set list_of_lib_files(10) "sky130_fd_sc_hd__ss_n40C_1v35.lib"
+ set list_of_lib_files(11) "sky130_fd_sc_hd__ss_n40C_1v40.lib"
+ set list_of_lib_files(12) "sky130_fd_sc_hd__ss_n40C_1v44.lib"
+ set list_of_lib_files(13) "sky130_fd_sc_hd__ss_n40C_1v76.lib"
+set list_of_lib_files(14) "sky130_fd_sc_hd__ss_n40C_1v60.lib "
+set list_of_lib_files(15) "sky130_fd_sc_hd__tt_025C_1v80.lib"
+set list_of_lib_files(16) "sky130_fd_sc_hd__tt_100C_1v80.lib"
+
+ read_liberty ./src/lib/avsdpll.lib
+ read_liberty ./src/lib/avsddac.lib
+
+ for {set i 1} {$i <= [array size list_of_lib_files]} {incr i} {
+ read_liberty ./src/lib/$list_of_lib_files($i)
+ read_verilog ./src/module/vsdbabysoc.synth.v
+ link_design vsdbabysoc
+ current_design
+ read_sdc ./src/sdc/vsdbabysoc_synthesis.sdc
+ check_setup -verbose
+
+mkdir sta_outputs
+report_checks -path_delay min_max -fields {nets cap slew input_pins fanout} -digits {4} > ./sta_outputs/min_max_$list_of_lib_files($i).txt
+
+ exec echo "$list_of_lib_files($i)" >> ./sta_outputs/sta_worst_max_slack.txt
+ report_worst_slack -max -digits {4} >> ./sta_outputs/sta_worst_max_slack.txt
+
+ exec echo "$list_of_lib_files($i)" >> ./sta_outputs/sta_worst_min_slack.txt
+ report_worst_slack -min -digits {4} >> ./sta_outputs/sta_worst_min_slack.txt
+
+ exec echo "$list_of_lib_files($i)" >> ./sta_outputs/sta_tns.txt
+ report_tns -digits {4} >> ./sta_outputs/sta_tns.txt
+
+ exec echo "$list_of_lib_files($i)" >> ./sta_outputs/sta_wns.txt
+ report_wns -digits {4} >> ./sta_outputs/sta_wns.txt
+ }
+
+```
+
+
+```
+#!/usr/bin/env tclsh
+#---------------------------------------------
+#  Multi-corner STA Automation Script (OpenSTA)
+#---------------------------------------------
+
+# Define list of timing libraries (corners)
+set list_of_lib_files {
+    sky130_fd_sc_hd__ff_n40C_1v95.lib
+    sky130_fd_sc_hd__ff_100C_1v65.lib
+    sky130_fd_sc_hd__ff_100C_1v95.lib
+    sky130_fd_sc_hd__ff_n40C_1v56.lib
+    sky130_fd_sc_hd__ff_n40C_1v65.lib
+    sky130_fd_sc_hd__ff_n40C_1v76.lib
+    sky130_fd_sc_hd__ss_100C_1v40.lib
+    sky130_fd_sc_hd__ss_100C_1v60.lib
+    sky130_fd_sc_hd__ss_n40C_1v28.lib
+    sky130_fd_sc_hd__ss_n40C_1v35.lib
+    sky130_fd_sc_hd__ss_n40C_1v40.lib
+    sky130_fd_sc_hd__ss_n40C_1v44.lib
+    sky130_fd_sc_hd__ss_n40C_1v76.lib
+    sky130_fd_sc_hd__ss_n40C_1v60.lib
+    sky130_fd_sc_hd__tt_025C_1v80.lib
+    sky130_fd_sc_hd__tt_100C_1v80.lib
+}
+
+#---------------------------------------------
+#  Load base cell libraries and design files
+#---------------------------------------------
+read_liberty ./src/lib/avsdpll.lib
+read_liberty ./src/lib/avsddac.lib
+
+#---------------------------------------------
+#  Create output folder
+#---------------------------------------------
+file mkdir sta_outputs
+
+#---------------------------------------------
+#  Loop through each .lib file (corner)
+#---------------------------------------------
+set i 1
+foreach lib_file $list_of_lib_files {
+
+    puts "\n=== Running STA for corner: $lib_file ==="
+
+    # Load corner-specific library
+    read_liberty ./src/lib/$lib_file
+
+    # Read design and constraints
+    read_verilog ./src/module/vsdbabysoc.synth.v
+    link_design vsdbabysoc
+    current_design vsdbabysoc
+    read_sdc ./src/sdc/vsdbabysoc_synthesis.sdc
+
+    # Perform timing checks
+    check_setup -verbose
+
+    #-----------------------------------------
+    # Generate detailed reports
+    #-----------------------------------------
+    report_checks \
+        -path_delay min_max \
+        -fields {nets cap slew input_pins fanout} \
+        -digits 4 \
+        > ./sta_outputs/min_max_$lib_file.txt
+
+    #-----------------------------------------
+    # Save key metrics (WNS, TNS)
+    #-----------------------------------------
+    exec echo "$lib_file" >> ./sta_outputs/sta_worst_max_slack.txt
+    report_worst_slack -max -digits 4 >> ./sta_outputs/sta_worst_max_slack.txt
+
+    exec echo "$lib_file" >> ./sta_outputs/sta_worst_min_slack.txt
+    report_worst_slack -min -digits 4 >> ./sta_outputs/sta_worst_min_slack.txt
+
+    exec echo "$lib_file" >> ./sta_outputs/sta_tns.txt
+    report_tns -digits 4 >> ./sta_outputs/sta_tns.txt
+
+    exec echo "$lib_file" >> ./sta_outputs/sta_wns.txt
+    report_wns -digits 4 >> ./sta_outputs/sta_wns.txt
+
+    incr i
+}
+puts "\n All corners analysed. Reports saved in ./sta_outputs/"
+
+```
+
+
 ## References
 
 https://github.com/The-OpenROAD-Project/OpenSTA.git
