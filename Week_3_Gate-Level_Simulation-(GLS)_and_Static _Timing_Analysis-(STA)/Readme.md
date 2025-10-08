@@ -1,3 +1,16 @@
+<details>
+  <summary>Gate Level Simulation (GLS)</summary>
+
+# Gate Level Simulation (GLS)
+
+
+</details>
+
+<details>
+  <summary>Static Timing Analysis</summary>
+
+# Static Timing Analysis
+</details>
 
 
 <details>
@@ -40,7 +53,7 @@ sta
 ```
 <img width="926" height="163" alt="image" src="https://github.com/user-attachments/assets/5a494ae0-a203-43fd-a008-b49a3c5e7331" />
 
-## Example 1: Timing Analysis Using Commands
+## Example: Timing Analysis Using Commands
 
 > Once you are in the OpenSTA interactive shell (indicated by the % prompt), you can execute the following commands to perform a basic static timing analysis:
 
@@ -250,6 +263,79 @@ report_units
 - **With SPEF**: Includes parasitic RC delays → **larger path delays**, **smaller slack**.  
 - SPEF-based slack is closer to real post-route timing and is critical for **final timing verification**.
 
+## Timing Analysis Using Scripts
+
+### Min_Max Delay Calculation using script
+
+```
+read_liberty -max nangate45_slow.lib.gz
+read_liberty -min nangate45_fast.lib.gz
+read_verilog example1.v
+link_design top
+create_clock -name clk -period 10 {clk1 clk2 clk3}
+set_input_delay -clock clk 0 {in1 in2}
+report_checks -path_delay min_max
+```
+
+- Load the file to run the STA analysis
+
+```
+sta
+source min_max_delays.tcl
+```
+<img width="1852" height="809" alt="image" src="https://github.com/user-attachments/assets/4e9bfe76-6dce-43ee-a105-a5c617d7c5b2" />
+<img width="925" height="311" alt="image" src="https://github.com/user-attachments/assets/18da13ef-50b2-467d-a6fd-0d10631ddce2" />
+
+### Multi-Corners 
+
+```
+# multi_corner.tcl
+# 3 corners with +/-10% derating example
+
+define_corners ss tt ff
+
+read_liberty -corner ss nangate45_slow.lib.gz
+read_liberty -corner tt nangate45_typ.lib.gz
+read_liberty -corner ff nangate45_fast.lib.gz
+
+read_verilog example1.v
+link_design top
+
+set_timing_derate -early 0.9
+set_timing_derate -late 1.1
+
+create_clock -name clk -period 10 {clk1 clk2 clk3}
+set_input_delay -clock clk 0 {in1 in2}
+
+# Report all corners
+report_checks -path_delay min_max
+
+# Report typical corner
+report_checks -corner tt
+
+```
+
+- Load the file to run the STA analysis
+```
+sta
+source multi_corner.tcl
+```
+<img width="925" height="320" alt="image" src="https://github.com/user-attachments/assets/bb53d6d9-b110-48a0-be75-cd2ae7a50902" />
+<img width="921" height="320" alt="image" src="https://github.com/user-attachments/assets/6399e2b9-16d5-4fbe-abe0-5c48b170f76c" />
+<img width="1863" height="668" alt="image" src="https://github.com/user-attachments/assets/1ec62094-ae5f-470a-8d52-1adaf584cc41" />
+
+```
+report_checks -corner ff
+```
+<img width="928" height="331" alt="image" src="https://github.com/user-attachments/assets/18604205-1e41-4d12-a97f-377a87179e3c" />
+
+
+## References
+
+https://github.com/The-OpenROAD-Project/OpenSTA.git
+
+https://github.com/ivmai/cudd.git
+
 </details>
 
 <details>
@@ -357,63 +443,18 @@ foreach file $files {
 puts "\n All downloads complete!"
 
 ```
+- Grant execute permission and run the TCL script to download all PVT corner library files.
+  
+```
 chmod 777 pvt_corners_download.tcl
 tclsh pvt_corners_download.tcl
-
+```
 
 <img width="929" height="169" alt="image" src="https://github.com/user-attachments/assets/f2c68f4b-f80e-4848-94ce-70b4c3d55b26" />
 
-- script to run sta for all pvt corners
-```
- set list_of_lib_files(1) "sky130_fd_sc_hd__ff_n40C_1v95.lib"
- set list_of_lib_files(2) "sky130_fd_sc_hd__ff_100C_1v65.lib"
- set list_of_lib_files(3) "sky130_fd_sc_hd__ff_100C_1v95.lib"
- set list_of_lib_files(4) "sky130_fd_sc_hd__ff_n40C_1v56.lib"
- set list_of_lib_files(5) "sky130_fd_sc_hd__ff_n40C_1v65.lib"
- set list_of_lib_files(6) "sky130_fd_sc_hd__ff_n40C_1v76.lib"
- set list_of_lib_files(7) "sky130_fd_sc_hd__ss_100C_1v40.lib"
- set list_of_lib_files(8) "sky130_fd_sc_hd__ss_100C_1v60.lib"
- set list_of_lib_files(9) "sky130_fd_sc_hd__ss_n40C_1v28.lib"
- set list_of_lib_files(10) "sky130_fd_sc_hd__ss_n40C_1v35.lib"
- set list_of_lib_files(11) "sky130_fd_sc_hd__ss_n40C_1v40.lib"
- set list_of_lib_files(12) "sky130_fd_sc_hd__ss_n40C_1v44.lib"
- set list_of_lib_files(13) "sky130_fd_sc_hd__ss_n40C_1v76.lib"
-set list_of_lib_files(14) "sky130_fd_sc_hd__ss_n40C_1v60.lib "
-set list_of_lib_files(15) "sky130_fd_sc_hd__tt_025C_1v80.lib"
-set list_of_lib_files(16) "sky130_fd_sc_hd__tt_100C_1v80.lib"
-
- read_liberty ./src/lib/avsdpll.lib
- read_liberty ./src/lib/avsddac.lib
-
- for {set i 1} {$i <= [array size list_of_lib_files]} {incr i} {
- read_liberty ./src/lib/$list_of_lib_files($i)
- read_verilog ./src/module/vsdbabysoc.synth.v
- link_design vsdbabysoc
- current_design
- read_sdc ./src/sdc/vsdbabysoc_synthesis.sdc
- check_setup -verbose
-
-mkdir sta_outputs
-report_checks -path_delay min_max -fields {nets cap slew input_pins fanout} -digits {4} > ./sta_outputs/min_max_$list_of_lib_files($i).txt
-
- exec echo "$list_of_lib_files($i)" >> ./sta_outputs/sta_worst_max_slack.txt
- report_worst_slack -max -digits {4} >> ./sta_outputs/sta_worst_max_slack.txt
-
- exec echo "$list_of_lib_files($i)" >> ./sta_outputs/sta_worst_min_slack.txt
- report_worst_slack -min -digits {4} >> ./sta_outputs/sta_worst_min_slack.txt
-
- exec echo "$list_of_lib_files($i)" >> ./sta_outputs/sta_tns.txt
- report_tns -digits {4} >> ./sta_outputs/sta_tns.txt
-
- exec echo "$list_of_lib_files($i)" >> ./sta_outputs/sta_wns.txt
- report_wns -digits {4} >> ./sta_outputs/sta_wns.txt
- }
+- Script to Run Static Timing Analysis (STA) for All PVT Corners
 
 ```
-
-
-```
-#!/usr/bin/env tclsh
 #---------------------------------------------
 #  Multi-corner STA Automation Script (OpenSTA)
 #---------------------------------------------
@@ -502,13 +543,9 @@ puts "\n All corners analysed. Reports saved in ./sta_outputs/"
 
 ## References
 
-https://github.com/The-OpenROAD-Project/OpenSTA.git
-
-https://github.com/ivmai/cudd.git
-
 https://github.com/spatha0011/spatha_vsd-hdp/tree/main/Day7
 
 https://github.com/arunkpv/vsd-hdp/blob/main/docs/Day_19.md
 
-
+</details>
 
