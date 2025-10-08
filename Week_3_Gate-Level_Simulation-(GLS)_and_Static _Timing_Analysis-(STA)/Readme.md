@@ -528,6 +528,91 @@ report_checks -path_delay min
 ```
 <img width="929" height="307" alt="image" src="https://github.com/user-attachments/assets/1e528851-ee7b-4219-ae11-8b576d8bc537" />
 
+### 
+
+```
+# =============================================================================
+# SDC Constraints for vsdbabysoc Module (synthesized netlist)
+# Generated for OpenSTA Static Timing Analysis
+# Clock period: 11 ns (~90.9 MHz)
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# Time Units
+# ---------------------------------------------------------------------------
+set_units -time ns
+# Sets the default time unit to nanoseconds. All timing values (delays, periods) are in ns.
+
+# ---------------------------------------------------------------------------
+# Clock Definition
+# ---------------------------------------------------------------------------
+create_clock -name clk -period 11 [get_pins pll/CLK]
+# Creates a clock named "clk" with a period of 11 ns (~90.9 MHz) using the top-level clock port "CLK".
+
+# Clock latency and uncertainty
+set_clock_latency -source 2 [get_clocks clk]
+# 2 ns source latency
+set_clock_latency 1 [get_clocks clk]
+# 1 ns internal latency
+set_clock_uncertainty -setup 0.5 [get_clocks clk]
+set_clock_uncertainty -hold 0.5 [get_clocks clk]
+# Clock setup and hold uncertainties
+
+# ---------------------------------------------------------------------------
+# Design Constraints
+# ---------------------------------------------------------------------------
+set_max_area 8000
+# Maximum total cell area
+set_max_fanout 5 vsdbabysoc
+# Maximum fanout per cell
+set_max_transition 10 vsdbabysoc
+# Maximum signal transition (rise/fall)
+
+# ---------------------------------------------------------------------------
+# Input Port Constraints
+# ---------------------------------------------------------------------------
+set_input_delay -clock clk -max 4 [get_ports {reset VCO_IN ENb_CP ENb_VCO REF VREFH}]
+set_input_delay -clock clk -min 1 [get_ports {reset VCO_IN ENb_CP ENb_VCO REF VREFH}]
+set_input_transition -max 0.4 [get_ports {reset VCO_IN ENb_CP ENb_VCO REF VREFH}]
+set_input_transition -min 0.1 [get_ports {reset VCO_IN ENb_CP ENb_VCO REF VREFH}]
+# Input arrival times and slew constraints
+
+# ---------------------------------------------------------------------------
+# Output Port Constraints
+# ---------------------------------------------------------------------------
+set_load -max 0.5 [get_ports OUT]
+set_load -min 0.5 [get_ports OUT]
+set_output_delay -clock clk -max 0.5 -clock clk [get_ports OUT]
+set_output_delay -clock clk -min 0.5 -clock clk [get_ports OUT]
+# Output load and clock-to-output delay constraints
+
+# ---------------------------------------------------------------------------
+# Path Delay Constraints
+# ---------------------------------------------------------------------------
+set_max_delay 10 -from [get_clocks clk] -to [get_ports OUT]
+# Maximum clock-to-output path delay ≤ 10 ns
+
+# =============================================================================
+# End of SDC
+# =============================================================================
+
+```
+
+- Setup and Hold reports
+
+```
+report_checks
+```
+<img width="1849" height="657" alt="image" src="https://github.com/user-attachments/assets/66b56dee-423b-4604-84c9-865c59fa57fa" />
+
+
+```
+report_checks -path_type min
+```
+<img width="925" height="314" alt="image" src="https://github.com/user-attachments/assets/bfd4447d-381b-4673-b499-f034dd25ab7a" />
+
+
+
 </details>
 
 <details>
@@ -535,6 +620,9 @@ report_checks -path_delay min
 
   
 # Multi-PVT Corner Timing Analysis of VSDBabySoC using OpenSTA
+
+
+theory to write
 
 ## Timing Libraries
 
@@ -649,7 +737,7 @@ foreach lib_file $list_of_lib_files {
     read_verilog ./src/module/vsdbabysoc.synth.v
     link_design vsdbabysoc
     current_design vsdbabysoc
-    read_sdc ./src/sdc/vsdbabysoc_synthesis.sdc
+    read_sdc ./src/sdc/updated_synth.sdc
 
     # Perform timing checks
     check_setup -verbose
@@ -681,8 +769,49 @@ foreach lib_file $list_of_lib_files {
     incr i
 }
 puts "\n All corners analysed. Reports saved in ./sta_outputs/"
+```
+
+- SDC file
 
 ```
+# =============================================================================
+# SDC Constraints for vsdbabysoc Module (synthesized netlist)
+# Generated for OpenSTA Static Timing Analysis
+# Clock period: 11 ns (~90.9 MHz)
+# =============================================================================
+
+set_units -time ns
+
+# Clock definition
+create_clock -name clk -period 11 [get_pins pll/CLK]
+
+set_clock_latency -source 2 [get_clocks clk]
+set_clock_latency 1 [get_clocks clk]
+set_clock_uncertainty -setup 0.5 [get_clocks clk]
+set_clock_uncertainty -hold 0.5 [get_clocks clk]
+
+# Design constraints
+set_max_area 8000
+set_max_fanout 5 vsdbabysoc
+set_max_transition 10 vsdbabysoc
+
+# Input constraints
+set_input_delay -clock clk -max 4 [get_ports {reset VCO_IN ENb_CP ENb_VCO REF VREFH}]
+set_input_delay -clock clk -min 1 [get_ports {reset VCO_IN ENb_CP ENb_VCO REF VREFH}]
+set_input_transition -max 0.4 [get_ports {reset VCO_IN ENb_CP ENb_VCO REF VREFH}]
+set_input_transition -min 0.1 [get_ports {reset VCO_IN ENb_CP ENb_VCO REF VREFH}]
+
+# Output constraints
+set_load -max 0.5 [get_ports OUT]
+set_load -min 0.5 [get_ports OUT]
+set_output_delay -clock clk -max 0.5 -clock clk [get_ports OUT]
+set_output_delay -clock clk -min 0.5 -clock clk [get_ports OUT]
+
+# Path delay
+set_max_delay 10 -from [get_clocks clk] -to [get_ports OUT]
+```
+
+<img width="928" height="426" alt="image" src="https://github.com/user-attachments/assets/9b0f5fe7-041c-4a1d-91b1-89c9a9b19c57" />
 
 
 ## References
