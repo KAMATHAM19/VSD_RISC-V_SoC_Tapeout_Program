@@ -12,7 +12,7 @@ Unlike RTL simulation (which works with behavioural code), GLS runs on the **act
   Ensures the synthesised gate-level netlist behaves the same as the RTL design.
 
 - **Validate Timing**  
-  When combined with **SDF (Standard Delay Format)** files, GLS helps verify setup/hold times and timing paths.
+  When combined with **SDF (Standard Delay Format)** files, GLS helps verify setup/hold times, as well as timing paths.
 
 - **Verify Reset and Initialisation**  
   Confirms all flip-flops and registers are properly initialised after synthesis.
@@ -158,7 +158,7 @@ To:
 
 
 <details>
-  <summary>OpenSTA Installation and Practical Examples Analysis</summary>
+  <summary>OpenSTA Installation and Practical Example Analysis</summary>
 
 # Installation of OpenSTA
 
