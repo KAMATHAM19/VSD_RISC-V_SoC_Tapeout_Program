@@ -1,7 +1,9 @@
 
 
+<details>
+  <summary>OpenSTA Installation and Practical Examples Analysis</summary>
 
-## Installation of OpenSTA
+# Installation of OpenSTA
 
 ```bash
 sudo apt-get update
@@ -38,9 +40,9 @@ sta
 ```
 <img width="926" height="163" alt="image" src="https://github.com/user-attachments/assets/5a494ae0-a203-43fd-a008-b49a3c5e7331" />
 
-## Timing Analysis Using Inline Commands
+## Example 1: Timing Analysis Using Commands
 
-> Once you are in the OpenSTA interactive shell (indicated by the % prompt), you can execute the following inline commands to perform a basic static timing analysis:
+> Once you are in the OpenSTA interactive shell (indicated by the % prompt), you can execute the following commands to perform a basic static timing analysis:
 
 ```tcl
 # Change to directory
@@ -86,6 +88,8 @@ report_checks -path_delay min
 
 > other command report_checks -path_delay min_max
 
+- Design
+  
 ```verilog
 module top (in1, in2, clk1, clk2, clk3, out);
   input in1, in2, clk1, clk2, clk3;
@@ -99,6 +103,7 @@ module top (in1, in2, clk1, clk2, clk3, out);
   DFF_X1 r3 (.D(u2z), .CK(clk3), .Q(out));
 endmodule // top
 ```
+- Synthesis
 ```tcl
 cd /OpenSTA/examples/
 yosys
@@ -136,7 +141,7 @@ Total arrival time  = 0.41 ns                       (trequired​=Tclk​−tset
 
 <img width="925" height="423" alt="sta_hold" src="https://github.com/user-attachments/assets/2580316d-a232-4f51-bff9-b3cc38f9e9d6" />
 
-- For hold check, we consider the shortest path
+- For the hold check, we consider the shortest path
   
 ```java
 Data arrival time = 0.00 ns (tarrivalmin​=tclk_q​+tcomb_min​)
@@ -218,12 +223,7 @@ report_units
 <img width="930" height="107" alt="image" src="https://github.com/user-attachments/assets/8fba9221-1ee7-49c2-90e5-94560198a9ad" />
 
 
-## Timing Report Comparison: Normal vs SPEF-based
-
-
-
-
-# Timing Report Comparison: Without SPEF vs With SPEF
+### Timing Report Comparison: Without SPEF vs With SPEF
 
 | Node / Signal               | Without SPEF Delay / Time (ns) | With SPEF Delay / Time (ns) |
 |------------------------------|-------------------------------|----------------------------|
@@ -244,15 +244,18 @@ report_units
 | Slack                        | 9.43 (MET)                     | 1.52 (MET)                 |
 
 
-### Observations
+#### Observations
 
 - **Without SPEF**: Only library cell delays are considered → **smaller path delays**, **larger slack**.  
 - **With SPEF**: Includes parasitic RC delays → **larger path delays**, **smaller slack**.  
 - SPEF-based slack is closer to real post-route timing and is critical for **final timing verification**.
 
+</details>
 
+<details>
+  <summary>Timing Analysis of VSDBabySoC design using OpenSTA</summary>
 
-# VSDBabySoC
+# Timing Analysis of VSDBabySoC design using OpenSTA
 
 ```tcl
 
@@ -274,6 +277,8 @@ link_design vsdbabysoc
 # Apply SDC Constraints
 read_sdc ./src/sdc/vsdbabysoc_synthesis.sdc
 ```
+
+- SDC Constraints
 ```sdc
 set_units -time ns
 create_clock [get_pins {pll/CLK}] -name clk -period 11
@@ -293,16 +298,22 @@ report_checks -path_delay min
 ```
 <img width="929" height="307" alt="image" src="https://github.com/user-attachments/assets/1e528851-ee7b-4219-ae11-8b576d8bc537" />
 
-# PVT Corners and Timing Analysis
+</details>
 
-### Timing Libraries
+<details>
+  <summary>Multi-PVT Corner Timing Analysis of VSDBabySoC using OpenSTA</summary>
+
+  
+# Multi-PVT Corner Timing Analysis of VSDBabySoC using OpenSTA
+
+## Timing Libraries
 
 Timing libraries required for this analysis can be downloaded from:
 
 **[SkyWater PDK – sky130_fd_sc_hd Timing Libraries](https://github.com/efabless/skywater-pdk-libs-sky130_fd_sc_hd/tree/master/timing)**
 
 
-script for downloading all lib files
+- Script to Download All Library Files
 
 ```
 #!/usr/bin/env tclsh
