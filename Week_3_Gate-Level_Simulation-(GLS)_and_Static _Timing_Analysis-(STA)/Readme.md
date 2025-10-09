@@ -842,6 +842,63 @@ set_max_delay 10 -from [get_clocks clk] -to [get_ports OUT]
 
 <img width="928" height="426" alt="image" src="https://github.com/user-attachments/assets/9b0f5fe7-041c-4a1d-91b1-89c9a9b19c57" />
 
+## Multi-PVT Timing Summary Report
+
+This summarises the setup and hold timing performance across multiple PVT (Process, Voltage, Temperature) corners analysed using **OpenSTA** for the `vsdbabysoc` design.
+
+### Timing Summary Table
+
+| Library Corner | Max/Worst Max Slack (Setup) | Min/Worst Min Slack (Hold) | WNS | TNS | Observation |
+|----------------|-----------------------------|-----------------------------|-----|-----|-------------|
+| **ff_100C_1v65** | 🟩 **+1.8464** | 🟨 **−0.2509** | 🟩 **0.0000** | 🟩 **0.0000** | Setup OK, slight hold risk |
+| **ff_100C_1v95** | 🟩 **+3.2659** | 🟨 **−0.3040** | 🟩 **0.0000** | 🟩 **0.0000** | Strong setup, minor hold issue |
+| **ff_n40C_1v56** | 🟩 **+0.4378** | 🟨 **−0.2085** | 🟩 **0.0000** | 🟩 **0.0000** | OK setup, small hold margin |
+| **ff_n40C_1v65** | 🟩 **+1.4603** | 🟨 **−0.2449** | 🟩 **0.0000** | 🟩 **0.0000** | Setup good, minor hold risk |
+| **ff_n40C_1v76** | 🟩 **+2.3565** | 🟨 **−0.2757** | 🟩 **0.0000** | 🟩 **0.0000** | Fast corner, small hold issue |
+| **ff_n40C_1v95** | 🟩 **+3.4382** | 🟨 **−0.3125** | 🟩 **0.0000** | 🟩 **0.0000** | Excellent setup, small hold issue |
+| **tt_025C_1v80** | 🟩 **+0.4581** | 🟨 **−0.1904** | 🟩 **0.0000** | 🟩 **0.0000** | Typical corner OK |
+| **tt_100C_1v80** | 🟩 **+0.5230** | 🟨 **−0.1855** | 🟩 **0.0000** | 🟩 **0.0000** | Typical-hot OK |
+| **ss_100C_1v40** | 🟥 **−13.9015** | 🟩 **+0.4053** | 🟥 **−13.9015** | 🟥 **−8745.7207** | Major setup fail |
+| **ss_100C_1v60** | 🟥 **−7.0384** | 🟩 **+0.1420** | 🟥 **−7.0384** | 🟥 **−3564.3682** | Setup fail |
+| **ss_n40C_1v28** | 🟥 **−77.3905** | 🟩 **+0.6461** | 🟥 **−77.3905** | 🟥 **−39948.4492** | Severe setup fail |
+| **ss_n40C_1v35** | 🟥 **−46.0748** | 🟩 **+0.6229** | 🟥 **−46.0748** | 🟥 **−25433.4102** | Setup fail |
+| **ss_n40C_1v40** | 🟥 **−33.7707** | 🟩 **+0.6119** | 🟥 **−33.7707** | 🟥 **−18960.8887** | Setup fail |
+| **ss_n40C_1v44** | 🟥 **−27.8124** | 🟩 **+0.4909** | 🟥 **−27.8124** | 🟥 **−15219.0166** | Setup fail |
+| **ss_n40C_1v60** | 🟥 **−11.6771** | 🟩 **+0.1628** | 🟥 **−11.6771** | 🟥 **−6229.2100** | Setup fail |
+| **ss_n40C_1v76** | 🟥 **−5.2641** | 🟩 **+0.0038** | 🟥 **−5.2641** | 🟥 **−2566.9700** | Setup fail |
+
+
+### Legend
+
+| Symbol | Meaning | Description |
+|---------|----------|-------------|
+| 🟩 | **PASS** | Slack ≥ 0 ns → Meets timing |
+| 🟨 | **MINOR VIOLATION** | −0.5 ns ≤ Slack < 0 ns → Slight violation, may need tuning |
+| 🟥 | **FAILURE** | Slack ≤ −1 ns → Fails timing and must be fixed |
+
+### Observations
+
+- 🟩 **FF (Fast-Fast)** and **TT (Typical-Typical)** corners meet setup timing comfortably.  
+- 🟨 Slight **hold violations** observed at fast corners (paths too short).  
+- 🟥 **SS (Slow-Slow)** corners exhibit **large setup violations** — slow devices + low voltage → timing delays exceed clock period.  
+- Hold slacks are positive in SS corners — setup dominates failure here.  
+- Indicates classic trade-off:  
+  - Fast corners → hold critical.  
+  - Slow corners → setup critical.  
+
+### Recommendations
+
+- **For setup violations (SS corners):**
+  - Optimise logic depth or use faster cells.  
+  - Consider reducing clock frequency or improving routing delay.  
+
+- **For hold issues (FF corners):**
+  - Insert delay buffers on short paths.  
+  - Use slower cells or longer routing where needed.
+
+> *This analysis helps identify which PVT corners are timing-critical and ensures design robustness across all operating conditions.*
+
+
 
 ## References
 
