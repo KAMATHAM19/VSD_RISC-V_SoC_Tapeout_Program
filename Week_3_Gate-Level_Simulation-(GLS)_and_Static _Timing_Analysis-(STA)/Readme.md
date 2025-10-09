@@ -532,7 +532,7 @@ report_checks -path_delay min
 
 ```
 # =============================================================================
-# SDC Constraints for vsdbabysoc Module (synthesized netlist)
+# SDC Constraints for vsdbabysoc Module (synthesised netlist)
 # Generated for OpenSTA Static Timing Analysis
 # Clock period: 11 ns (~90.9 MHz)
 # =============================================================================
@@ -858,8 +858,8 @@ This summarises the setup and hold timing performance across multiple PVT (Proce
 | **ff_n40C_1v95** | 🟩 **+3.4382** | 🟨 **−0.3125** | 🟩 **0.0000** | 🟩 **0.0000** | Excellent setup, small hold issue |
 | **tt_025C_1v80** | 🟩 **+0.4581** | 🟨 **−0.1904** | 🟩 **0.0000** | 🟩 **0.0000** | Typical corner OK |
 | **tt_100C_1v80** | 🟩 **+0.5230** | 🟨 **−0.1855** | 🟩 **0.0000** | 🟩 **0.0000** | Typical-hot OK |
-| **ss_100C_1v40** | 🟥 **−13.9015** | 🟩 **+0.4053** | 🟥 **−13.9015** | 🟥 **−8745.7207** | Major setup fail |
-| **ss_100C_1v60** | 🟥 **−7.0384** | 🟩 **+0.1420** | 🟥 **−7.0384** | 🟥 **−3564.3682** | Setup fail |
+| **ss_100C_1v40** | 🟥 **−13.9015** | 🟩 **+0.4053** |🟥 **−13.9015** | 🟥 **−8745.7207** | Major setup fail |
+| **ss_100C_1v60** | 🟥 **−7.0384** | 🟩 **+0.1420**  | 🟥 **−7.0384** | 🟥 **−3564.3682** | Setup fail |
 | **ss_n40C_1v28** | 🟥 **−77.3905** | 🟩 **+0.6461** | 🟥 **−77.3905** | 🟥 **−39948.4492** | Severe setup fail |
 | **ss_n40C_1v35** | 🟥 **−46.0748** | 🟩 **+0.6229** | 🟥 **−46.0748** | 🟥 **−25433.4102** | Setup fail |
 | **ss_n40C_1v40** | 🟥 **−33.7707** | 🟩 **+0.6119** | 🟥 **−33.7707** | 🟥 **−18960.8887** | Setup fail |
@@ -886,19 +886,29 @@ This summarises the setup and hold timing performance across multiple PVT (Proce
   - Fast corners → hold critical.  
   - Slow corners → setup critical.  
 
-### Recommendations
+- Heatmap
+  
+<img width="1695" height="752" alt="image" src="https://github.com/user-attachments/assets/e170d513-9e2e-45ff-8510-35604e3d538d" />
 
-- **For setup violations (SS corners):**
-  - Optimise logic depth or use faster cells.  
-  - Consider reducing clock frequency or improving routing delay.  
+1. Max/Worst max slack across corners
 
-- **For hold issues (FF corners):**
-  - Insert delay buffers on short paths.  
-  - Use slower cells or longer routing where needed.
+<img width="1831" height="724" alt="image" src="https://github.com/user-attachments/assets/5d372947-567c-4e58-8622-56bc35789306" />
+
+2. Min/Worst min slack across corners
+
+<img width="917" height="353" alt="image" src="https://github.com/user-attachments/assets/5527c006-4bc8-4231-aae1-2e908cd8fd8e" />
+
+3. Worst negative slack across corners
+
+<img width="914" height="357" alt="image" src="https://github.com/user-attachments/assets/27f96d94-afdb-402e-84d5-b1305dfb53fc" />
+
+4. Total negative slack across the corner
+
+<img width="923" height="366" alt="image" src="https://github.com/user-attachments/assets/0759086a-6288-41af-ad41-220d79231c20" />
 
 > *This analysis helps identify which PVT corners are timing-critical and ensures design robustness across all operating conditions.*
-
-
+>
+> *Future work will focus on reducing violations by applying setup and hold optimisation techniques*
 
 ## References
 
