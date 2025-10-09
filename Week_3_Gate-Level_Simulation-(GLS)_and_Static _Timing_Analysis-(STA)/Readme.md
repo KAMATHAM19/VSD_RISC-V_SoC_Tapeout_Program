@@ -621,8 +621,37 @@ report_checks -path_type min
   
 # Multi-PVT Corner Timing Analysis of VSDBabySoC using OpenSTA
 
+## What Are Multi-PVT Corners in STA
 
-theory to write
+**Multi-PVT (Process, Voltage, Temperature) analysis** is a crucial step in Static Timing Analysis (STA) to ensure a digital design meets its timing requirements under all possible manufacturing and environmental conditions.
+
+In real silicon, circuit behaviour changes due to:
+- **Process variation (P)**: Differences in transistor manufacturing cause cells to behave faster or slower [e.g., fast-fast (FF), typical-typical (TT), slow-slow (SS)].
+- **Voltage variation (V)**: Supply voltage can vary (e.g., 1.95 V, 1.80 V, 1.40 V), affecting switching speeds.
+- **Temperature variation (T)**: Performance changes with temperature (e.g., -40 °C, 25 °C, 100 °C).
+> Each combination of these parameters forms a PVT corner — a specific operating condition under which the design’s timing must be validated.
+
+### Why Multi-PVT Analysis Is Important
+
+1. Ensures the design meets setup and hold timing across all real-world conditions.
+2. Detects worst-case scenarios that might not appear at typical corners.
+3. Guarantees robust performance and manufacturability across chip batches.
+
+For example:
+- FF @ -40 °C, 1.95 V → Fast corner → Checks hold violations (data arrives too early).
+- SS @ 100 °C, 1.40 V → Slow corner → Checks setup violations (data arrives too late).
+
+### How the Multi-PVT Script Helps
+
+The provided `multi_pvt_corners.tcl`script automates STA across multiple .lib timing models (each representing one PVT corner).
+For each corner, it:
+
+1. Loads the specific timing library (e.g., sky130_fd_sc_hd__ss_100C_1v40.lib)
+2. Links the synthesised netlist
+3. Applies the same SDC constraints
+4. Runs timing checks (setup, hold, WNS, TNS)
+5. Saves detailed reports under ./sta_outputs/
+> This ensures comprehensive timing validation across all operating conditions in a fully automated flow.
 
 ## Timing Libraries
 
@@ -775,7 +804,7 @@ puts "\n All corners analysed. Reports saved in ./sta_outputs/"
 
 ```
 # =============================================================================
-# SDC Constraints for vsdbabysoc Module (synthesized netlist)
+# SDC Constraints for vsdbabysoc Module (synthesised netlist)
 # Generated for OpenSTA Static Timing Analysis
 # Clock period: 11 ns (~90.9 MHz)
 # =============================================================================
