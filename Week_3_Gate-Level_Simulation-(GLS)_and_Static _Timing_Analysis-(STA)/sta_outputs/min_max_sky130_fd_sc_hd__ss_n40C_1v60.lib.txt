@@ -1,0 +1,65 @@
+Warning: multi_pvt_corners.tcl line 60, unknown field nets.
+Startpoint: _9423_ (rising edge-triggered flip-flop clocked by clk)
+Endpoint: _10265_ (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type: min
+
+Fanout       Cap      Slew     Delay      Time   Description
+-------------------------------------------------------------------------------------
+                    0.0000    0.0000    0.0000   clock clk (rise edge)
+                              3.0000    3.0000   clock network delay (ideal)
+                    0.0000    0.0000    3.0000 ^ _9423_/CLK (sky130_fd_sc_hd__dfxtp_1)
+     1    0.0015    0.0340    0.5413    3.5413 v _9423_/Q (sky130_fd_sc_hd__dfxtp_1)
+                    0.0340    0.0000    3.5413 v _10265_/D (sky130_fd_sc_hd__dfxtp_1)
+                                        3.5413   data arrival time
+
+                    0.0000    0.0000    0.0000   clock clk (rise edge)
+                              3.0000    3.0000   clock network delay (ideal)
+                              0.5000    3.5000   clock uncertainty
+                              0.0000    3.5000   clock reconvergence pessimism
+                                        3.5000 ^ _10265_/CLK (sky130_fd_sc_hd__dfxtp_1)
+                             -0.1215    3.3785   library hold time
+                                        3.3785   data required time
+-------------------------------------------------------------------------------------
+                                        3.3785   data required time
+                                       -3.5413   data arrival time
+-------------------------------------------------------------------------------------
+                                        0.1628   slack (MET)
+
+
+Startpoint: _10277_ (rising edge-triggered flip-flop clocked by clk)
+Endpoint: _10321_ (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type: max
+
+Fanout       Cap      Slew     Delay      Time   Description
+-------------------------------------------------------------------------------------
+                    0.0000    0.0000    0.0000   clock clk (rise edge)
+                              3.0000    3.0000   clock network delay (ideal)
+                    0.0000    0.0000    3.0000 ^ _10277_/CLK (sky130_fd_sc_hd__dfxtp_1)
+     2    0.0041    0.0508    0.5614    3.5614 v _10277_/Q (sky130_fd_sc_hd__dfxtp_1)
+                    0.0508    0.0000    3.5614 v _4607_/A (sky130_fd_sc_hd__nor4_1)
+    39    0.0856    7.8173    6.4221    9.9836 ^ _4607_/Y (sky130_fd_sc_hd__nor4_1)
+                    7.8173    0.0000    9.9836 ^ _4821_/A3 (sky130_fd_sc_hd__a31oi_1)
+     3    0.0068    0.7269    2.1229   12.1064 v _4821_/Y (sky130_fd_sc_hd__a31oi_1)
+                    0.7269    0.0000   12.1064 v _6259_/D (sky130_fd_sc_hd__nor4_1)
+    63    0.1289   11.6729    9.5726   21.6790 ^ _6259_/Y (sky130_fd_sc_hd__nor4_1)
+                   11.6729    0.0000   21.6790 ^ _6286_/A1 (sky130_fd_sc_hd__o21ai_0)
+     1    0.0015    0.8253    2.6893   24.3683 v _6286_/Y (sky130_fd_sc_hd__o21ai_0)
+                    0.8253    0.0000   24.3683 v _10321_/D (sky130_fd_sc_hd__dfxtp_1)
+                                       24.3683   data arrival time
+
+                    0.0000   11.0000   11.0000   clock clk (rise edge)
+                              3.0000   14.0000   clock network delay (ideal)
+                             -0.5000   13.5000   clock uncertainty
+                              0.0000   13.5000   clock reconvergence pessimism
+                                       13.5000 ^ _10321_/CLK (sky130_fd_sc_hd__dfxtp_1)
+                             -0.8088   12.6912   library setup time
+                                       12.6912   data required time
+-------------------------------------------------------------------------------------
+                                       12.6912   data required time
+                                      -24.3683   data arrival time
+-------------------------------------------------------------------------------------
+                                      -11.6771   slack (VIOLATED)
+
+

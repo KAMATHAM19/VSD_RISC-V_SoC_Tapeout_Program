@@ -1,0 +1,65 @@
+Warning: multi_pvt_corners.tcl line 60, unknown field nets.
+Startpoint: reset (input port clocked by clk)
+Endpoint: _10395_ (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type: min
+
+Fanout       Cap      Slew     Delay      Time   Description
+-------------------------------------------------------------------------------------
+                    0.0000    0.0000    0.0000   clock clk (rise edge)
+                              3.0000    3.0000   clock network delay (ideal)
+                              1.0000    4.0000 ^ input external delay
+     1    0.0013    0.1000    0.0000    4.0000 ^ reset (in)
+                    0.1000    0.0000    4.0000 ^ _10395_/D (sky130_fd_sc_hd__dfxtp_1)
+                                        4.0000   data arrival time
+
+                    0.0000    0.0000    0.0000   clock clk (rise edge)
+                              3.0000    3.0000   clock network delay (ideal)
+                              0.5000    3.5000   clock uncertainty
+                              0.0000    3.5000   clock reconvergence pessimism
+                                        3.5000 ^ _10395_/CLK (sky130_fd_sc_hd__dfxtp_1)
+                             -0.1461    3.3539   library hold time
+                                        3.3539   data required time
+-------------------------------------------------------------------------------------
+                                        3.3539   data required time
+                                       -4.0000   data arrival time
+-------------------------------------------------------------------------------------
+                                        0.6461   slack (MET)
+
+
+Startpoint: _10277_ (rising edge-triggered flip-flop clocked by clk)
+Endpoint: _10321_ (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type: max
+
+Fanout       Cap      Slew     Delay      Time   Description
+-------------------------------------------------------------------------------------
+                    0.0000    0.0000    0.0000   clock clk (rise edge)
+                              3.0000    3.0000   clock network delay (ideal)
+                    0.0000    0.0000    3.0000 ^ _10277_/CLK (sky130_fd_sc_hd__dfxtp_1)
+     2    0.0038    0.1046    1.4926    4.4926 v _10277_/Q (sky130_fd_sc_hd__dfxtp_1)
+                    0.1046    0.0000    4.4926 v _4607_/A (sky130_fd_sc_hd__nor4_1)
+    39    0.0756   25.6700   21.4241   25.9167 ^ _4607_/Y (sky130_fd_sc_hd__nor4_1)
+                   25.6700    0.0000   25.9167 ^ _4821_/A3 (sky130_fd_sc_hd__a31oi_1)
+     3    0.0061    1.9114   12.1284   38.0451 v _4821_/Y (sky130_fd_sc_hd__a31oi_1)
+                    1.9114    0.0000   38.0451 v _6259_/D (sky130_fd_sc_hd__nor4_1)
+    63    0.1143   38.7190   32.1939   70.2389 ^ _6259_/Y (sky130_fd_sc_hd__nor4_1)
+                   38.7190    0.0000   70.2389 ^ _6286_/A1 (sky130_fd_sc_hd__o21ai_0)
+     1    0.0013    2.4902   17.4000   87.6389 v _6286_/Y (sky130_fd_sc_hd__o21ai_0)
+                    2.4902    0.0000   87.6389 v _10321_/D (sky130_fd_sc_hd__dfxtp_1)
+                                       87.6389   data arrival time
+
+                    0.0000   11.0000   11.0000   clock clk (rise edge)
+                              3.0000   14.0000   clock network delay (ideal)
+                             -0.5000   13.5000   clock uncertainty
+                              0.0000   13.5000   clock reconvergence pessimism
+                                       13.5000 ^ _10321_/CLK (sky130_fd_sc_hd__dfxtp_1)
+                             -3.2516   10.2484   library setup time
+                                       10.2484   data required time
+-------------------------------------------------------------------------------------
+                                       10.2484   data required time
+                                      -87.6389   data arrival time
+-------------------------------------------------------------------------------------
+                                      -77.3905   slack (VIOLATED)
+
+
