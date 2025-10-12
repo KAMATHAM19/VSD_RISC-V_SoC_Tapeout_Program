@@ -524,7 +524,7 @@ synth -top vsdbabysoc
 | <img width="227" height="147" alt="clockgate" src="https://github.com/user-attachments/assets/c2e0fb56-8bd0-4ef0-beec-15f5eb4099a3" /> | <img width="224" height="304" alt="rvmyth" src="https://github.com/user-attachments/assets/a9cf19ec-3a6e-4369-8685-0b0419256621" /> | <img width="226" height="173" alt="vsdbabysoc" src="https://github.com/user-attachments/assets/16ac9661-0ab5-4be2-9605-b7dd47f494b0" /> | <img width="236" height="364" alt="design-hier" src="https://github.com/user-attachments/assets/ac254241-a53b-4c0e-b7b2-466ff23062a2" /> |
 
 ```
-dfflibmap -liberty ~/VLSI/VSDBabySoC/src/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+dfflibmap -liberty ./src/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
 ```
 <img width="919" height="359" alt="image" src="https://github.com/user-attachments/assets/1c95146d-7c24-4d78-90b8-d8ce0c20cfd5" />
 
