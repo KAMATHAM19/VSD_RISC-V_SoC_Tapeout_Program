@@ -79,7 +79,7 @@ synth -top vsdbabysoc
 
 
 ```
-dfflibmap -liberty ~/VLSI/VSDBabySoC/src/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+dfflibmap -liberty ./src/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
 ```
 <img width="919" height="359" alt="image" src="https://github.com/user-attachments/assets/1c95146d-7c24-4d78-90b8-d8ce0c20cfd5" />
 
