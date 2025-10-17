@@ -105,7 +105,6 @@ This stage, known as **tape-in**, marks the point where the chip is ready to be 
 Setup guide for the **VSD RISC-V Tapeout Program**. Follow the steps below to prepare your environment.  
 
 
-
 ## Required Downloads  
 
 -  Download and install **Oracle VirtualBox**:  
@@ -178,24 +177,8 @@ gtkwave
 ```
 <img width="1855" height="832" alt="image" src="https://github.com/user-attachments/assets/bbe6b7f1-08b6-4503-a086-dadc1bb5a421" />
 
-### 4. Ngspice
 
-Download the tarball from [SourceForge](https://sourceforge.net/projects/ngspice/files/) to your local directory.  
-Then unpack it using:
-
-```bash
-tar -zxvf ngspice-44.tar.gz 
-cd ngspice-44 
-mkdir release 
-cd release 
-../configure --with-x --with-readline=yes --disable-debug 
- make 
- sudo make install
-ngspice
-```
-<img width="1848" height="330" alt="image" src="https://github.com/user-attachments/assets/8ddd04f0-4955-45c4-a061-1a9ebcf343b4" />
-
-### 5. Magic
+### 4. Magic
 ```bash
 sudo apt-get install m4 tcsh csh libx11-dev tcl-dev tk-dev libcairo2-dev mesa-common-dev libglu1-mesa-dev libncurses-dev
 git clone https://github.com/RTimothyEdwards/magic
@@ -207,7 +190,7 @@ magic
 ```
 <img width="1854" height="827" alt="image" src="https://github.com/user-attachments/assets/8f5e8715-f095-4830-9a97-18ede3e6bfa9" />
 
-### 6. OpenLane
+### 5. OpenLane
 
 ##### Step 1 - Install Docker
 
@@ -286,7 +269,6 @@ make mount
 ## References
 - https://github.com/YosysHQ/yosys.git
 - https://github.com/steveicarus/iverilog.git
-- https://sourceforge.net/projects/ngspice/files/
 - https://github.com/RTimothyEdwards/magic
 - https://github.com/The-OpenROAD-Project/OpenLane
   
