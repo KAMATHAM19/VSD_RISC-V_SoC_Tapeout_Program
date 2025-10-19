@@ -1126,7 +1126,122 @@ If the rise and fall delays are mismatched due to PMOS/NMOS resistance (Ron) dif
 </details>
 
 
+<details>
+  <summary>CMOS Inverter Noise Margin and Robustness Analysis</summary>
 
+Introduction to Noise Margin
+
+Noise margin is a measure of a CMOS circuit’s tolerance to voltage noise at its input without causing logic errors at the output. In other words, it tells us how much unwanted voltage fluctuation the circuit can safely handle while still interpreting signals correctly as logic HIGH or LOW.
+
+- Ideal inverter characteristic:
+  - The voltage transfer curve (VTC) has an infinite slope, meaning the output switches abruptly at VDD/2
+  - There is no ambiguous region—logic HIGH and LOW are perfectly defined
+- Actual inverter characteristic:
+  - The VTC has a finite slope, so the transition from HIGH to LOW (or vice versa) is gradual.
+  - This creates a transition region where the output is undefined, which limits the allowable noise voltage.
+    
+<img width="1204" height="690" alt="image" src="https://github.com/user-attachments/assets/00c9aa78-4cd5-497e-8f16-a6614b57b11b" />
+
+Understanding Noise Margins and Critical Voltages
+
+When analysing a CMOS inverter’s voltage transfer characteristic (VTC), several key points and regions define its noise tolerance and reliability:
+
+Left Plot – Critical Slopes:
+
+The slope of the VTC equals −1 at two important points:
+
+VIL (Input Low Threshold Voltage): The maximum input voltage recognised as logic LOW.
+
+VIH (Input High Threshold Voltage): The minimum input voltage recognised as logic HIGH.
+
+Right Diagram – Output Levels and Thresholds:
+
+VOH and VOL represent the valid output HIGH and LOW voltage levels, respectively.
+
+VIL and VIH indicate the input voltages where the VTC slope equals −1, marking the boundaries of the undefined region.
+
+Noise Margins:
+
+NMH (Noise Margin High) = VOH − VIH: The maximum noise voltage tolerated on a logic HIGH input.
+
+NML (Noise Margin Low) = VIL − VOL: The maximum noise voltage tolerated on a logic LOW input.
+
+Undefined Region:
+
+The region between VIL and VIH is undefined, meaning the output logic may be unstable.
+
+Any input noise in this region can lead to unpredictable or invalid outputs.
+
+<img width="1126" height="661" alt="image" src="https://github.com/user-attachments/assets/437921ad-8836-4b4b-9815-69c300c0fae7" />
+
+Input and Output Thresholds and Noise Bump Scenarios
+
+To ensure reliable CMOS operation, it is important to understand the input and output voltage thresholds and how small voltage disturbances (noise bumps) affect logic interpretation:
+
+Input Thresholds:
+
+VIL (Input Low Voltage): Input voltages below ~10% of VDD are reliably interpreted as logic ‘0’.
+
+VIH (Input High Voltage): Input voltages above ~90% of VDD are reliably interpreted as logic ‘1’.
+
+Output Thresholds:
+
+VOL (Output Low Voltage): Output near 0 V, recognised as logic ‘0’ by the next gate.
+
+VOH (Output High Voltage): Output near VDD, recognised as logic ‘1’ by the next gate.
+
+Noise Bump Scenarios:
+
+1. Case (a): Noise bump between VOL and VIL → signal still interpreted as logic ‘0’.
+2. Case (b): Noise bump between VIL and VIH → signal enters the undefined region, causing unstable or unpredictable output.
+3. Case (c): Noise bump between VIH and VOH → signal still interpreted as logic ‘1’.
+
+
+<img width="1279" height="613" alt="image" src="https://github.com/user-attachments/assets/dfd8b846-1c25-498d-88f7-80043dc8a822" />
+
+**Experiment 5: CMOS Inverter Noise Margin Analysis**
+
+```
+ngspice day4_inv_noisemargin_wp1_wn036.spice
+plot out vs in
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</details>
 
 
 
