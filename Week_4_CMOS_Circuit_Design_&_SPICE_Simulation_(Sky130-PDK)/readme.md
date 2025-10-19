@@ -734,6 +734,238 @@ plot -vdd#branch
 
 </details>
 
+<details>
+  <summary>CMOS Inverter Analysis and MOSFET Behaviour in SPICE Simulations</summary>
+
+# CMOS NMOS I–V Characteristics and Velocity Saturation
+
+**NMOS transistor behavior** in long-channel and short-channel devices, using **SPICE simulations** to illustrate linear, saturation, and velocity-saturated regions. It also covers **peak current comparisons** and operational regimes.
+
+We simulate NMOS devices using SPICE with the following parameters:
+
+- **Long-channel:** W = 1.8 μm, L = 1.2 μm, W/L = 1.5
+  
+<img width="1698" height="1030" alt="image" src="https://github.com/user-attachments/assets/5eff9911-3cd6-4377-8797-23a238f34c01" />
+
+- **Short-channel:** W = 0.375 μm, L = 0.25 μm, W/L = 1.5
+  
+<img width="1786" height="956" alt="image" src="https://github.com/user-attachments/assets/21b2ca5c-e43b-4831-84d8-8e47168a4d52" />
+
+
+## Observation 1: Long-Channel vs Short-Channel NMOS
+
+<img width="1903" height="996" alt="image" src="https://github.com/user-attachments/assets/dc1c25ea-2794-43f8-a35f-7e7b01bdcb77" />
+
+We compare two devices with the same W/L = 1.5:
+
+| Device Type   | Width (W) | Length (L) | Channel Type                  |
+|---------------|-----------|------------|-------------------------------|
+| Long-channel  | 1.8 μm    | 1.2 μm     | W/L > 250 nm → Long channel  |
+| Short-channel | 0.375 μm  | 0.25 μm    | W/L < 250 nm → Short channel |
+
+- Since the channel length is < 0.25 μm in the second device, it is classified as a **short-channel device**.
+- Both devices have the **same W/L ratio (1.5)**, but different absolute dimensions, allowing direct comparison of their electrical behavior.
+  
+<img width="1919" height="903" alt="image" src="https://github.com/user-attachments/assets/58ef765a-0b03-40a6-bbba-65a08af2f874" />
+
+### Long-Channel Devices
+- Drain current (**Id**) shows **quadratic dependence on VGS**  
+- **Linear dependence on VDS** in the linear (ohmic) region  
+- Saturation current is independent of further **VDS** increases  
+
+### Short-Channel Devices
+- Quadratic at low **VGS**, but becomes **linear at high VGS** due to **velocity saturation**  
+- Peak drain current is reduced compared to long-channel devices  
+- New operational mode appears: **velocity saturation** between linear and saturation regions  
+
+
+ In **long-channel devices**, carriers accelerate freely, producing the ideal **quadratic Id-VGS curve**.  
+ 
+ In **short-channel devices**, at low VGS the behavior is similar, but at higher VGS the **carrier velocity saturates** due to high electric fields. 
+ 
+Once the **velocity limit** is reached, the **Id-VGS curve flattens**, transitioning from quadratic to linear.  
+
+> **Conclusion:** This comparison clearly demonstrates how **velocity saturation alters short-channel NMOS behavior**, reducing peak current and introducing a new operational regime not present in long-channel devices.
+
+<img width="444" height="218" alt="m" src="https://github.com/user-attachments/assets/257f313a-ddee-40bd-a375-5f490aa9a054" />
+
+ **Low Electric Fields:** Carrier velocity (**v**) increases linearly with the electric field (**E**).  
+  - - Carrier velocity (v) increases linearly with the electric field (E):
+  
+      v(x) = μ * E(x) = μ * dV(x)/dx
+
+- Where:  
+    μ = mobility  
+    V(x) = channel potential  
+  - Observed in **long-channel devices** at low VGS.
+
+- **High Electric Fields:** Carrier velocity reaches a maximum (**v_sat**) and **saturates**.
+- Carrier velocity reaches a maximum (v_sat) and **saturates**:
+
+  v(E) = (μ * E) / (1 + E / Ec)  
+
+- Where:  
+  Ec = μ / v_sat  
+   v_sat = technology-limited maximum carrier velocity (~10^5 m/s)
+  
+  - This is called **velocity saturation**.  
+  - Observed in **short-channel devices** at high VGS.  
+  - Limits the drain current and flattens the Id-VGS curve.
+ 
+  For continuity:  
+    v is linear when E <= Ec  
+    v is constant (v_sat) when E >= Ec  
+
+- **Effective saturation voltage (VDSAT)** occurs when velocity saturation dominates.
+
+Charge per Unit Area in the Channel
+
+Qi(x) = -Cox * [(VGS - V(x)) - VT]
+
+ where : 
+ - Cox = oxide capacitance per unit area  
+- VGS = gate-source voltage  
+- VT = threshold voltage  
+
+Drain Current
+
+ID = W * Qi(x) * v(x)
+
+- W = transistor width  
+- Qi(x) = channel charge  
+- v(x) = carrier velocity  
+
+<img width="287" height="59" alt="image" src="https://github.com/user-attachments/assets/3c38eebf-d83d-4cbd-bdf5-59eec2569e6d" />
+
+> **Note:** Velocity saturation introduces a new operational regime not present in long-channel devices.
+
+| Device Type         | Channel Length | Modes of Operation                                   | Notes                                           |
+|--------------------|----------------|-----------------------------------------------------|------------------------------------------------|
+| Long-Channel        | > 250 nm       | Cutoff → Resistive → Saturation                     | Standard long-channel behavior                 |
+| Short-Channel       | < 250 nm       | Cutoff → Resistive → Velocity Saturation → Saturation | Velocity saturation introduces an additional mode |
+
+<img width="1757" height="762" alt="image" src="https://github.com/user-attachments/assets/ecb3d7a7-8df2-4beb-a542-7b4d1a09eb25" />
+
+Observation 2: Peak Current Comparison — Long-Channel vs Short-Channel NMOS
+
+<img width="1905" height="868" alt="image" src="https://github.com/user-attachments/assets/aa55c264-8934-4808-b149-65bc65b93f61" />
+
+| Device Type | W (μm) | L (μm) | Peak Id (μA) | Notes |
+|-------------|--------|--------|---------------|-------|
+| Long-channel | 1.8 | 1.2 | 410 | Free carrier acceleration; higher Id |
+| Short-channel | 0.375 | 0.25 | 210 | Velocity saturation limits current |
+
+- **Short-channel devices** allow for **faster switching** and **smaller sizes**, but their **peak drain current is lower** than long-channel devices.  
+- This reduction is caused by **velocity saturation**, which limits the maximum carrier velocity in short-channel devices.  
+- In **long-channel devices**, carriers can accelerate freely under the electric field, resulting in a **higher peak Id**.
+
+
+
+**Experiment 2: Threshold Voltage Extraction & Velocity Saturation**
+
+ **ID vs VDS**: Drain current variation with drain-source voltage 
+
+<img width="925" height="439" alt="image" src="https://github.com/user-attachments/assets/357a0651-10ae-42ef-a6d8-fe78cd34af97" />
+
+ **ID vs VGS**: Drain current variation with gate-source voltage  
+
+<img width="928" height="425" alt="image" src="https://github.com/user-attachments/assets/450c09d4-705c-4e6e-97c2-bdd7fec70838" />
+
+## Analysis
+
+1. MOSFET On/Off Conditions
+
+<img width="388" height="231" alt="image" src="https://github.com/user-attachments/assets/931f4ff9-b92d-4bc2-82d5-d38ae315558d" />
+
+MOSFET as a Switch
+
+A MOSFET can act like an electronic switch, turning current on or off depending on the voltage applied to its gate.
+
+1. OFF State
+
+When the gate–source voltage V_GS is less than the threshold voltage V_th: |V_GS| < |V_th|
+- The MOSFET does not conduct.
+- It behaves like an open switch.
+- The resistance between drain and source is very high (ideally infinite).
+
+2. ON State
+
+When the gate–source voltage exceeds the threshold voltage: |V_GS| > |V_th|
+- The MOSFET conducts current from drain to source.
+- It behaves like a closed switch.
+- The resistance between drain and source is low (called R_DS(on)).
+
+## CMOS Inverter 
+
+<img width="1868" height="915" alt="image" src="https://github.com/user-attachments/assets/a8a9afee-ce53-42ac-9feb-1e5ab5b45397" />
+
+A CMOS inverter is one of the simplest and most fundamental building blocks in digital electronics. Let’s break down its operation.
+
+1. CMOS Inverter at the Transistor Level
+- The PMOS transistor is connected to V_DD (supply voltage).
+- The NMOS transistor is connected to V_SS (ground).
+- The input voltage V_in is applied to the gates of both transistors.
+- The output voltage V_out is taken from the common drain node, where the drains of PMOS and NMOS meet.
+- C_L represents the load capacitance at the output.
+
+2. Switch Model: Input V_in = V_DD
+
+- When the input is high (V_in = V_DD):
+- The NMOS transistor turns ON, acting like a resistor R_n.
+- The PMOS transistor turns OFF, behaving as an open switch.
+The output is pulled down to ground: V_out = 0
+
+3. Switch Model: Input V_in = 0
+
+- When the input is low (V_in = 0):
+- The PMOS transistor turns ON, acting like a resistor R_p.
+- The NMOS transistor turns OFF, behaving as an open switch.
+The output is pulled up to V_DD: V_out = V_DD
+
+
+### Load Line Curves for NMOS and PMOS
+
+The load line method is a graphical way to find the DC operating point of a CMOS inverter by plotting the currents of NMOS and PMOS transistors versus the output voltage.
+
+<img width="1909" height="1018" alt="image" src="https://github.com/user-attachments/assets/9a0f1f40-a446-4f97-b258-c1bd2ffb44e0" />
+
+Step 1: Convert the PMOS gate-to-source voltage (VgsP) in terms of an equivalent input voltage (Vin). Replace all internal node voltages using only Vin, Vdd, Vss, and Vout
+
+<img width="1919" height="1029" alt="image" src="https://github.com/user-attachments/assets/3539c093-e4b0-47ed-8460-40478fead0b7" />
+
+Step 2: Convert the PMOS and NMOS drain-to-source voltages (VdsP and VdsN) in terms of the output voltage, Vout.
+
+<img width="1906" height="1068" alt="image" src="https://github.com/user-attachments/assets/11710911-b2b6-4d70-8769-061b0f61ec0e" />
+
+Step 3: Both Load Curves
+
+<img width="1917" height="623" alt="image" src="https://github.com/user-attachments/assets/b26879be-ed7f-42a2-b49f-306e824f3f54" />
+
+Step 4: Combine the NMOS and PMOS load curves by equating their drain currents (Ids) as functions of Vout. Then, plot the Voltage Transfer Characteristic (VTC) by sweeping Vin and mapping the corresponding Vout to illustrate the inverter’s switching behavior from logic HIGH to LOW.
+
+<img width="1907" height="1072" alt="image" src="https://github.com/user-attachments/assets/ed17cb3e-5cee-4b5a-9572-a38899318525" />
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Title: From Transistor Behavior to Timing Analysis (STA): The CMOS Design Flow
 
 Mind-Map Structure
