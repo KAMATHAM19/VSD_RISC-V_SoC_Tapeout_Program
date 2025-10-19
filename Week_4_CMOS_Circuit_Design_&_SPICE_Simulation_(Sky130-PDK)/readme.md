@@ -1,7 +1,7 @@
 # Week 4 – CMOS Circuit Design & SPICE Simulation (Sky130-PDK)
 
 <details>
- <summary>Day 1: Introduction to Circuit Design & SPICE Simulations</summary>
+ <summary>Introduction to Circuit Design & SPICE Simulations</summary>
 <br>
 
 ## Circuit Design and SPICE Simulation
@@ -95,11 +95,9 @@ Delay_{est} = D_1 + \frac{(X - X_1)}{(X_2 - X_1)} \times (D_2 - D_1)
 $$
 
 Where:
-- \( D_1, D_2 \): Known delay values from the LUT  
-- \( X_1, X_2 \): Corresponding known input slew or output load points  
+- \( D1, D2 \): Known delay values from the LUT  
+- \( X1, X2 \): Corresponding known input slew or output load points  
 - \( X \): The required (intermediate) value for which delay is being estimated  
-
-
 
 #### Extrapolation
 - **Used when:** The required slew or load **falls outside** the bounds of the LUT  
@@ -113,8 +111,8 @@ Delay_{ext} = D_1 + \frac{(X - X_1)}{(X_2 - X_1)} \times (D_2 - D_1)
 $$
 
 Where:
-- \( D_1, D_2 \): Delay values from the **nearest two known LUT entries**  
-- \( X_1, X_2 \): Corresponding **input slew or output load** points  
+- \( D1, D2 \): Delay values from the **nearest two known LUT entries**  
+- \( X1, X2 \): Corresponding **input slew or output load** points  
 - \( X \): The **out-of-range** value for which the delay is being estimated
   
 > **Note:**  
@@ -130,16 +128,18 @@ Below are the questions we aim to answer after the end of this week:
 #### 2️⃣ Are the delay models accurate?
 
 #### 3️⃣ How do we verify that what STA is reporting is correct?
+</details>
 
-### NMOS and PMOS Transistors
-
-| NMOS | PMOS |
-|------|------|
-
+<details>
+ <summary> NMOS Transistor</summary>
+ 
+## NMOS Transistor
 
 **NMOS** stands for **N-channel Metal Oxide Semiconductor** 
 
+<div align="center">
 <img width="551" height="378" alt="nmos" src="https://github.com/user-attachments/assets/b9015ff4-d6d9-4a31-b979-0767f5eb7c22" />
+</div>
 
 - An NMOS transistor is a 4-terminal device: 
 ```
@@ -151,13 +151,11 @@ Below are the questions we aim to answer after the end of this week:
 - Consists of P-substrate, Gate oxide (SiO2), n+ diffusion region, Poly-silicon
 - In p-type substrates, the majority carriers are holes and the minority carriers are electrons
   
+Case I: When **V<sub>GS</sub> = 0**:
 
-Case i : 
-
+<div align="center">
 <img width="551" height="378" alt="nmos1" src="https://github.com/user-attachments/assets/c207284f-64d2-4d94-85e8-f328ca509ad1" />
-</br>
-
-When **V<sub>GS</sub> = 0**:
+</div>
 
 - The **source, drain, and bulk (body)** are all connected to **ground**.  
 - The **substrate-to-source (B–S)** and **substrate-to-drain (B–D)** each form a **PN junction diode**.  
@@ -176,9 +174,11 @@ Implications for the MOSFET:
 
 > **Summary:** With V<sub>GS</sub> = 0, the MOSFET remains **OFF**, acting like an open circuit.
 
-case II : 
+Case II: 
 
+<div align="center">
 <img width="551" height="378" alt="nmos2" src="https://github.com/user-attachments/assets/12f03ad9-2f32-48fc-bb0c-9acc97d53917" />
+</div>
 
 When a **small positive voltage** is applied to the gate of a MOS structure:
 
@@ -196,39 +196,361 @@ Because of this separation of charges:
 - The p-type substrate near the surface behaves similarly to a **reverse-biased PN junction**.  
 - This leads to the formation of a **depletion region**, where mobile carriers are scarce and only immobile ions remain.
 
+Case III:
+
+<div align="center">
+<img width="551" height="378" alt="nmos3" src="https://github.com/user-attachments/assets/676d4b2e-c6d2-4c46-a8dd-d2316c6c7447" />
+</div>
+
+When we **increase the gate voltage (V<sub>GS</sub>)** in an **NMOS transistor** (with a p-type substrate):
+
+- The **depletion region** under the gate becomes **wider**, as **holes** (the majority carriers in the p-type substrate) are **repelled** from the surface.  
+- **Free electrons** (the minority carriers) begin to gather near the surface, replacing the repelled holes.  
+- At the **Si–SiO₂ interface**, the **p-type substrate** is gradually converted into an **n-type region**.  
+- This phenomenon is called **strong inversion** or **surface inversion**.
+
+- The value of **V<sub>GS</sub>** at which strong inversion occurs is known as the **threshold voltage (V<sub>T</sub>)**.
+
+Increasing V<sub>GS</sub> Beyond Threshold
+
+- When **V<sub>GS</sub>** is increased **beyond the threshold voltage**, there is **no further significant increase** in the depletion width, since the region is already depleted of holes.  
+- Instead, **electrons** (negatively charged carriers) from the **heavily doped n⁺ source region** are **attracted toward the gate region**, forming a **thin n-type channel** just beneath the oxide layer.  
+- As the gate voltage continues to rise, **more electrons accumulate**, and the **channel width increases**, improving conductivity.  
+- A continuous **n-channel** now connects the **source** and **drain**, allowing **current (I<sub>D</sub>)** to flow when a voltage is applied between them.  
+- The **conductivity of this channel** is **modulated by the gate voltage**, meaning higher V<sub>GS</sub> produces a stronger (lower resistance) channel.
+
+The **Body Effect** (also called the **Substrate Bias Effect**) describes how the **threshold voltage (V<sub>T</sub>)** of an NMOS transistor changes when the **source-to-body voltage (V<sub>SB</sub>)** is not zero.
+
+<div align="center">
+<img width="512" height="201" alt="vsb" src="https://github.com/user-attachments/assets/33d115cc-60fe-4b55-ab6f-4bd224905ba1" />
+</div>
+
+This comparison shows NMOS operation under two cases:  
+1. **V<sub>SB</sub> = 0**  
+2. **V<sub>SB</sub> > 0**
+   
+ <div align="center"> 
+<img width="512" height="201" alt="vsb1" src="https://github.com/user-attachments/assets/5fac33c1-1bc1-4b48-aa7b-9df6f446a5da" />
+ </div>
+
+Case I: V<sub>SB</sub> = 0
+
+- The **source**, **drain**, and **body (substrate)** are at the same potential.  
+- When **V<sub>GS</sub>** increases, **normal channel formation** occurs.  
+- The **semiconductor surface** inverts to **n-type** when the gate voltage reaches the **threshold voltage (V<sub>T0</sub>)**.  
+
+> Channel forms when  **V<sub>GS</sub> = V<sub>T0</sub>**
+
+Case II: V<sub>SB</sub> > 0 (Positive Substrate Bias)
+
+- A **reverse bias** is introduced between the **source** and the **body (substrate)**.  
+- This **increases the depletion region width** near the source.  
+- As a result:
+  - The **threshold voltage (V<sub>T</sub>)** **increases**.  
+  - The **depletion layer** becomes slightly wider near the source.  
+  - **More gate voltage (V<sub>GS</sub>)** is required to **turn ON** the transistor and achieve **strong inversion**.
+
+> Channel forms when  **V<sub>GS</sub> = V<sub>T0</sub> + ΔV<sub>T</sub>**
+
+> This effect is known as the **Body Effect** or **Substrate Bias Effect**.
+
+Threshold Voltage Equation
+
+The modified threshold voltage is given by:
+
+**V<sub>T</sub> = V<sub>T0</sub> + γ [ √(|−2ϕ<sub>F</sub> + V<sub>SB</sub>|) − √(|−2ϕ<sub>F</sub>|) ]**
+
+where:
+
+- **V<sub>T</sub>** → Threshold voltage with body bias  
+- **V<sub>T0</sub>** → Threshold voltage when V<sub>SB</sub> = 0 (process-dependent)  
+- **γ (gamma)** → Body-effect coefficient, expresses how V<sub>T</sub> changes with body bias  
+- **ϕ<sub>F</sub>** → Fermi potential, related to substrate doping  
+
+Body Effect Coefficient (γ)
+
+**γ = √( (2 × q × ε<sub>Si</sub> × N<sub>A</sub>) / C<sub>ox</sub> )**
+
+Where:
+
+| Symbol | Meaning | Typical Value / Notes |
+|---------|----------|-----------------------|
+| **q** | Electron charge | 1.6 × 10⁻¹⁹ C |
+| **ε<sub>Si</sub>** | Permittivity of silicon | 11.7 × ε₀ |
+| **N<sub>A</sub>** | Acceptor doping concentration | Depends on substrate |
+| **C<sub>ox</sub>** | Oxide capacitance | C<sub>ox</sub> = ε<sub>ox</sub> / t<sub>ox</sub> |
+| **ε<sub>ox</sub>** | Permittivity of SiO₂ | ≈ 3.45 × 10⁻¹¹ F/m |
+| **t<sub>ox</sub>** | Oxide thickness | Process-dependent |
+
+Fermi Potential (ϕ<sub>F</sub>)
+
+**ϕ<sub>F</sub> = −ϕ<sub>T</sub> × ln(n<sub>i</sub> / N<sub>A</sub>)**
+
+or equivalently,
+
+**2ϕ<sub>F</sub> = −2ϕ<sub>T</sub> × ln(n<sub>i</sub> / N<sub>A</sub>)**
+
+Where:
+- **n<sub>i</sub>** = Intrinsic carrier concentration  
+- **N<sub>A</sub>** = Substrate doping concentration  
+- **ϕ<sub>T</sub>** = Thermal voltage = (kT / q)
+
+> As **V<sub>SB</sub>** increases, the **threshold voltage (V<sub>T</sub>)** also increases.
+
+NMOS Transistor — Resistive (Linear) Region of Operation
+
+**Condition:**  
+V<sub>GS</sub> > V<sub>T</sub> and **small** V<sub>DS</sub>
+
+<div align="center">
+<img width="1024" height="683" alt="image" src="https://github.com/user-attachments/assets/cca4724f-2d5c-43c1-8425-8d71873666a4" />
+</div>
+
+- When **V<sub>GS</sub> ≥ V<sub>T</sub>**, a **channel is formed** due to strong inversion.  
+- Charge carriers (electrons, for NMOS) flow **from the source to the drain**.  
+- The **local potential** along the channel is represented as **v(x)**.  
+- The **gate-to-channel voltage** at a point *x* is:  
+  **V<sub>GS</sub> − V(x)**  
+
+The **induced charge density** (Q<sub>i</sub>) in the channel is proportional to **(V<sub>GS</sub> − V<sub>T</sub>)**.
+
+Channel Charge Relationship
+
+The **local inversion charge per unit area** is:
+
+**Q<sub>i</sub>(x) = −C<sub>ox</sub> × ([V<sub>GS</sub> − V(x)] − V<sub>T</sub>)**
+
+Where:
+- **C<sub>ox</sub>** → Oxide capacitance per unit area  
+- **V(x)** → Potential at point *x* along the channel  
+- **V<sub>GS</sub>** → Gate-to-source voltage  
+- **V<sub>T</sub>** → Threshold voltage  
+
+The **effective channel length (L)** and the **voltage profile** along the x-axis determine the **current flow**.
+
+> In this region, the MOSFET behaves like a **voltage-controlled resistor**.
+
+Current Components
+
+1. **Drift Current**
+- Dominant in the **resistive (linear)** region.  
+- Caused by the **electric field** established by **V<sub>DS</sub>** across the channel.  
+- Electrons are accelerated through the channel by this field.
+
+2. **Diffusion Current**
+- Due to **carrier concentration differences** along the channel.  
+- Usually much smaller than the drift current in this region.
+
+
+Drift Current 
+
+In the resistive region (V<sub>GS</sub> > V<sub>T</sub>, small V<sub>DS</sub>):
+
+**Drift current (I<sub>D</sub>)** is given by:
+
+**I<sub>D</sub> = (carrier velocity) × (available charge) × (channel width)**
+
+or equivalently,
+
+**I<sub>D</sub> = −v<sub>n</sub>(x) · Q<sub>i</sub>(x) · W**
+
+Where:
+- **v<sub>n</sub>(x)** = electron drift velocity = μ<sub>n</sub> × E = μ<sub>n</sub> × (dv/dx)  
+- **μ<sub>n</sub>** = electron mobility  
+- **W** = channel width  
+
+Substitute Q<sub>i</sub>(x):
+
+**I<sub>D</sub> = μ<sub>n</sub> · C<sub>ox</sub> · W · ([V<sub>GS</sub> − v(x)] − V<sub>T</sub>) · (dv/dx)**
+
+Integration Across the Channel
+
+Integrate from:
+- **x = 0 → L**, and  
+- **v = 0 → V<sub>DS</sub>**
+
+![linerar](https://github.com/user-attachments/assets/f56abef8-fabc-4369-b5fd-ab3cd575f127)
+
+Since I<sub>D</sub> is constant along the channel:
+
+**∫₀ᴸ I<sub>D</sub> dx = μ<sub>n</sub> C<sub>ox</sub> W ∫₀ⱽᴰˢ ([V<sub>GS</sub> − v] − V<sub>T</sub>) dv**
+
+Simplifying:
+
+**I<sub>D</sub> · L = μ<sub>n</sub> C<sub>ox</sub> W [ (V<sub>GS</sub> − V<sub>T</sub>)V<sub>DS</sub> − (V<sub>DS</sub>² / 2) ]**
+
+Simplified Drain Current Equation
+
+Define **k′<sub>n</sub> = μ<sub>n</sub> C<sub>ox</sub>** (process transconductance parameter)
+
+Then:
+
+**I<sub>D</sub> = k′<sub>n</sub> (W / L) [ (V<sub>GS</sub> − V<sub>T</sub>)V<sub>DS</sub> − (V<sub>DS</sub>² / 2) ]**
+
+Or, using the **gain factor (k<sub>n</sub>)**:
+
+**k<sub>n</sub> = k′<sub>n</sub> × (W / L)**
+
+Final form:
+
+> **I<sub>D</sub> = k<sub>n</sub> [ (V<sub>GS</sub> − V<sub>T</sub>)V<sub>DS</sub> − (V<sub>DS</sub>² / 2) ]**
+
+ Numerical Example
+
+**Given:**
+
+| Parameter | Symbol | Value |
+|------------|---------|--------|
+| Threshold voltage | V<sub>T</sub> | 0.454 V |
+| Drain–Source voltage | V<sub>DS</sub> | 0.05 V |
+| Gate–Source voltage | V<sub>GS</sub> | 1.0 V |
+
+Step 1: Check Region of Operation
+
+Compute:
+
+**ΔV = V<sub>GS</sub> − V<sub>T</sub> = 1.0 − 0.454 = 0.546 V**
+
+Compare:
+
+**V<sub>DS</sub> = 0.05 V ≤ 0.546 V**
+ Therefore, the transistor is operating in the **linear (resistive) region**.
+
+Step 2: Use Linear Region Formula
+
+The drain current in the **linear region** is given by:
+
+**I<sub>D</sub> = Kn [ (V<sub>GS</sub> − V<sub>T</sub>)V<sub>DS</sub> − (V<sub>DS</sub>² / 2) ]**
+
+Substitute the known values:
+
+**I<sub>D</sub> = Kn [ (0.546)(0.05) − (0.05² / 2) ]**
+
+Step 3: Simplify the Expression
+
+**I<sub>D</sub> = Kn [ (0.02730) − (0.00125) ]**  
+**I<sub>D</sub> = Kn × 0.02605**
+
+Table (one-step numerical results)
+
+| V<sub>GS</sub> (V) | ΔV = V<sub>GS</sub> − V<sub>T</sub> (V) | Region | I<sub>D</sub> (in terms of Kn) |
+|--------------------:|-----------------------------------------:|:------:|-------------------------------:|
+| 0.5                 | 0.05                                     | Linear (edge) | **0.00125 · Kn** |
+| 1.0                 | 0.55                                     | Linear | **0.02625 · Kn** |
+| 1.5                 | 1.05                                     | Linear | **0.05125 · Kn** |
+| 2.0                 | 1.55                                     | Linear | **0.07625 · Kn** |
+| 2.5                 | 2.05                                     | Linear | **0.10125 · Kn** |
+
+**How each I<sub>D</sub> was computed (example for V<sub>GS</sub>=1.0):**
+
+- ΔV = 1.0 − 0.45 = 0.55  
+- (ΔV)·V<sub>DS</sub> = 0.55 × 0.05 = 0.02750  
+- V<sub>DS</sub>² / 2 = 0.05² / 2 = 0.00125  
+- Bracket = 0.02750 − 0.00125 = 0.02625  
+- I<sub>D</sub> = **0.02625 · Kn**
+
+- **ΔV = V<sub>GS</sub> − V<sub>T</sub>** is the gate overdrive. It controls how strong the inversion layer (n-channel) is. Larger ΔV → more electrons at the surface → lower channel resistance → higher I<sub>D</sub>.
+- For the given V<sub>DS</sub> = 0.05 V, all tested V<sub>GS</sub> values satisfy **V<sub>DS</sub> ≤ ΔV**, so the device stays in the **linear (resistive) region** for every row. (When V<sub>DS</sub> > ΔV, the device would enter **saturation**.)
+- The drain current in the linear region is approximately proportional to **ΔV·V<sub>DS</sub>** (minus the small V<sub>DS</sub>²/2 correction). Because V<sub>DS</sub> is small and fixed, **I<sub>D</sub> increases roughly linearly with ΔV (hence with V<sub>GS</sub>)**.
+- The V<sub>GS</sub>=0.5 case is the **edge** case: ΔV = 0.05 equals V<sub>DS</sub>, so the transistor is just at the boundary between linear and saturation — it produces a very small current (0.00125·β).
+- To convert the symbolic results to **amperes**, multiply each entry by the numerical value of **β** for the device/process.
+
+When **(V<sub>GS</sub> − V<sub>DS</sub>) > V<sub>T</sub>**,  
+a **conductive channel** is formed between the **source** and **drain**.
+
+
+![l1](https://github.com/user-attachments/assets/d626e1ff-d3e9-4894-80f6-4f471197cd10)
+
+
+Let’s consider an **NMOS transistor** where:
+
+![l2](https://github.com/user-attachments/assets/b0158821-1feb-4af0-a9c5-217dea1fc2d9)
+
+- **V<sub>GS</sub> = 1.0 V**  
+- **V<sub>DS</sub> = 0.55 V**  
+- **V<sub>T</sub> = 0.45 V**
+
+At the **source end** of the channel:
+- The gate-to-source voltage is **V<sub>GS</sub> = 1.0 V**.
+- Since **V<sub>GS</sub> > V<sub>T</sub>**, an **n-type inversion layer** is formed, allowing electrons to flow.
+
+At the **drain end** of the channel:
+- The local channel voltage is reduced by **V<sub>DS</sub>**.  
+- The **effective gate-to-channel voltage** becomes:
+
+
+V_GC = V_GS - V_DS = 1.0 - 0.55 = 0.45 V
+
+- Notice that **V<sub>GC</sub> = V<sub>T</sub>**, meaning the gate-to-channel voltage at the drain end has just reached the **threshold voltage**.
+
+- When **V<sub>GC</sub> = V<sub>T</sub>**, the **inversion layer disappears** at the **drain side**.  
+- This point is known as **pinch-off** — the channel **just ends** at the drain.  
+- Beyond this point, increasing **V<sub>DS</sub>** further does **not significantly increase current**, because the **channel can’t extend any further** into the drain region.
+
+
+![l3](https://github.com/user-attachments/assets/07b98bb2-11f8-4f3d-ade3-6eed78070113)
+
+
+Pinch-Off Condition
+
+When the drain-source voltage (Vds) is increased further, the channel near the drain **disappears**. This occurs at the **pinch-off condition**, which is mathematically expressed as:
+
+**VDS ≥ VGS - VT**
+
+Where:  
+- Vgs = Gate-Source Voltage  
+- Vt = Threshold Voltage  
+
+At this point, the **voltage along the channel** remains essentially **constant**:
+
+**Vchannel ≈ VGS - VT**
+
+Drain Current Before Pinch-Off
+
+Before pinch-off, the drain current is given by:
+
+**ID = Kn · (VGS - VT) · VDS**
+
+Where Kn is the process transconductance factor.
+
+At pinch-off, replace Vds with (Vgs - Vt):
+
+**ID = (Kn / 2) · (VGS - VT)²**
+
+Transistor Parameters
+
+The parameter Kn is related to device geometry and mobility:
+
+**Kn = k'n · (W / L)**
+
+Where:  
+- k'_n = μ_n · C_ox (process transconductance)  
+- W = Channel Width  
+- L = Channel Length  
+
+Thus, the **saturated drain current** can also be written as:
+
+**ID = (k'n / 2) · (W / L) · (VGS - VT)²**
+
+Channel Length Modulation (λ)
+
+When Vds increases beyond pinch-off, the **depletion region at the drain expands**, effectively **shortening the channel**. This effect is called **channel-length modulation** and is modeled by the parameter λ.  
+
+The drain current, considering channel-length modulation, is:
+
+**ID = (k'n / 2) · (W / L) · (VGS - VT)² · (1 + λ · VDS)**
+
+> λ increases as the channel length L decreases.  
+> Shorter channel → larger λ → more pronounced channel-length modulation.
+</details>
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<details>
+ <summary> Installation of NGSPICE and SPICE  </summary>
+<br>
 
 ## Installation of NGSPICE
-
 
 Download the tarball from [SourceForge](https://sourceforge.net/projects/ngspice/files/) to your local directory.  
 Then unpack it using:
@@ -255,6 +577,8 @@ cd sky130CircuitDesignWorkshop
 ls
 ```
 <img width="920" height="427" alt="image" src="https://github.com/user-attachments/assets/27cc04de-0551-4a41-bd44-a1ec821c98bb" />
+
+
 
 Experiment 1: MOSFET Behaviour (Id vs Vds)
 
