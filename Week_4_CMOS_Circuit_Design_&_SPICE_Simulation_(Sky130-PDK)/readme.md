@@ -548,7 +548,6 @@ The drain current, considering channel-length modulation, is:
 
 <details>
  <summary> Installation of NGSPICE and SPICE  </summary>
-<br>
 
 ## Installation of NGSPICE
 
@@ -578,10 +577,162 @@ ls
 ```
 <img width="920" height="427" alt="image" src="https://github.com/user-attachments/assets/27cc04de-0551-4a41-bd44-a1ec821c98bb" />
 
+**SPICE (Simulation Program with Integrated Circuit Emphasis)**, developed at **UC Berkeley**, is a fundamental tool for simulating analogue and mixed-signal circuits.  
+It solves **nonlinear equations** for components like:
+
+- Transistors  
+- Resistors
+- Capacitors
+  
+SPICE has evolved into several tools, both open-source and commercial:
+
+- **Free:** Ngspice, LTSpice  
+- **Commercial:** HSPICE, PSPICE  
+
+<img width="1869" height="992" alt="image" src="https://github.com/user-attachments/assets/7cbfc064-4026-46ad-911d-f44a45e075d9" />
 
 
-Experiment 1: MOSFET Behaviour (Id vs Vds)
+A **SPICE deck** is the input file that defines what the simulator should run.  
+It includes:
 
+1. **Netlist** – List of components and their interconnections  
+2. **Device Models & Parameters** – Defines transistor or component behavior  
+3. **Initial Conditions** – Specifies starting voltages or states  
+4. **Inputs (Stimulus)** – Voltage/current sources for testing  
+5. **Simulation Options & Commands** – Specify the type of analysis (e.g., DC, AC, transient)
+
+1. **SPICE Netlist**
+<img width="778" height="521" alt="image" src="https://github.com/user-attachments/assets/8f488612-3b2b-40c3-847f-f16e8173f68d" />
+
+```spice
+M1 VDD n1 0 0 nmos w=1.8u L=1.2u
+R1 in n1 55
+VDD vdd 0 2.5
+Vin in 0 2.5
+```
+| **Element** | **Syntax / Meaning** | **Description** |
+|--------------|----------------------|-----------------|
+| **M1** | `M<name> Drain Gate Source Bulk Model W= L=` | Defines an **NMOS transistor**.<br>In this example:<br>→ Drain = `VDD`<br>→ Gate = `n1`<br>→ Source = `0` (ground)<br>→ Bulk = `0` (ground)<br>→ Uses model **nmos**<br>→ Width = **1.8 µm**, Length = **1.2 µm** |
+| **R1 in n1 55** | `R<name> Node1 Node2 Resistance` | A **resistor** between nodes `in` and `n1` with resistance **55 Ω**. |
+| **VDD vdd 0 2.5** | `V<name> +node -node Value` | A **DC voltage source** providing **2.5 V** between `vdd` and ground. |
+| **Vin in 0 2.5** | `V<name> +node -node Value` | Another **voltage source**, possibly representing an **input signal**. |
+
+2. **Technology File (Model File)**
+A technology file (also called a model file) defines the electrical behavior of devices like transistors, resistors, and capacitors.
+
+It provides process-specific parameters that describe how real silicon behaves
+
+```spice
+.MODEL nmos NMOS (Tox= , Vtho= , u0= , GAMMA= )
+.end1
+```
+| **Parameter** | **Symbol** | **Description** | **Impact on Device Behavior** |
+|----------------|-------------|-----------------|-------------------------------|
+| **Threshold Voltage** | `Vt` or `Vtho` | The minimum gate-to-source voltage required to turn the MOSFET **on**. | Determines **switching voltage** and **drive strength**. |
+| **Body Effect Coefficient** | `γ` (Gamma) | Models how the **bulk voltage** influences the **threshold voltage**. | Affects performance when the source and substrate are at different potentials. |
+| **Oxide Thickness** | `TOX` | The physical thickness of the transistor’s **gate oxide layer**. | Controls **gate capacitance**, which affects speed and power. |
+| **Carrier Mobility** | `U0` | Indicates how easily charge carriers (electrons/holes) move in the channel. | Higher mobility ⇒ **faster switching** and **higher drive current**. |
+| **Other Process Parameters** | — | Include factors like channel length modulation (λ), surface potential (Φ), and junction capacitances. | Used for **fine-tuning** device accuracy in simulations. |
+> These parameters depend on the CMOS technology node (e.g., 180 nm, 65 nm, 25 nm)
+
+```
+.lib "xxx_025um_model.mod" CMOS_MODELS
+```
+This line tells SPICE to load transistor model data from an external file (e.g., xxx_025um_model.mod), corresponding to a 0.25 µm CMOS technology.
+
+- .lib — Loads a library file containing multiple models (NMOS, PMOS, etc.).
+- "xxx_025um_model.mod" — File path to the model definitions.
+- CMOS_MODELS — Specifies which section or model set to use.
+
+3. **Simulation Commands**
+
+```
+
+.op
+.dc Vin 0 2.5 0.1
+.tran 1n 100n
+```
+| **Command** | **Type of Analysis** | **Purpose / Description** | **Typical Usage Example** |
+|--------------|----------------------|----------------------------|----------------------------|
+| **.op** | **Operating Point Analysis** | Calculates the **DC operating point** of the circuit — i.e., the steady-state voltages and currents with all sources constant. Useful for verifying **biasing conditions** of transistors and nodes. | `.op` |
+| **.dc** | **DC Sweep Analysis** | Sweeps a **voltage or current source** across a specified range to study how circuit outputs respond (e.g., I–V or V–V characteristics). | `.dc Vin 0 2.5 0.1` (sweeps `Vin` from 0 V to 2.5 V in 0.1 V steps) |
+| **.tran** | **Transient Analysis** | Simulates **time-domain behavior** — how voltages and currents change over time. Commonly used for pulse or signal analysis. | `.tran 1n 100n` (simulates 100 ns with 1 ns step) |
+| **.ac** | **AC (Small-Signal) Analysis** | Analyzes **frequency response** by linearizing the circuit around the operating point and sweeping frequency. Useful for **gain**, **bandwidth**, and **phase** studies. | `.ac dec 10 1k 100Meg` (sweeps frequency from 1 kHz to 100 MHz, 10 points per decade) |
+
+
+
+**Experiment 1: MOSFET Behaviour (Id vs Vds)**
+
+```spice
+* SKY130 NMOS Circuit Simulation Example
+
+.param temp=27
+
+* Include SKY130 model library (typical corner)
+.lib "sky130_fd_pr/models/sky130.lib.spice" tt
+
+* Circuit netlist
+XM1 Vdd n1 0 0 sky130_fd_pr__nfet_01v8 w=5 l=2
+R1 n1 in 55
+Vdd vdd 0 1.8V
+Vin in 0 1.8V
+
+* Simulation commands
+.op
+.dc Vdd 0 1.8 0.1 Vin 0 1.8 0.2
+
+.control
+run
+display
+setplot dc1
+.endc
+
+.end
+```
+| **Item / Element** | **Syntax / Meaning** | **Description / Purpose** |
+|-------------------|---------------------|---------------------------|
+| `.param temp=27` | Defines a global parameter | Sets simulation temperature to **27°C**, affecting transistor properties like threshold voltage and carrier mobility. |
+| `.lib` | Includes an external library file | Loads device models from a library. |
+| `"sky130_fd_pr/models/sky130.lib.spice"` | Path to model file | SKY130 PDK model file providing NMOS/PMOS device definitions. |
+| `tt` | Process corner | **Typical-Typical** — nominal NMOS and PMOS behavior. Other corners: SS (slow), FF (fast), FS/SF (mixed). |
+| **XM1** | `M<name> Drain Gate Source Bulk Model W= L=` | NMOS transistor.<br>→ Drain = `Vdd`<br>→ Gate = `n1`<br>→ Source = `0`<br>→ Bulk = `0`<br>→ Model = `sky130_fd_pr__nfet_01v8`<br>→ W = 5 µm, L = 2 µm |
+| **R1 n1 in 55** | `R<name> Node1 Node2 Resistance` | Resistor between nodes `n1` and `in` with **55 Ω**. |
+| **Vdd vdd 0 1.8V** | `V<name> +node -node DC_value` | DC power supply providing **1.8 V**. |
+| **Vin in 0 1.8V** | `V<name> +node -node DC_value` | Input voltage source of **1.8 V**, can be swept or pulsed. |
+| `.op` | Operating Point Analysis | Computes **steady-state DC voltages and currents** at each node. Checks circuit bias conditions. |
+| `.dc Vdd 0 1.8 0.1 Vin 0 1.8 0.2` | DC Sweep Analysis | Sweeps `Vdd` (0→1.8 V, step 0.1 V) and `Vin` (0→1.8 V, step 0.2 V) to study output variations with power and input. |
+| `.control ... .endc` | Control block | Executes commands in Ngspice control interpreter. |
+| `run` | Command in control block | Starts simulation using the defined analyses. |
+| `display` | Command in control block | Lists all **available variables** (node voltages, currents, etc.). |
+| `setplot dc1` | Command in control block | Selects the DC sweep data (named `dc1`) for plotting or further analysis. |
+
+
+To run the simulation, launch the SPICE tool
+
+```
+ngspice day1_nfet_idvds_L2_W5.spice
+```
+<img width="928" height="431" alt="image" src="https://github.com/user-attachments/assets/a12c8aa9-c7fa-4d4b-a907-8822fcbcc250" />
+
+Plot the waveforms using Ngspice
+
+```
+plot -vdd#branch
+```
+
+<img width="923" height="431" alt="image" src="https://github.com/user-attachments/assets/dfe171b5-0388-434e-9e71-2fc1d8c32b19" />
+
+## References
+
+1. UC Berkeley SPICE: https://bwrcs.eecs.berkeley.edu/Classes/IcBook/SPICE/
+
+2. Ngspice: http://ngspice.sourceforge.net/
+
+3. LTSpice: https://www.analog.com/en/design-center/design-tools-and-calculators/ltspice-simulator.html
+
+4. HSPICE: https://www.synopsys.com/verification/analog-mixed-signal/hspice.html
+
+</details>
 
 Title: From Transistor Behavior to Timing Analysis (STA): The CMOS Design Flow
 
