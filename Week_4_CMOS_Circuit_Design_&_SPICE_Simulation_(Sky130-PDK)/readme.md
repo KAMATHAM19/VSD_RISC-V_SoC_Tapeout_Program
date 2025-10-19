@@ -766,7 +766,7 @@ We compare two devices with the same W/L = 1.5:
 | Short-channel | 0.375 μm  | 0.25 μm    | W/L < 250 nm → Short channel |
 
 - Since the channel length is < 0.25 μm in the second device, it is classified as a **short-channel device**.
-- Both devices have the **same W/L ratio (1.5)**, but different absolute dimensions, allowing direct comparison of their electrical behavior.
+- Both devices have the **same W/L ratio (1.5)**, but different absolute dimensions, allowing direct comparison of their electrical behaviour.
   
 <img width="1919" height="903" alt="image" src="https://github.com/user-attachments/assets/58ef765a-0b03-40a6-bbba-65a08af2f874" />
 
@@ -783,11 +783,11 @@ We compare two devices with the same W/L = 1.5:
 
  In **long-channel devices**, carriers accelerate freely, producing the ideal **quadratic Id-VGS curve**.  
  
- In **short-channel devices**, at low VGS the behavior is similar, but at higher VGS the **carrier velocity saturates** due to high electric fields. 
+ In **short-channel devices**, at low VGS the behaviour is similar, but at higher VGS the **carrier velocity saturates** due to high electric fields. 
  
 Once the **velocity limit** is reached, the **Id-VGS curve flattens**, transitioning from quadratic to linear.  
 
-> **Conclusion:** This comparison clearly demonstrates how **velocity saturation alters short-channel NMOS behavior**, reducing peak current and introducing a new operational regime not present in long-channel devices.
+> **Conclusion:** This comparison clearly demonstrates how **velocity saturation alters short-channel NMOS behaviour**, reducing peak current and introducing a new operational regime not present in long-channel devices.
 
 <img width="444" height="218" alt="m" src="https://github.com/user-attachments/assets/257f313a-ddee-40bd-a375-5f490aa9a054" />
 
@@ -1026,7 +1026,7 @@ Output Fall Time (𝑡𝑓)
 
 <img width="927" height="431" alt="o1" src="https://github.com/user-attachments/assets/b4c7f460-1323-4c46-b2eb-6c3278014cbd" />
 
-### Static Behavior Evaluation — CMOS Inverter Robustness and Switching Threshold Voltage
+### Static Behaviour Evaluation — CMOS Inverter Robustness and Switching Threshold Voltage
 
 When evaluating the robustness of a CMOS inverter, several key characteristics are considered:
 - Switching Threshold Voltage (Vm)
@@ -1059,7 +1059,7 @@ Different portions of the voltage transfer curve correspond to different transis
 4. PMOS Saturation / NMOS Linear — Input near high logic.
 5. PMOS OFF / NMOS Linear — High input region.
 
-> Understanding these regions helps in analyzing switching behavior and designing inverters for robust performance under process, voltage, and temperature variations.
+> Understanding these regions helps in analysing switching behaviour and designing inverters for robust performance under process, voltage, and temperature variations.
 
 <img width="1804" height="933" alt="image" src="https://github.com/user-attachments/assets/79050e1f-d839-403d-b528-30171ff5047a" />
 
@@ -1069,12 +1069,12 @@ At the switching threshold voltage (Vm), the inverter is in a special operating 
 
 This means the PMOS is sourcing the same current that the NMOS is sinking.
 
-Since we are analyzing at Vm:
+Since we are analysing at Vm:
 
 - For the NMOS, the gate-to-source voltage is equal to the input voltage: VGSn​=Vm​
 - For the PMOS, the gate-to-source voltage is the difference between the input and VDD: VGSp​=Vm​−VDD​​
 
-This current balance is crucial because it defines the point of maximum voltage gain in the CMOS inverter and ensures symmetric switching behavior.
+This current balance is crucial because it defines the point of maximum voltage gain in the CMOS inverter and ensures symmetric switching behaviour.
 
 <img width="1758" height="925" alt="image" src="https://github.com/user-attachments/assets/8cd43e2d-b772-425f-9420-f8edb62cffe0" />
 
@@ -1192,16 +1192,23 @@ ngspice day4_inv_noisemargin_wp1_wn036.spice
 plot out vs in
 ```
 <img width="929" height="436" alt="image" src="https://github.com/user-attachments/assets/de41e0ee-7936-4882-9443-e55e523cfe03" />
+
+
+<img width="868" height="401" alt="4" src="https://github.com/user-attachments/assets/322e68b3-9582-405d-884f-5409b8a1ab25" />
+
+<img width="923" height="374" alt="4 1" src="https://github.com/user-attachments/assets/5eca8053-e196-4d96-806d-73d59e87b628" />
+
+
 </details>
 
 
 <details>
   <summary>CMOS Inverter Robustness under Power Supply and Device Variations</summary>
 
-## Static Behavior Evaluation — CMOS Inverter Robustness under Power Supply Variation
+## Static Behaviour Evaluation — CMOS Inverter Robustness under Power Supply Variation
 
 Overview:
-The power supply voltage (VDD) has a direct impact on the static behavior of a CMOS inverter. Changing VDD affects:
+The power supply voltage (VDD) has a direct impact on the static behaviour of a CMOS inverter. Changing VDD affects:
 - The switching threshold voltage (Vm)
 - The noise margins (NMH and NML)
 The overall robustness of the inverter against noise and variations
@@ -1260,8 +1267,12 @@ Disadvantages:
 ngspice day5_inv_supplyvariation_Wp1_Wn036.spice
 ```
 <img width="929" height="422" alt="image" src="https://github.com/user-attachments/assets/8c916549-dc5d-4669-b190-b705f4f1bb3a" />
+<img width="886" height="428" alt="5" src="https://github.com/user-attachments/assets/6ab497ea-967c-43a0-a82c-aa2f29ede1b4" />
+<img width="926" height="406" alt="5 1" src="https://github.com/user-attachments/assets/6ccbae76-a90f-4118-99e6-5686f96ecf43" />
 
-Static Behavior Evaluation — CMOS Inverter Robustness under Device Variation
+
+
+Static Behaviour Evaluation — CMOS Inverter Robustness under Device Variation
 
 Device Variation and CMOS Inverter Robustness
 The robustness of a CMOS inverter is significantly influenced by device variations that arise during fabrication. These variations can occur due to:
