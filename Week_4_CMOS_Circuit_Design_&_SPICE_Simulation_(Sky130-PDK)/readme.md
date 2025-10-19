@@ -946,6 +946,186 @@ Step 4: Combine the NMOS and PMOS load curves by equating their drain currents (
 <img width="1907" height="1072" alt="image" src="https://github.com/user-attachments/assets/ed17cb3e-5cee-4b5a-9572-a38899318525" />
 </details>
 
+<details>
+  <summary>CMOS Inverter Analysis: Static, Dynamic, and SPICE-Based Characterisation</summary>
+
+### Voltage Transfer Characteristics and SPICE Simulations: CMOS Inverter SPICE Deck
+
+This section explains how to set up a SPICE deck for simulating a CMOS inverter.
+
+1. **Component Connectivity**: Start by defining how each element is connected. Specify the PMOS (M1) and NMOS (M2) transistors, the power supply (Vdd), ground (Vss), input (Vin), and output (Vout). Proper connections ensure the circuit functions as intended.
+
+2. **Component Values**: Set the key parameters for each component. For transistors, define the width-to-length ratio (W/L). Specify the supply voltage (e.g., Vdd = 2.5V) and the load capacitance (e.g., Cload = 10 fF). These values influence the inverter’s electrical behaviour and timing.
+
+3. **Identify Nodes**: Recognise all nodes in the circuit, including input, output, power, ground, and each transistor terminal. Understanding node locations is essential for accurate analysis.
+
+4. **Name Nodes**: Assign clear and consistent names to all nodes. This makes it easier to interpret simulation results and debug the SPICE deck if needed.
+   
+<img width="1864" height="840" alt="image" src="https://github.com/user-attachments/assets/127a3f57-1c51-400e-9a6d-0f3850b98333" />
+
+When setting up a SPICE simulation for a CMOS inverter, the deck is organized into several important sections:
+
+*Model & Netlist Description*:
+- M1 out in vdd vdd pmos W=0.375u L=0.25u – This defines the PMOS transistor M1. It has a width of 0.375 µm and length of 0.25 µm. The source is connected to VDD, the drain to the output node (out), the gate to the input (in), and the bulk tied to VDD.
+- M2 out in 0 0 nmos W=0.375u L=0.25u – This defines the NMOS transistor M2 with the same dimensions. Its source is connected to ground, the drain to the output, the gate to the input, and the bulk tied to ground.
+- cload out 0 10f – A load capacitor of 10 fF connected between the output node and ground, representing parasitic or external capacitance.
+
+*Voltage Sources*:
+- Vdd vdd 0 2.5 – Sets the DC supply voltage of 2.5 V between VDD and ground.
+- Vin in 0 2.5 – Represents the input voltage, which will be swept during the simulation to observe inverter behavior.
+
+*Simulation Commands*:
+- .op – Performs an operating point analysis to determine the DC bias point of the circuit.
+- .dc Vin 0 2.5 0.05 – Sweeps the input voltage from 0 V to 2.5 V in 0.05 V steps, generating the voltage transfer characteristic (VTC) of the inverter.
+
+*Model Inclusion*:
+- .include tsmc_025um_model.mod – Includes the technology-specific model file containing parameters for PMOS and NMOS transistors.
+- .LIB "tsmc_025um_model.mod" CMOS_MODELS – An alternative way to reference the same transistor models.
+
+*End Statement*:
+- .end – Marks the end of the SPICE deck.
+  
+<img width="1790" height="744" alt="image" src="https://github.com/user-attachments/assets/602bddf8-3140-4d91-861a-4772e84e381a" />
+
+**Experiment 3: CMOS Inverter VTC**
+ 
+```
+ngspice day3_inv_vtc_Wp084_Wn036.spice
+plot out vs in
+```
+<img width="926" height="432" alt="image" src="https://github.com/user-attachments/assets/45bad43c-cab7-4bb8-98b7-aba20cd2724c" />
+
+**Experiment 4: CMOS Inverter Transient Response**
+
+```
+ngspice day3_inv_tran_Wp084_Wn036.spice
+plot out vs time in
+```
+
+<img width="923" height="419" alt="image" src="https://github.com/user-attachments/assets/0443d4be-fc81-4d35-b3ad-bc3bd4274666" />
+
+
+**Calculating Rise Time and Fall Time from Transient Analysis**
+
+When analysing the transient response of a CMOS inverter, the rise time and fall time describe how quickly the output transitions between logic levels. These are determined from the output voltage waveform as follows:
+
+Output Rise Time (𝑡𝑟)
+- This is the time it takes for the output to transition from LOW to HIGH.
+- Measure the time when the output voltage reaches 50% of the HIGH level during the rising edge.
+
+<img width="928" height="428" alt="o" src="https://github.com/user-attachments/assets/c66c575a-2b8a-40f6-afce-6f024abf51e3" />
+
+
+Output Fall Time (𝑡𝑓)
+- This is the time it takes for the output to transition from HIGH to LOW.
+- Measure the time when the output voltage reaches 50% of the HIGH level during the falling edge.
+
+<img width="927" height="431" alt="o1" src="https://github.com/user-attachments/assets/b4c7f460-1323-4c46-b2eb-6c3278014cbd" />
+
+Static Behavior Evaluation — CMOS Inverter Robustness and Switching Threshold Voltage
+
+When evaluating the robustness of a CMOS inverter, several key characteristics are considered:
+- Switching Threshold Voltage (Vm)
+- Noise Margin
+- Power Supply Variations
+- Device Variations
+
+Switching Threshold Voltage (Vm)
+
+The switching threshold voltage (Vm) is the input voltage at which the inverter output equals the input: 𝑉in = 𝑉out
+​Vm is a critical parameter because it directly affects the inverter’s noise margin and overall robustness. At Vm:
+ - Both the NMOS and PMOS transistors are in the saturation region.
+ - Both transistors are conducting simultaneously, producing a high voltage gain
+
+<img width="1875" height="930" alt="image" src="https://github.com/user-attachments/assets/3ed4808b-fa20-4fd4-8f4f-babab8312960" />
+
+### Impact of Transistor Sizing on Vm
+
+| Case | Wn (µm) | Ln (µm) | Wp (µm) | Lp (µm) | (W/L)n | (W/L)p | Resulting Vm (V) | Notes |
+|------|----------|----------|----------|----------|--------|--------|----------------|-------|
+| Equal Sizing (Left graph) | 0.375 | 0.25 | 0.375 | 0.25 | 1.5 | 1.5 | 0.98 | Balanced NMOS & PMOS, Vm near mid-supply |
+| Stronger PMOS (Right graph) | 0.375 | 0.25 | 0.9375 | 0.25 | 1.5 | 3.75 | 1.2 | PMOS stronger, Vm shifts higher |
+
+Regions of Operation
+
+Different portions of the voltage transfer curve correspond to different transistor operating regions:
+1. PMOS Linear / NMOS OFF — Low input region.
+2. PMOS Linear / NMOS Saturation — Input rising.
+3. PMOS Saturation / NMOS Saturation — Vm occurs here, maximum gain.
+4. PMOS Saturation / NMOS Linear — Input near high logic.
+5. PMOS OFF / NMOS Linear — High input region.
+
+> Understanding these regions helps in analyzing switching behavior and designing inverters for robust performance under process, voltage, and temperature variations.
+
+<img width="1804" height="933" alt="image" src="https://github.com/user-attachments/assets/79050e1f-d839-403d-b528-30171ff5047a" />
+
+Current Balance at Vm
+
+At the switching threshold voltage (Vm), the inverter is in a special operating point where the currents through the NMOS and PMOS transistors are equal in magnitude but flow in opposite directions. Mathematically:  IDp​=−IDn​
+
+This means the PMOS is sourcing the same current that the NMOS is sinking.
+
+Since we are analyzing at Vm:
+
+- For the NMOS, the gate-to-source voltage is equal to the input voltage: VGSn​=Vm​
+- For the PMOS, the gate-to-source voltage is the difference between the input and VDD: VGSp​=Vm​−VDD​​
+
+This current balance is crucial because it defines the point of maximum voltage gain in the CMOS inverter and ensures symmetric switching behavior.
+
+<img width="1758" height="925" alt="image" src="https://github.com/user-attachments/assets/8cd43e2d-b772-425f-9420-f8edb62cffe0" />
+
+Expressing Vm in Terms of Transistor Sizing and Mobility
+
+To determine the switching threshold voltage Vm, we start with the current balance condition at Vm:
+
+                                       IDp​+IDn​=0
+  
+This equation states that the current sourced by the PMOS exactly equals the current sunk by the NMOS, but in opposite directions.
+
+By solving this equation for the ratio of PMOS to NMOS strengths (R), we can express Vm as a function of transistor sizing (W/L ratios) and carrier mobility factors
+
+In other words, Vm depends on:
+- The width-to-length ratios of the NMOS and PMOS transistors.
+- The mobility of electrons and holes, which affects how strongly each transistor conducts.
+- The supply voltage (VDD).
+
+<img width="1859" height="946" alt="image" src="https://github.com/user-attachments/assets/e9a4cf12-f6a6-435a-bc93-33d5e6cef47f" />
+
+Determining the PMOS-to-NMOS Sizing Ratio for a Desired Vm
+This expression demonstrates how to calculate the required ratio of PMOS to NMOS strengths, (Wp/Lp​)/(Wn/Ln), for a specific switching threshold voltage Vm.
+
+<img width="829" height="491" alt="image" src="https://github.com/user-attachments/assets/27ba0b1d-b4d5-4cde-8275-4b222444ab7b" />
+
+Effect of PMOS-to-NMOS Sizing on Inverter Performance
+
+<img width="1835" height="511" alt="image" src="https://github.com/user-attachments/assets/e692fb87-08c5-4eae-9580-34dcc768ce63" />
+
+This table illustrates how changing the Wp/Wn ratio influences key inverter characteristics:
+
+Rise Delay – the time it takes for the output to transition from LOW to HIGH
+
+Fall Delay – the time it takes for the output to transition from HIGH to LOW
+
+Switching Threshold Voltage (Vm) – the input voltage at which the inverter switches
+
+Key observations:
+
+When the PMOS is roughly twice as strong as the NMOS (Wp/Lp≈2×Wn/Ln):
+Rise and fall delays are balanced, around 80 ps each.
+
+The switching threshold Vm​ ≈1.2 V
+
+In this balanced condition, the clock buffer does not introduce duty cycle distortion, so no correction is needed.
+
+If the rise and fall delays are mismatched due to PMOS/NMOS resistance (Ron) differences:
+- Duty cycle distortion can occur.
+- Duty cycle correction circuits are then added in the clock tree to maintain a 50% duty cycle.
+
+> Balancing transistor strengths is therefore critical for fast, symmetric switching and reliable timing in CMOS circuits.
+
+</details>
+
+
 
 
 
