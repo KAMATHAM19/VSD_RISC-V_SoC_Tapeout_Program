@@ -1205,6 +1205,7 @@ Noise Bump Scenarios:
 ngspice day4_inv_noisemargin_wp1_wn036.spice
 plot out vs in
 ```
+<img width="929" height="436" alt="image" src="https://github.com/user-attachments/assets/de41e0ee-7936-4882-9443-e55e523cfe03" />
 
 
 
