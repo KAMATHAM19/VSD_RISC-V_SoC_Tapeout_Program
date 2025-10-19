@@ -17,7 +17,6 @@ It allows designers to see the **circuit’s output characteristics—such as vo
 
 ![SPICE Waveforms](https://github.com/user-attachments/assets/65ca0258-5a49-43a4-9387-8eb8c0878a16)
 
-
 ### Why we need SPICE
 
 **SPICE (Simulation Program with Integrated Circuit Emphasis)** is essential because it allows us to find the **real, accurate delay values** of circuits *before manufacturing*.
@@ -166,7 +165,7 @@ Looking at it from **Ohm's Law**:
 - The resistance is given by `R = V / I`.  
 - Here, `V = 0` and `I = 0`, so the resistance becomes **very large**—effectively **infinite**.
 
-Implications for the MOSFET:
+### Implications for the MOSFET:
 
 - The device shows **very high resistance** between source and drain.  
 - **No current flows** through the device.  
@@ -254,7 +253,7 @@ Case II: V<sub>SB</sub> > 0 (Positive Substrate Bias)
 
 > This effect is known as the **Body Effect** or **Substrate Bias Effect**.
 
-Threshold Voltage Equation
+**Threshold Voltage Equation**
 
 The modified threshold voltage is given by:
 
@@ -297,7 +296,7 @@ Where:
 
 > As **V<sub>SB</sub>** increases, the **threshold voltage (V<sub>T</sub>)** also increases.
 
-NMOS Transistor — Resistive (Linear) Region of Operation
+### NMOS Transistor — Resistive (Linear) Region of Operation
 
 **Condition:**  
 V<sub>GS</sub> > V<sub>T</sub> and **small** V<sub>DS</sub>
@@ -342,7 +341,7 @@ Current Components
 - Usually much smaller than the drift current in this region.
 
 
-Drift Current 
+### Drift Current 
 
 In the resistive region (V<sub>GS</sub> > V<sub>T</sub>, small V<sub>DS</sub>):
 
@@ -491,7 +490,7 @@ V_GC = V_GS - V_DS = 1.0 - 0.55 = 0.45 V
 ![l3](https://github.com/user-attachments/assets/07b98bb2-11f8-4f3d-ade3-6eed78070113)
 
 
-Pinch-Off Condition
+### Pinch-Off Condition
 
 When the drain-source voltage (Vds) is increased further, the channel near the drain **disappears**. This occurs at the **pinch-off condition**, which is mathematically expressed as:
 
@@ -532,7 +531,7 @@ Thus, the **saturated drain current** can also be written as:
 
 **ID = (k'n / 2) · (W / L) · (VGS - VT)²**
 
-Channel Length Modulation (λ)
+### Channel Length Modulation (λ)
 
 When Vds increases beyond pinch-off, the **depletion region at the drain expands**, effectively **shortening the channel**. This effect is called **channel-length modulation** and is modeled by the parameter λ.  
 
@@ -549,7 +548,9 @@ The drain current, considering channel-length modulation, is:
 <details>
  <summary> Installation of NGSPICE and SPICE  </summary>
 
-## Installation of NGSPICE
+## Installation of NGSPICE and SPICE
+
+### Installation of NGSPICE
 
 Download the tarball from [SourceForge](https://sourceforge.net/projects/ngspice/files/) to your local directory.  
 Then unpack it using:
@@ -568,7 +569,7 @@ ngspice
 <img width="1848" height="330" alt="image" src="https://github.com/user-attachments/assets/8ddd04f0-4955-45c4-a061-1a9ebcf343b4" />
 
 
-## Workshop Collaterals
+### Workshop Collaterals
 
 ```
 git clone https://github.com/kunalg123/sky130CircuitDesignWorkshop.git
@@ -660,8 +661,7 @@ This line tells SPICE to load transistor model data from an external file (e.g.,
 | **.ac** | **AC (Small-Signal) Analysis** | Analyzes **frequency response** by linearizing the circuit around the operating point and sweeping frequency. Useful for **gain**, **bandwidth**, and **phase** studies. | `.ac dec 10 1k 100Meg` (sweeps frequency from 1 kHz to 100 MHz, 10 points per decade) |
 
 
-
-**Experiment 1: MOSFET Behaviour (Id vs Vds)**
+#### **Experiment 1: MOSFET Behaviour (Id vs Vds)**
 
 ```spice
 * SKY130 NMOS Circuit Simulation Example
@@ -722,7 +722,7 @@ plot -vdd#branch
 
 <img width="923" height="431" alt="image" src="https://github.com/user-attachments/assets/dfe171b5-0388-434e-9e71-2fc1d8c32b19" />
 
-## References
+### References
 
 1. UC Berkeley SPICE: https://bwrcs.eecs.berkeley.edu/Classes/IcBook/SPICE/
 
@@ -732,12 +732,14 @@ plot -vdd#branch
 
 4. HSPICE: https://www.synopsys.com/verification/analog-mixed-signal/hspice.html
 
+5. Circuit Design Workshop: https://github.com/kunalg123/sky130CircuitDesignWorkshop.git
+
 </details>
 
 <details>
   <summary>CMOS Inverter Analysis and MOSFET Behaviour in SPICE Simulations</summary>
 
-# CMOS NMOS I–V Characteristics and Velocity Saturation
+## CMOS NMOS I–V Characteristics and Velocity Saturation
 
 **NMOS transistor behavior** in long-channel and short-channel devices, using **SPICE simulations** to illustrate linear, saturation, and velocity-saturated regions. It also covers **peak current comparisons** and operational regimes.
 
@@ -752,7 +754,7 @@ We simulate NMOS devices using SPICE with the following parameters:
 <img width="1786" height="956" alt="image" src="https://github.com/user-attachments/assets/21b2ca5c-e43b-4831-84d8-8e47168a4d52" />
 
 
-## Observation 1: Long-Channel vs Short-Channel NMOS
+### Observation 1: Long-Channel vs Short-Channel NMOS
 
 <img width="1903" height="996" alt="image" src="https://github.com/user-attachments/assets/dc1c25ea-2794-43f8-a35f-7e7b01bdcb77" />
 
@@ -861,7 +863,7 @@ Observation 2: Peak Current Comparison — Long-Channel vs Short-Channel NMOS
 
 
 
-**Experiment 2: Threshold Voltage Extraction & Velocity Saturation**
+### **Experiment 2: Threshold Voltage Extraction & Velocity Saturation**
 
  **ID vs VDS**: Drain current variation with drain-source voltage 
 
@@ -871,7 +873,7 @@ Observation 2: Peak Current Comparison — Long-Channel vs Short-Channel NMOS
 
 <img width="928" height="425" alt="image" src="https://github.com/user-attachments/assets/450c09d4-705c-4e6e-97c2-bdd7fec70838" />
 
-## Analysis
+### Analysis
 
 1. MOSFET On/Off Conditions
 
@@ -949,6 +951,8 @@ Step 4: Combine the NMOS and PMOS load curves by equating their drain currents (
 <details>
   <summary>CMOS Inverter Analysis: Static, Dynamic, and SPICE-Based Characterisation</summary>
 
+## CMOS Inverter Analysis: Static, Dynamic, and SPICE-Based Characterisation
+
 ### Voltage Transfer Characteristics and SPICE Simulations: CMOS Inverter SPICE Deck
 
 This section explains how to set up a SPICE deck for simulating a CMOS inverter.
@@ -987,7 +991,7 @@ When setting up a SPICE simulation for a CMOS inverter, the deck is organized in
   
 <img width="1790" height="744" alt="image" src="https://github.com/user-attachments/assets/602bddf8-3140-4d91-861a-4772e84e381a" />
 
-**Experiment 3: CMOS Inverter VTC**
+### **Experiment 3: CMOS Inverter VTC**
  
 ```
 ngspice day3_inv_vtc_Wp084_Wn036.spice
@@ -995,7 +999,7 @@ plot out vs in
 ```
 <img width="926" height="432" alt="image" src="https://github.com/user-attachments/assets/45bad43c-cab7-4bb8-98b7-aba20cd2724c" />
 
-**Experiment 4: CMOS Inverter Transient Response**
+### **Experiment 4: CMOS Inverter Transient Response**
 
 ```
 ngspice day3_inv_tran_Wp084_Wn036.spice
@@ -1022,7 +1026,7 @@ Output Fall Time (𝑡𝑓)
 
 <img width="927" height="431" alt="o1" src="https://github.com/user-attachments/assets/b4c7f460-1323-4c46-b2eb-6c3278014cbd" />
 
-Static Behavior Evaluation — CMOS Inverter Robustness and Switching Threshold Voltage
+### Static Behavior Evaluation — CMOS Inverter Robustness and Switching Threshold Voltage
 
 When evaluating the robustness of a CMOS inverter, several key characteristics are considered:
 - Switching Threshold Voltage (Vm)
@@ -1030,7 +1034,7 @@ When evaluating the robustness of a CMOS inverter, several key characteristics a
 - Power Supply Variations
 - Device Variations
 
-Switching Threshold Voltage (Vm)
+## **Switching Threshold Voltage (Vm)**
 
 The switching threshold voltage (Vm) is the input voltage at which the inverter output equals the input: 𝑉in = 𝑉out
 ​Vm is a critical parameter because it directly affects the inverter’s noise margin and overall robustness. At Vm:
@@ -1046,7 +1050,7 @@ The switching threshold voltage (Vm) is the input voltage at which the inverter 
 | Equal Sizing (Left graph) | 0.375 | 0.25 | 0.375 | 0.25 | 1.5 | 1.5 | 0.98 | Balanced NMOS & PMOS, Vm near mid-supply |
 | Stronger PMOS (Right graph) | 0.375 | 0.25 | 0.9375 | 0.25 | 1.5 | 3.75 | 1.2 | PMOS stronger, Vm shifts higher |
 
-Regions of Operation
+**Regions of Operation**
 
 Different portions of the voltage transfer curve correspond to different transistor operating regions:
 1. PMOS Linear / NMOS OFF — Low input region.
@@ -1059,7 +1063,7 @@ Different portions of the voltage transfer curve correspond to different transis
 
 <img width="1804" height="933" alt="image" src="https://github.com/user-attachments/assets/79050e1f-d839-403d-b528-30171ff5047a" />
 
-Current Balance at Vm
+**Current Balance at Vm**
 
 At the switching threshold voltage (Vm), the inverter is in a special operating point where the currents through the NMOS and PMOS transistors are equal in magnitude but flow in opposite directions. Mathematically:  IDp​=−IDn​
 
@@ -1078,10 +1082,9 @@ Expressing Vm in Terms of Transistor Sizing and Mobility
 
 To determine the switching threshold voltage Vm, we start with the current balance condition at Vm:
 
-                                       IDp​+IDn​=0
+  IDp​+IDn​=0
   
 This equation states that the current sourced by the PMOS exactly equals the current sunk by the NMOS, but in opposite directions.
-
 By solving this equation for the ratio of PMOS to NMOS strengths (R), we can express Vm as a function of transistor sizing (W/L ratios) and carrier mobility factors
 
 In other words, Vm depends on:
@@ -1091,29 +1094,25 @@ In other words, Vm depends on:
 
 <img width="1859" height="946" alt="image" src="https://github.com/user-attachments/assets/e9a4cf12-f6a6-435a-bc93-33d5e6cef47f" />
 
-Determining the PMOS-to-NMOS Sizing Ratio for a Desired Vm
+**Determining the PMOS-to-NMOS Sizing Ratio for a Desired Vm**
 This expression demonstrates how to calculate the required ratio of PMOS to NMOS strengths, (Wp/Lp​)/(Wn/Ln), for a specific switching threshold voltage Vm.
 
 <img width="829" height="491" alt="image" src="https://github.com/user-attachments/assets/27ba0b1d-b4d5-4cde-8275-4b222444ab7b" />
 
-Effect of PMOS-to-NMOS Sizing on Inverter Performance
+**Effect of PMOS-to-NMOS Sizing on Inverter Performance**
 
 <img width="1835" height="511" alt="image" src="https://github.com/user-attachments/assets/e692fb87-08c5-4eae-9580-34dcc768ce63" />
 
 This table illustrates how changing the Wp/Wn ratio influences key inverter characteristics:
-
-Rise Delay – the time it takes for the output to transition from LOW to HIGH
-
-Fall Delay – the time it takes for the output to transition from HIGH to LOW
-
-Switching Threshold Voltage (Vm) – the input voltage at which the inverter switches
+- Rise Delay – the time it takes for the output to transition from LOW to HIGH
+- Fall Delay – the time it takes for the output to transition from HIGH to LOW
+- Switching Threshold Voltage (Vm) – the input voltage at which the inverter switches
 
 Key observations:
 
 When the PMOS is roughly twice as strong as the NMOS (Wp/Lp≈2×Wn/Ln):
-Rise and fall delays are balanced, around 80 ps each.
-
-The switching threshold Vm​ ≈1.2 V
+- Rise and fall delays are balanced, around 80 ps each.
+- The switching threshold Vm​ ≈1.2 V
 
 In this balanced condition, the clock buffer does not introduce duty cycle distortion, so no correction is needed.
 
@@ -1129,7 +1128,7 @@ If the rise and fall delays are mismatched due to PMOS/NMOS resistance (Ron) dif
 <details>
   <summary>CMOS Inverter Noise Margin and Robustness Analysis</summary>
 
-Introduction to Noise Margin
+## Introduction to Noise Margin
 
 Noise margin is a measure of a CMOS circuit’s tolerance to voltage noise at its input without causing logic errors at the output. In other words, it tells us how much unwanted voltage fluctuation the circuit can safely handle while still interpreting signals correctly as logic HIGH or LOW.
 
@@ -1145,31 +1144,22 @@ Noise margin is a measure of a CMOS circuit’s tolerance to voltage noise at it
 Understanding Noise Margins and Critical Voltages
 
 When analysing a CMOS inverter’s voltage transfer characteristic (VTC), several key points and regions define its noise tolerance and reliability:
+- Left Plot – Critical Slopes:
+   - The slope of the VTC equals −1 at two important points:
 
-Left Plot – Critical Slopes:
+**VIL (Input Low Threshold Voltage)**: The maximum input voltage recognised as logic LOW.
+**VIH (Input High Threshold Voltage)**: The minimum input voltage recognised as logic HIGH.
 
-The slope of the VTC equals −1 at two important points:
+- Right Diagram – Output Levels and Thresholds:
+ - VOH and VOL represent the valid output HIGH and LOW voltage levels, respectively.
+- VIL and VIH indicate the input voltages where the VTC slope equals −1, marking the boundaries of the undefined region.
 
-VIL (Input Low Threshold Voltage): The maximum input voltage recognised as logic LOW.
+**Noise Margins**:
+**NMH (Noise Margin High)** = VOH − VIH: The maximum noise voltage tolerated on a logic HIGH input.
+**NML (Noise Margin Low)** = VIL − VOL: The maximum noise voltage tolerated on a logic LOW input.
 
-VIH (Input High Threshold Voltage): The minimum input voltage recognised as logic HIGH.
-
-Right Diagram – Output Levels and Thresholds:
-
-VOH and VOL represent the valid output HIGH and LOW voltage levels, respectively.
-
-VIL and VIH indicate the input voltages where the VTC slope equals −1, marking the boundaries of the undefined region.
-
-Noise Margins:
-
-NMH (Noise Margin High) = VOH − VIH: The maximum noise voltage tolerated on a logic HIGH input.
-
-NML (Noise Margin Low) = VIL − VOL: The maximum noise voltage tolerated on a logic LOW input.
-
-Undefined Region:
-
+**Undefined Region**:
 The region between VIL and VIH is undefined, meaning the output logic may be unstable.
-
 Any input noise in this region can lead to unpredictable or invalid outputs.
 
 <img width="1126" height="661" alt="image" src="https://github.com/user-attachments/assets/437921ad-8836-4b4b-9815-69c300c0fae7" />
@@ -1178,19 +1168,15 @@ Input and Output Thresholds and Noise Bump Scenarios
 
 To ensure reliable CMOS operation, it is important to understand the input and output voltage thresholds and how small voltage disturbances (noise bumps) affect logic interpretation:
 
-Input Thresholds:
+**Input Thresholds**:
+- VIL (Input Low Voltage): Input voltages below ~10% of VDD are reliably interpreted as logic ‘0’.
+- VIH (Input High Voltage): Input voltages above ~90% of VDD are reliably interpreted as logic ‘1’.
 
-VIL (Input Low Voltage): Input voltages below ~10% of VDD are reliably interpreted as logic ‘0’.
+**Output Thresholds**:
+- VOL (Output Low Voltage): Output near 0 V, recognised as logic ‘0’ by the next gate.
+- VOH (Output High Voltage): Output near VDD, recognised as logic ‘1’ by the next gate.
 
-VIH (Input High Voltage): Input voltages above ~90% of VDD are reliably interpreted as logic ‘1’.
-
-Output Thresholds:
-
-VOL (Output Low Voltage): Output near 0 V, recognised as logic ‘0’ by the next gate.
-
-VOH (Output High Voltage): Output near VDD, recognised as logic ‘1’ by the next gate.
-
-Noise Bump Scenarios:
+**Noise Bump Scenarios**:
 
 1. Case (a): Noise bump between VOL and VIL → signal still interpreted as logic ‘0’.
 2. Case (b): Noise bump between VIL and VIH → signal enters the undefined region, causing unstable or unpredictable output.
@@ -1206,125 +1192,199 @@ ngspice day4_inv_noisemargin_wp1_wn036.spice
 plot out vs in
 ```
 <img width="929" height="436" alt="image" src="https://github.com/user-attachments/assets/de41e0ee-7936-4882-9443-e55e523cfe03" />
+</details>
 
 
+<details>
+  <summary>CMOS Inverter Robustness under Power Supply and Device Variations</summary>
+
+## Static Behavior Evaluation — CMOS Inverter Robustness under Power Supply Variation
+
+Overview:
+The power supply voltage (VDD) has a direct impact on the static behavior of a CMOS inverter. Changing VDD affects:
+- The switching threshold voltage (Vm)
+- The noise margins (NMH and NML)
+The overall robustness of the inverter against noise and variations
+
+Lowering or increasing VDD shifts the inverter’s voltage transfer characteristic (VTC), potentially altering logic-level interpretation.
+
+SPICE Simulation Example:
+To study this effect, the CMOS inverter is simulated at two supply voltages:
+ - Original supply: VDD = 2.5 V
+ - Scaled-down supply: VDD = 1 V
+
+Transistor dimensions remain constant:
+ - PMOS: Wp = 0.9375 µm
+ - NMOS: Wn = 0.375 µm
+
+This simulation demonstrates how Vm and noise margins shift when the supply voltage changes, highlighting the importance of designing inverters that remain robust across different VDD levels.
+
+<img width="1801" height="990" alt="image" src="https://github.com/user-attachments/assets/385ba066-f2e1-45e9-9402-153a2ce17232" />
+
+**Switching Threshold (Vm)**:
+
+As the supply voltage VDD decreases, the inverter’s switching threshold Vm tends to shift toward the midpoint of the supply range.
+However, the noise margins shrink, making the inverter more susceptible to voltage fluctuations.
+
+**Noise Margins**:
+
+Lower VDD reduces the inverter’s noise immunity, meaning even small voltage disturbances can cause incorrect logic interpretation.
+Higher VDD improves noise tolerance but comes at the cost of higher power consumption.
+
+**Performance Impact**:
+
+Low VDD operation reduces both static and dynamic power, which is desirable for low-power designs.
+However, it limits noise robustness and increases sensitivity to process or supply variations.
+
+High VDD operation increases noise margin and reliability but results in higher power dissipation.
+
+<img width="1610" height="952" alt="image" src="https://github.com/user-attachments/assets/7dd4cf79-0293-4aeb-89f0-5dcc54104456" />
+Using a 0.5 V Supply in CMOS Inverters
+
+Advantages:
+- Operating at a lower supply voltage (VDD = 0.5 V) offers significant benefits:
+- Approximately 50% improvement in voltage gain.
+- Around 90% reduction in energy consumption.
+> This demonstrates the efficiency of power supply scaling in CMOS inverter design, making it attractive for low-power applications.
+
+Disadvantages:
+<img width="1360" height="877" alt="image" src="https://github.com/user-attachments/assets/726b428d-b72c-443e-82b7-f669f022927c" />
+- Lowering VDD also comes with trade-offs:
+- Reduced drive strength slows down the switching speed of the inverter.
+- Circuits may exhibit slower performance, which can impact timing-critical applications.
 
 
+**Experiment 6: Variation & Supply Study**
+
+```
+ngspice day5_inv_supplyvariation_Wp1_Wn036.spice
+```
+<img width="929" height="422" alt="image" src="https://github.com/user-attachments/assets/8c916549-dc5d-4669-b190-b705f4f1bb3a" />
+
+Static Behavior Evaluation — CMOS Inverter Robustness under Device Variation
+
+Device Variation and CMOS Inverter Robustness
+The robustness of a CMOS inverter is significantly influenced by device variations that arise during fabrication. These variations can occur due to:
+- Etching variation
+- Oxide thickness (Tox) variation
+- Minor deviations in transistor dimensions (W and L)
+- Etching Variation
+
+<img width="1701" height="665" alt="image" src="https://github.com/user-attachments/assets/a9c15f9d-f433-4fc9-a7ce-601e066cf6a6" />
 
 
+Etching is a critical step in semiconductor fabrication that defines the physical layout of transistors and interconnects.
+Consider an inverter chain — multiple CMOS inverters connected in series to study delay, robustness, and performance variations across stages.
+
+The layout layers include:
+- Poly-silicon (gate)
+- P-diffusion and N-diffusion regions (transistor channels)
+- VDD and VSS rails
+- Small deviations during etching can alter:
+- Width (W) of NMOS and PMOS gates
+> Length (L) of the gate, which corresponds to the technology node (e.g., 20 nm, 45 nm)
+
+Metal layers and contacts between layers
+
+<img width="1830" height="913" alt="image" src="https://github.com/user-attachments/assets/ca5ac4ba-b77f-469b-b8a0-8fb4884e765e" />
+
+<img width="1412" height="746" alt="image" src="https://github.com/user-attachments/assets/a6da6788-495a-4cd7-9c97-accf568e538d" />
 
 
+Impact:
+
+Since the drain current (Id) depends on W and L, etching variations lead to changes in transistor drive strength.
+This affects the switching threshold (Vm), noise margins, and overall circuit robustness.
+
+Oxide Thickness (Tox) Variation
+<img width="1827" height="877" alt="image" src="https://github.com/user-attachments/assets/649f3936-cf84-4646-8281-37e319f9999d" />
+<img width="1173" height="144" alt="image" src="https://github.com/user-attachments/assets/3ea4e1ec-7d2c-4abe-a736-84ee988e68b6" />
 
 
+During fabrication, the actual gate oxide thickness often differs from the intended design.
+- The drain current Id depends on the gate oxide capacitance Cox
+- Variations in Tox therefore directly impact Id, influencing inverter speed, Vm, and noise margins.
+
+### Transistor Strength Definitions
+
+<img width="1799" height="930" alt="image" src="https://github.com/user-attachments/assets/06428521-959c-4669-ac5c-5daf48832c82" />
 
 
+| Transistor Type | Strength | Characteristics | How Achieved |
+|-----------------|----------|----------------|--------------|
+| PMOS            | Strong   | Lower resistance, charges output capacitor faster | Use wider PMOS |
+| PMOS            | Weak     | Higher resistance, slower charging | Use narrower PMOS |
+| NMOS            | Strong   | Lower resistance, discharges output quickly | Use wider NMOS |
+| NMOS            | Weak     | Higher resistance, slower discharging | Use narrower NMOS |
 
 
+<img width="1533" height="832" alt="image" src="https://github.com/user-attachments/assets/1686b271-2725-4ffa-903c-5d5fcda6b564" />
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```
+ngspice day5_inv_supplyvariation_Wp1_Wn036.spice
+plot out vs in
+```
+<img width="927" height="433" alt="image" src="https://github.com/user-attachments/assets/c35faab9-3a2c-46bc-9566-1ebd593ad6a4" />
 
 </details>
 
 
+<details>
+  <summary>From Transistor Behaviour to Timing Analysis (STA): The CMOS Design Flow</summary>
 
+## Level 1: Transistor Behaviour (Device Physics)
 
+**Foundation:** Individual NMOS / PMOS operation — the building blocks of all CMOS logic.
 
+**Key Concepts:**
+- **I–V Characteristics (Id vs. Vds / Vgs):**
+  - Linear & Saturation regions  
+  - Threshold voltage (Vt) extraction  
+  - Velocity saturation in short-channel devices
+- **Device Parameters:**
+  - W/L ratio → Drive strength  
+  - Tox, doping, channel length → Vt variation  
+  - Supply voltage (VDD) → Switching speed
 
+## Level 2: CMOS Inverter Behavior (Circuit Level)
 
+**Foundation:** Combination of NMOS and PMOS — the simplest CMOS logic gate.
 
+**Key Concepts:**
+- **VTC Curve (Vout vs. Vin):**
+  - Defines switching threshold (Vm)  
+  - Forms the basis for noise margins (NMH, NML)
+- **Transient Response:**
+  - Rise/fall delay  
+  - Effect of load capacitance and drive current
+- **Noise Margin Analysis:**
+  - Determines logical robustness
 
+## Level 3: Timing Behavior (Digital Logic Level)
 
+**Foundation:** How circuit-level behavior translates to timing in digital systems.
 
+**Key Concepts:**
+- **Propagation Delays (tPHL, tPLH):**
+  - Used in standard timing libraries (`.lib`)
+- **Variation Effects:**
+  - Delay, threshold, and noise margins under **PVT corners**
+- **Power Supply Variation Impact:**
+  - Trade-off between delay and dynamic power
 
+## Level 4: Static Timing Analysis (System Level)
 
+**Foundation:** How EDA tools utilize transistor data for full-chip timing verification.
 
-
-
-
-
-
-Title: From Transistor Behavior to Timing Analysis (STA): The CMOS Design Flow
-
-Mind-Map Structure
-
-Level 1:
-Transistor Behavior (Device Physics)
-
-↳ Foundation: individual NMOS/PMOS operation
-
-Branches:
-- I–V Characteristics (Id vs. Vds / Vgs)
-  * Linear & Saturation regions
-  * Threshold voltage (Vt) extraction
-  * Velocity saturation in short-channel devices
-
-- Device Parameters
-  * W/L ratio → Drive strength
-  * Tox, doping, channel length → Vt variation
-  * Supply voltage (VDD) → Switching speed
-
-Level 2:
-CMOS Inverter Behavior (Circuit Level)
-
-↳ Combination of NMOS + PMOS devices
-
-Branches:
-- VTC Curve (Vout vs. Vin)
-  * Defines switching threshold (Vm)
-  * Basis for noise margins (NMH, NML)
-- Transient Response
-  * Rise/fall delay
-  * Load capacitance and drive current impact
-- Noise Margin Analysis
-  * Determines logical robustness
-
-Level 3:
-Timing Behavior (Digital Logic Level)
-
-↳ Behavior of gates in real timing conditions
-
-Branches:
-- Propagation Delays (tPHL, tPLH)
-  * Used in timing libraries (.lib)
-- Variation Effects
-  * Delay, threshold, and noise margins under PVT corners
-- Power Supply Variation Impact
-  * Dynamic delay & power trade-off
-
-Level 4:
-Static Timing Analysis (System Level)
-
-↳ How EDA tools use transistor data to verify chip timing
-
-Branches:
-- From SPICE → .lib Models
- * Extracted delay tables
- * Slew, load, and drive strength dependencies
-- STA Concepts
-  * Arrival time, required time, slack
-  * Setup/Hold margins derived from transistor behaviour
-- Goal:
-Accurate timing closure under variation and process constraints.
-
+**Key Concepts:**
+- **From SPICE → `.lib` Models:**
+  - Extracted delay tables  
+  - Slew, load, and drive strength dependencies
+- **STA Concepts:**
+  - Arrival time, required time, slack  
+  - Setup/Hold margins derived from transistor-level behavior
+- **Goal:**
+  - Achieve accurate **timing closure** under process and variation constraints
 
 ```scss
 
@@ -1342,24 +1402,16 @@ Static Timing Analysis (STA)
 
 ```
 
-## Connection to Static Timing Analysis (STA)
-
-When tools like **Static Timing Analysis (STA)** check circuit timing, they **don’t calculate delays using simple formulas**.  
-Instead, they **read delay numbers directly** from the SPICE-generated tables to ensure **timing accuracy**.
-
-## Importance of Correct SPICE Setup
-
-If the SPICE setup is incorrect — for example, if:
-
-- Transistor models are wrong  
-- Load values are unrealistic  
-- Input transition times are inaccurate  
-
-Then the resulting **STA results will also be inaccurate** and won’t match **real silicon behaviour**.
-
-## Reference
-- https://sourceforge.net/projects/ngspice/files/
-- https://github.com/kunalg123/sky130CircuitDesignWorkshop.git
-
-
 </details>
+
+
+
+
+
+
+
+
+
+
+
+
