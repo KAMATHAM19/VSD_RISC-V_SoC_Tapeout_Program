@@ -40,27 +40,57 @@ The **OpenROAD toolchain** integrates multiple components to perform the **full 
 
 ### OpenROAD Installation 
 
+1. Update your system
 ```
-## 1. Clone the OpenROAD Repository
-git clone --recursive https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts
-cd OpenROAD-flow-scripts
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y git curl wget software-properties-common build-essential
+```
+2. Install build dependencies
+```
+sudo apt install -y \
+    g++ clang make ninja-build \
+    bison flex libreadline-dev \
+    tcl-dev tk-dev swig python3-dev \
+    qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools \
+    libboost-all-dev libeigen3-dev libspdlog-dev \
+    libpcre3-dev libgtest-dev libabsl-dev \
+    liblemon-dev zlib1g-dev
+```
+3. Clone the OpenROAD Repository
+```
+git clone --recursive https://github.com/The-OpenROAD-Project/OpenROAD.git
+cd OpenROAD
+ls
+```
+<img width="925" height="407" alt="image" src="https://github.com/user-attachments/assets/9bde04a9-cc98-4147-863e-760a153ff809" />
 
-## 2. Run the Setup Script
-sudo ./setup.sh
+4. Run the Setup Script
+```
+sudo ./etc/DependencyInstaller.sh -common
+```
+<img width="925" height="414" alt="image" src="https://github.com/user-attachments/assets/230a1a72-b2ca-4c08-9afd-9603b50d2ebe" />
 
-## 3. Build OpenROAD
-./build_openroad.sh --local
+5. Build OpenROAD
+```
+mkdir build && cd build
+cmake ..
+make -j$(nproc)
+sudo make install
+```
 
-## 4. Verify the Installation
-source ./env.sh
+
+4. Verify the Installation
+```
+which openroad
 openroad -help
-
-## 5. Run the OpenROAD Flow
-cd flow
-make
-
-## 6. Launch the GUI for Visualisation
-make gui_final
+```
+5. Run OpenROAD
+```
+openroad
+```
+6. Launch the GUI for Visualisation
+```
+openroad -gui
 ```
 
 
