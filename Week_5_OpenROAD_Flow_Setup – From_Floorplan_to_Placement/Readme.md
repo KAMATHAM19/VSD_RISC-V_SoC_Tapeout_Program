@@ -1,5 +1,9 @@
 
+# Week-5 OpenROAD Flow Setup - from Floorplan to Placement
 
+<details>
+  <summary>OpenROAD Flow Setup</summary>
+    
 ## OpenROAD
 
 **OpenROAD (Open Routing, Optimisation, and Analysis for Designs)** is an open-source project that provides a **complete RTL-to-GDSII flow** for digital integrated circuit (IC) design. It enables **physical design automation** — taking a circuit described at the RTL (Register Transfer Level) and automatically generating the final layout (GDSII) that can be fabricated.
@@ -37,62 +41,52 @@ The **OpenROAD toolchain** integrates multiple components to perform the **full 
 </div>
 
 
-
 ### OpenROAD Installation 
 
-1. Update your system
 ```
-sudo apt update && sudo apt upgrade -y
-sudo apt install -y git curl wget software-properties-common build-essential
-```
-2. Install build dependencies
-```
-sudo apt install -y \
-    g++ clang make ninja-build \
-    bison flex libreadline-dev \
-    tcl-dev tk-dev swig python3-dev \
-    qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools \
-    libboost-all-dev libeigen3-dev libspdlog-dev \
-    libpcre3-dev libgtest-dev libabsl-dev \
-    liblemon-dev zlib1g-dev
-```
-3. Clone the OpenROAD Repository
-```
-git clone --recursive https://github.com/The-OpenROAD-Project/OpenROAD.git
-cd OpenROAD
-ls
-```
-<img width="925" height="407" alt="image" src="https://github.com/user-attachments/assets/9bde04a9-cc98-4147-863e-760a153ff809" />
+## 1. Clone the OpenROAD Repository
+git clone --recursive https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts
+cd OpenROAD-flow-scripts
 
-4. Run the Setup Script
-```
-sudo ./etc/DependencyInstaller.sh -common
-```
-<img width="925" height="414" alt="image" src="https://github.com/user-attachments/assets/230a1a72-b2ca-4c08-9afd-9603b50d2ebe" />
+## 2. Run the Setup Script
+sudo ./setup.sh
 
-5. Build OpenROAD
-```
-mkdir build && cd build
-cmake ..
-make -j$(nproc)
-sudo make install
-```
+## 3. Build OpenROAD
+./build_openroad.sh --local
 
-
-4. Verify the Installation
-```
-which openroad
+## 4. Verify the Installation
+## The binaries should be available on your $PATH after setting up the environment
+source ./env.sh
+yosys -help  
 openroad -help
 ```
+<img width="926" height="421" alt="image" src="https://github.com/user-attachments/assets/a2b268ff-3965-47fb-a2e1-6374676525d2" />
+
 5. Run OpenROAD
 ```
 openroad
 ```
+<img width="928" height="87" alt="image" src="https://github.com/user-attachments/assets/77b6ecab-9119-48e8-a8fd-59491b25bd76" />
+
 6. Launch the GUI for Visualisation
 ```
 openroad -gui
 ```
+<img width="926" height="411" alt="image" src="https://github.com/user-attachments/assets/9b331d2b-12ef-4efe-8a43-2c14d2f23d3b" />
 
+7. Run the OpenROAD Flow
+- The make command runs from RTL-GDSII generation for default design gcd with nangate45 PDK
+```
+cd flow
+make
+```
+<img width="928" height="358" alt="image" src="https://github.com/user-attachments/assets/635ea0ac-8fbc-432e-abc5-118469f531db" />
+
+- You can view final layout images in OpenROAD GUI using this command
+```
+make gui_final
+```
+<img width="927" height="411" alt="image" src="https://github.com/user-attachments/assets/b94c7c7e-f472-42d1-a718-76f1a90611ef" />
 
 ## Example design run 
 1. Steps to run the Design
@@ -125,3 +119,18 @@ Clean the previous run database
 make DESIGN_CONFIG=./designs/nangate45/gcd/config.mk clean_floorplan
 To remove entire logs/results/reports for the specific run, use
 make DESIGN_CONFIG=./designs/nangate45/gcd/config.mk clean_all
+
+</details>
+
+
+<details>
+  <summary>Day 1: Introduction to Verilog RTL design and Synthesis</summary>
+
+</details>
+
+token_var error
+<img width="926" height="94" alt="image" src="https://github.com/user-attachments/assets/a1fede64-d540-4ce8-a462-e38b823e73d9" />
+
+include error
+<img width="925" height="95" alt="image" src="https://github.com/user-attachments/assets/b95a724c-5497-4ae4-a0e6-19aa58d002f5" />
+
