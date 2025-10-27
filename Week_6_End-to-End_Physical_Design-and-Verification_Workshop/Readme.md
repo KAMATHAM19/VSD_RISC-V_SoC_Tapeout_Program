@@ -102,6 +102,23 @@ sudo make install
 magic
 ```
 <img width="1854" height="827" alt="image" src="https://github.com/user-attachments/assets/8f5e8715-f095-4830-9a97-18ede3e6bfa9" />
+
+### Building PDKs from Source
+
+To build and install the **OpenPDKs (Process Design Kits)** for the **SkyWater SKY130 process node**, follow the steps below:
+
+```
+git clone https://github.com/RTimothyEdwards/open_pdks.git
+cd open_pdks
+```
+<img width="1860" height="236" alt="image" src="https://github.com/user-attachments/assets/d335b412-0427-472e-a4ba-e19f7b5bbb31" />
+
+```
+./configure --enable-sky130-pdk
+make
+sudo make install
+```
+
   
 </details>
 
