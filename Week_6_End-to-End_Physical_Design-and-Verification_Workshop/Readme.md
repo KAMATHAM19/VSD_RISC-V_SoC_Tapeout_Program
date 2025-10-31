@@ -752,64 +752,416 @@ To minimize these effects:
 - Ensures a **uniform power distribution network (PDN)** throughout the design.
 
 <img width="1899" height="986" alt="image" src="https://github.com/user-attachments/assets/b90616a9-f9ed-4e64-a97b-b8b90b7a0f3a" />
-
  
 > Connecting all macros to multiple **VDD** and **VSS** taps improves power integrity, reduces noise, and ensures reliable chip operation during switching events.
 
-  
-  
+## 5. Pin Placement
 
-    
- 
+**pin placement**, where **input** and **output** ports are positioned around the chip core.  
+Proper pin placement ensures efficient routing and balanced signal flow across the design.
 
-### LABS 
-* floorplan in openlane `run_floorplan`
+###  Key Points
 
-<img width="953" alt="2 1" src="https://user-images.githubusercontent.com/64173714/215262087-ce4be0c1-be55-4835-9bb3-f12ae759249d.png">
+- **Input/Output Ports:**  
+  Define where signals enter (inputs) and exit (outputs) the chip.
 
-The `picorv32a.floorplan.def` file was generated in the `./results/floorplan` directory by this command.
+- **Ordering of Ports:**  
+  The placement order depends on the **connectivity** between cells to minimize wire length and congestion.
 
-* We use the Magic tool to view the floorplan, and we need three files to do so:
-   * Magic Tech file : sky130A.tech
-   * LEF file : merged.lef
-   * Def file of floorplan : picorv32a.floorplan.def
+- **Clock Pins:**  
+  Clock ports are designed to be **larger in size** to reduce **resistance** and ensure low **clock skew** across the circuit.
+
+<img width="1808" height="972" alt="image" src="https://github.com/user-attachments/assets/7f1be7ba-8568-4472-a456-94671faac67e" />
+
+> **Good pin placement** improves timing, reduces routing complexity, and helps achieve better power and signal integrity.
+
+## 6. Logical Cell Placement Blockage
+
+### What Is a Placement Blockage?
+
+A **placement blockage** is a **reserved area** on the chip where **no standard cells** can be placed.  
+These regions are intentionally left empty to ensure proper spacing, routing, and signal isolation.
+
+### Purpose of Placement Blockages
+
+- Prevents cells from being placed **too close** to critical regions (e.g., pre-placed macros, power grids, or clock trees).  
+- Ensures sufficient **routing space** and avoids **congestion**.  
+- Used around **memory blocks, I/O pads**, and **analog IPs** where dense logic placement is undesirable.
+
+<img width="1322" height="913" alt="image" src="https://github.com/user-attachments/assets/2108d874-2b5a-4393-8a8f-c13ebac6c6a2" />
+
+### Types of Blockages
+
+- **Hard Blockage:** No cells or routing allowed.  
+- **Soft Blockage:** Placement restricted, but routing may pass through.
+
+> Logical cell placement blockages help maintain routing quality and design reliability by controlling where standard cells can be placed.
+
+
+## Floorplanning in OpenLANE
+
+###  Default Configuration Files
+
+The **default settings** of OpenLANE are stored in:
+
+`/home/vsduser/Desktop/work/tools/openlane_working_dir/openlane/configuration`
+
+<img width="1850" height="115" alt="image" src="https://github.com/user-attachments/assets/e5b1cf70-8011-403d-aec5-4b54593679a7" />
+
+
+These files define the base parameters used during the flow unless overridden by user-specific configurations.
+
+### User-Defined Configuration (`config.tcl`)
+
+Each design has its own configuration file that defines project-specific parameters.  
+For the **picorv32a** design, the configuration file is located at:
+
+
+The user define config.tcl File
+`/home/vsduser/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a`
+
+Below is an example of a typical **`config.tcl`** setup:
+
+```tcl
+# Design
+set ::env(DESIGN_NAME) "picorv32a"
+
+set ::env(VERILOG_FILES) "./designs/picorv32a/src/picorv32a.v"
+set ::env(SDC_FILE) "./designs/picorv32a/src/picorv32a.sdc"
+
+# Clock Configuration
+set ::env(CLOCK_PERIOD) "10.000"
+set ::env(CLOCK_PORT) "clk"
+set ::env(CLOCK_NET) $::env(CLOCK_PORT)
+
+# Floorplan Settings
+set ::env(FP_CORE_UTIL) 65
+set ::env(FP_IO_VMETAL) 4
+set ::env(FP_IO_HMETAL) 3
+
+
+set filename $::env(OPENLANE_ROOT)/designs/$::env(DESIGN_NAME)/$::env(PDK)_$::env(STD_CELL_LIBRARY)_config.tcl
+if { [file exists $filename] == 1} {
+	source $filename
+}
 
 ```
- magic -T <location of techfile> lef read <loction of lef file> def read <location of floorplan def file>
- ```
+To start the floorplanning process in OpenLANE, run the following command in interactive mode:
 ```
-~/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/runs/27-01_19-20/results/floorplan$
-magic -T /home/venkykamatham1998/Desktop/work/tools/openlane_working_dir/pdks/sky130A/libs.tech/magic/sky130A.tech lef read ../../tmp/merged.lef def read picorv32a.floorplan.def &
+run_floorplan
 ```
-The above command can be used to view the floorplan in the Magic tool.
-
-<img width="959" alt="magic" src="https://user-images.githubusercontent.com/64173714/215261151-64df2adf-2cbd-45a1-8988-626328ad414e.png">
-
-* placement in openlane `run_placement`
-
-<img width="960" alt="p1" src="https://user-images.githubusercontent.com/64173714/215262016-617f0a68-ae1b-4670-8428-8e6e46931cc3.png">
-
-The `picorv32a.placement.def` file was generated in the `./results/placement` directory by this command.
+The generated DEF (Design Exchange Format) file can be found in:
 ```
- magic -T <location of techfile> lef read <loction of lef file> def read <location of placement def file>
- 
+/home/vsduser/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/runs/31-10_09-36/results/floorplan
 ```
 
+<img width="890" height="528" alt="image" src="https://github.com/user-attachments/assets/5070afd9-c02b-4923-8a5a-0ea93ea8947f" />
+
+Required Files for Viewing in Magic
+To visualize the floorplan using the Magic layout tool, you’ll need the following three files:
+- Magic Tech File: sky130A.tech
+- LEF File: merged.lef
+- DEF File: picorv32a.floorplan.def
+
+Command to Open in Magic
+
+Run the following command in your terminal to load the floorplan:
+```bash
+magic -T <location_of_techfile> \
+      lef read <location_of_lef_file> \
+      def read <location_of_floorplan_def_file>
+
+cd /work/tools/openlane_working_dir/openlane/designs/picorv32a/runs/31-10_09-36/results/floorplan
+
+magic -T /home/vsduser/Desktop/work/tools/openlane_working_dir/pdks/sky130A/libs.tech/magic/sky130A.tech lef read ../../tmp/merged.lef  def read picorv32a.floorplan.def &
 ```
-~/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/runs/27-01_19-20/results/placement$
-magic -T /home/venkykamatham1998/Desktop/work/tools/openlane_working_dir/pdks/sky130A/libs.tech/magic/sky130A.tech lef read ../../tmp/merged.lef def read picorv32a.placement.def &
+Once the floorplan is loaded in **Magic**, you can interact with and inspect different parts of the design using the following controls:
+
+<img width="716" height="682" alt="image" src="https://github.com/user-attachments/assets/84b19028-52f9-44bc-9319-d86c82bfd874" />
+
+###  Basic Controls
+
+| Action | Key / Command | Description |
+|:-------|:---------------|:-------------|
+| **Fit the Design to Screen** | `s` then `f` | Press **`s`** followed by **`f`** to fit the entire design within the Magic window. |
+| **Select a Specific Region** | Left + Right Click | Click **left and right mouse buttons** together to draw a selection box around the desired area. |
+| **Zoom In** | `z` | Press **`z`** to zoom in on the current view. |
+| **Identify Selected Object** | `s`, then `what` | Place the cursor on the object, press **`s`** to select it, and in the **Tcl console**, type: |
+| |  | ```tcl what``` |
+| |  | This command displays information about the selected cell, layer, or region. |
+
+
+- Use the **scroll wheel** (if available) for smooth zooming.  
+- Always ensure the design is **fully loaded** before interacting to avoid display errors.  
+- The **`what`** command is especially useful for checking **cell names, coordinates, and layer details**.
+
+<img width="1055" height="978" alt="image" src="https://github.com/user-attachments/assets/27dfbc1e-6520-4626-9048-a966ac22e696" />
+
+  <img width="887" height="735" alt="2" src="https://github.com/user-attachments/assets/7ac36a5f-03d2-4898-9ea8-44a9dd305df3" />
+
+## Placement
+
+### 1. Binding Netlist with Physical Cells
+
+After floorplanning, the next step is **placement**, where the logical netlist is **mapped to physical cells** from the standard cell library.
+
+<table>
+  <tr>
+    <th align="center">Before Placement</th>
+    <th align="center">After Placement</th>
+  </tr>
+  <tr>
+    <td align="center">
+      <img width="1205" height="1000" alt="Before Placement" src="https://github.com/user-attachments/assets/692157b6-a4c4-4aae-bf01-7c2182940e85" />
+    </td>
+    <td align="center">
+      <img width="1492" height="987" alt="After Placement" src="https://github.com/user-attachments/assets/14f71495-9c5b-4de9-ba20-fedbaaed4a90" />
+    </td>
+  </tr>
+</table>
+
+In the real world, **logic gates** (like AND, OR, NAND, etc.) have **physical shapes** — typically rectangular — with defined **width** and **height**.  
+These cells are stored in a **standard cell library**, which contains:
+
+-  **Shape and Size Information** – Defines the physical dimensions of each gate.  
+-  **Timing (Delay) Information** – Describes how fast the cell operates.  
+-  **Power Information** – Indicates power consumption characteristics.  
+-  **Area Information** – Defines how much silicon space the cell occupies.  
+-  **Operating Conditions** – Specifies voltage, temperature, and process parameters for accurate modeling.
+
+<img width="1825" height="456" alt="image" src="https://github.com/user-attachments/assets/6cbffb00-e862-44e7-8f3f-8a32ab4727fb" />
+
+###  2. Cell Placement
+
+During **placement**, the tool takes all physical cells from the library and places them into the **floorplan region** according to connectivity and timing requirements.
+
+<img width="1894" height="744" alt="image" src="https://github.com/user-attachments/assets/47b36a1b-a951-46a7-a669-5d67d6599a7a" />
+
+- The placement step determines **exact locations** of standard cells inside the chip core.  
+- **Pre-placed IPs (macros)** are already fixed in the floorplan, so **no standard cells** should be placed near or overlap them.  
+
+  <img width="1898" height="914" alt="image" src="https://github.com/user-attachments/assets/c5ccb39f-4df1-4c48-8bac-c1fa033b9248" />
+
+## 3. Optimize Placement
+
+The **placement optimization** stage focuses on improving timing, reducing wire length, and minimizing congestion while ensuring signal integrity.
+
+- **Wire Length Estimation:**  
+  The placement tool estimates wire lengths between connected cells to minimize routing complexity and delay.
+
+- **Resistance and Capacitance:**  
+  Longer wires introduce higher **resistance (R)** and **capacitance (C)**, which can degrade signal quality.  
+  The relationship is given by:  R = ρ × (L / A)
+
+where:  
+- `ρ` = Resistivity of the material  
+- `L` = Wire length  
+- `A` = Cross-sectional area  
+
+- **Signal Integrity and Repeaters:**  
+To maintain strong signal levels over long interconnects, **repeaters** (buffers) are inserted.  
+These buffers regenerate the original signal to avoid degradation, but they **consume additional area** on the chip.
+
+- **Slew (Transition Time):**  
+Slew depends on the **load capacitance**. Larger capacitance causes slower transitions, which can affect timing.
+
+### Optimization Goals
+
+Placement optimization ensures:
+- **Optimal wire length**  
+- **Minimal routing congestion**  
+- **Improved timing performance**  
+- **Better signal integrity**  
+
+### Timing Analysis
+
+After optimization:
+- **Data paths** are checked to confirm timing closure.  
+- The **clock is considered ideal** (zero skew condition) during early placement timing analysis.  
+- **Setup timing** is verified to ensure all signals meet required arrival times **based on the design specifications** and to confirm that the **placement is correct**.
+
+<img width="1895" height="925" alt="image" src="https://github.com/user-attachments/assets/57bb14e5-f011-4c83-a0a9-8b69aa612f8c" />
+
+> Placement optimization refines cell locations to balance **area, timing, and signal quality**, preparing the design for clock tree synthesis and routing.
+
+**Library characterization and modeling** form the foundation for all stages of the ASIC design flow.  
+Every gate or cell in the library is modeled for its **timing**, **power**, and **area** under specific process, voltage, and temperature conditions.
+
+
+### Design Flow Stages Using the Same Cells
+
+1. **Logic Synthesis** – Converts RTL code into a gate-level netlist using standard cells.  
+2. **Floorplanning** – Defines the chip area, power distribution, and macro placement.  
+3. **Placement** – Positions all standard cells within the defined floorplan.  
+4. **Clock Tree Synthesis (CTS)** – Distributes the clock signal evenly to all flip-flops.  
+5. **Routing** – Connects all cells and nets based on the logical connections.  
+6. **Static Timing Analysis (STA)** – Verifies timing constraints and ensures the design meets performance goals.
+
+>  All these stages use the **same standard cells** characterized in the technology library.
+
+## Placement in OpenLANE
+
+The **placement** process in OpenLANE is divided into two main stages:
+
+
+### 1. Global Placement
+
+- Performs a **coarse placement** of standard cells.  
+- Focuses on **reducing wire length** and optimizing connectivity.  
+- No **legalization** (cell alignment or spacing check) happens at this stage.  
+- OpenLANE uses **Half-Perimeter Wire Length (HPWL)** as the metric for placement optimization.
+
+### 2. Detailed Placement
+
+- Refines the placement from the global stage.  
+- Ensures **standard cells are aligned** properly within defined **rows**.  
+- Removes any **overlaps** between cells to create a legal and manufacturable layout.
+
 
 ```
+run_placement
+```
 
-<img width="956" alt="placement" src="https://user-images.githubusercontent.com/64173714/215261639-6099a3f9-0480-434b-ae2f-da66f1ac7be9.png">
+<img width="1856" height="927" alt="image" src="https://github.com/user-attachments/assets/acc2aff9-2da6-4924-bc1d-b3bdf8ab8e6e" />
 
-### Standard Cell Design
-The typical standard cell design flow consists of 3 elements :
-1. Inputs - PDKs , DRC & LVS rules, SPICE models, library & user-defined specs
-2. Design Steps - Circuit design, layout design, characterization
-3. Outputs - CDL(circuit description lanuage), GDSII, LEF, extracted spice netlist(.crc)
+```
+cd /work/tools/openlane_working_dir/openlane/designs/picorv32a/runs/31-10_09-36/results/placement
+ magic -T /home/vsduser/Desktop/work/tools/openlane_working_dir/pdks/sky130A/libs.tech/magic/sky130A.tech lef read ../../tmp/merged.lef  def read picorv32a.placement.def &
+```
 
-<a name="3-design-and-characterize-one-library-cell-using-magic-layout-tool-and-ngspice"></a>
+<img width="716" height="791" alt="image" src="https://github.com/user-attachments/assets/97480932-a476-42e1-9f21-0b3b61b23d43" />
+
+- standard cells are overlaped
+
+<img width="1027" height="791" alt="image" src="https://github.com/user-attachments/assets/d69ac2cb-6685-4d60-bee5-062441ad47b5" />
+
+## Standard Cell Design
+
+A **standard cell** is a basic building block used in digital integrated circuit design.  
+The **standard cell design flow** ensures that each cell is accurately modeled, verified, and ready for use in synthesis and physical design stages.
+
+### Standard Cell Design Flow
+
+The process consists of **three main elements**:
+
+
+### Inputs
+
+These are the essential resources required to start standard cell design:
+
+- **PDKs (Process Design Kits)** – Provide technology-specific information.  
+- **DRC & LVS Rules** – Define design and layout verification constraints.  
+- **SPICE Models** – Represent electrical behavior of transistors and interconnects.  
+- **Library & User-Defined Specifications** – Define performance, area, and power requirements.
+
+### Design Steps
+
+The core steps in creating a standard cell include:
+
+- **Circuit Design** – Create the transistor-level schematic for the logic function.  
+- **Layout Design** – Draw the physical geometry following DRC/LVS rules.  
+- **Characterization** – Measure and model timing, power, and area for different operating conditions.
+
+
+### Outputs
+
+The results of the standard cell design flow include:
+
+- **CDL (Circuit Description Language)** – Describes the transistor-level circuit.  
+- **GDSII** – Contains the final physical layout ready for fabrication.  
+- **LEF (Library Exchange Format)** – Abstract physical view used during floorplanning and placement.  
+- **Extracted SPICE Netlist (.crc)** – Represents parasitic effects for accurate timing and power analysis.
+
+## Standard Cell Characterization Flow
+
+**Characterization** is the process of measuring and modeling the behavior of standard cells under different electrical conditions.  
+It provides accurate data for **timing**, **power**, and **noise**, which are later used during synthesis and physical design.
+
+### Standard Characterization Steps
+
+1. **Read the Model Files**  
+   - Load the transistor and device models (from PDK) required for SPICE simulations.
+
+2. **Read the Extracted SPICE Netlist**  
+   - Import the post-layout extracted netlist containing parasitic resistance and capacitance.
+
+3. **Define or Recognize Circuit Behavior**  
+   - Identify the logical function and pins (input, output, power) of the circuit.
+
+4. **Read the Subcircuits**  
+   - Include all dependent subcircuits (e.g., inverters, NAND, NOR) referenced in the main design.
+
+5. **Attach Power Sources**  
+   - Connect the power rails (**VDD** and **VSS**) to the circuit for simulation.
+
+6. **Apply the Stimulus**  
+   - Provide input signal transitions to test the behavior of the cell (e.g., rising/falling edges).
+
+7. **Provide Output Capacitances**  
+   - Connect capacitive loads to the outputs to emulate real interconnect and fan-out effects.
+
+8. **Run Necessary Simulation Commands**  
+   - Execute SPICE simulations to measure **delay**, **slew**, **power consumption**, and **noise** under various conditions.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/ec2e78d9-d9c1-4b3c-91bd-04df204bbe52" alt="GUNA Input Setup" width="48%"/>
+  <img src="https://github.com/user-attachments/assets/01165e93-608f-44c1-a7cf-1ef28fd21aa0" alt="GUNA Output Results" width="48%"/>
+</p>
+
+
+After completing all the setup and simulation steps,  
+**all the generated files** (model files, extracted SPICE netlist, subcircuits, stimulus, and simulation scripts)  
+are provided as **inputs to the GUNA characterization software**.
+
+GUNA uses these inputs to:
+- Perform **timing**, **power**, and **noise** characterization.  
+- Generate **.lib (timing library)** files used in synthesis and static timing analysis.
+
+<img width="1756" height="668" alt="image" src="https://github.com/user-attachments/assets/312f5dd2-56f1-4549-b527-5609cdf8723c" />
+
+## Timing Characterization 
+
+| Parameter | Description | Typical Value |
+|------------|--------------|----------------|
+| **Slew low rise threshold** | Voltage level where rising transition starts (low reference) | 20% of swing |
+| **Slew high rise threshold** | Voltage level where rising transition ends (high reference) | 80% of swing |
+| **Slew low fall threshold** | Voltage level where falling transition ends (low reference) | 20% of swing |
+| **Slew high fall threshold** | Voltage level where falling transition starts (high reference) | 80% of swing |
+| **Input rise threshold** | Input voltage reference for rise delay | 50% |
+| **Input fall threshold** | Input voltage reference for fall delay | 50% |
+| **Output rise threshold** | Output voltage reference for rise delay | 50% |
+| **Output fall threshold** | Output voltage reference for fall delay | 50% |
+
+> Percentages are relative to the **actual low and high voltages** of each transition.
+
+
+### 1. Propagation Delay (`tpd`)
+
+Time difference between when the **input** signal crosses its 50% level and when the **output** signal crosses its 50% level.
+
+Propagation delay (rise):
+t_pd,rise = t_out,50 - t_in,50
+
+Propagation delay (fall):
+t_pd,fall = t_out,50 - t_in,50
+
+### 2. Transition Time / Slew
+
+Duration for a signal to transition between two threshold points.
+
+#### For Rising Edge:
+
+Rise time:
+t_rise = t_80 - t_20
+
+Fall time:
+t_fall = |t_80 - t_20|
+
+These are also referred to as **input slew** or **output slew**, depending on which pin the waveform corresponds to.
+
+
+
+
 # 3 - Design and characterize one library cell using Magic Layout tool and ngspice
 
 ### Labs
