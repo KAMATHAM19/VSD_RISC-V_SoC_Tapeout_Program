@@ -1162,40 +1162,74 @@ These are also referred to as **input slew** or **output slew**, depending on wh
 
 # 3 - Design and characterize one library cell using Magic Layout tool and ngspice
 
-### ioPlacer - to changes I/O pins and place around the core
+## Modifying the Flow & Re-Running Floorplan
+
+If any changes are made to the flow — for example, adjusting the **input and output port spacing** —  
+you can update the configuration in the shell and **re-run the floorplan** command to observe the new I/O pin alignment.
+
 
 ```
-% set ::env(FP_IO_MODE) 2
-2
-% run_floorplan
+set ::env(FP_IO_MODE) 2
+run_floorplan
 ```
 To see how I/O pins are aligned after changing the value in ioPlacer 
 
 <img width="960" alt="reset" src="https://user-images.githubusercontent.com/64173714/215265586-4619331d-3f95-4573-9765-2c9d07226e55.png">
 
-Spice Simulations (Pre-Layout)
-The spice simulations mainly consist of :
-1. Spice deck - component connectivity, component values, identify nodes, name nodes
-2. NGspice introduction
-3. Static behaviour evaluation 
+## SPICE Simulations (Pre-Layout)
 
-## SPICE simulation lab for CMOS inverter
+SPICE simulations help verify the **functional** and **static behavior** of a circuit **before layout**.  
+They are an essential step in validating circuit performance at the transistor level.
 
-* At first we need to git clone the standard cells and command is :
-```
+### SPICE Deck
+- Defines the **circuit connectivity**, **component values**, and **node names**.  
+- Acts as the input file for SPICE simulation.  
+- Includes details such as voltage sources, resistors, capacitors, and transistors.
+
+### NGSPICE 
+- **NGSPICE** is an open-source circuit simulator used for **analog** and **mixed-signal** analysis.  
+- It interprets the SPICE deck to perform simulations like DC, AC, and transient analysis.
+
+### Static Behavior Evaluation
+- Determines the **DC operating points**, **logic voltage levels**, and **steady-state conditions**.  
+- Helps confirm the circuit’s correct operation before applying dynamic or transient signals.
+
+
+
+## SPICE Simulation Lab for CMOS Inverter
+
+This lab demonstrates how to perform a **SPICE simulation** for a CMOS inverter using the **Sky130 PDK** and **Magic** layout tool.
+
+### Step 1: Clone the Standard Cell Repository
+
+Use the following commands to clone the standard cell design repository and navigate into it:
+
+```bash
 git clone https://github.com/nickson-jose/vsdstdcelldesign.git
+cd vsdstdcelldesign
+```
+
+### Step 2: Prepare the Magic Technology File
+
+Before opening the layout in Magic, you need the technology file `(sky130A.tech)`.
+
+Navigate to the tech file location and copy it into your vsdstdcelldesign directory:
+  
+```
+cp /home/vsduser/Desktop/work/tools/openlane_working_dir/pdks/sky130A/libs.tech/magic/sky130A.tech \
+/home/vsduser/Desktop/work/tools/openlane_working_dir/openlane/vsdstdcelldesign
+```
+
+Step 3: Open the Layout in Magic
+
+Use the following command to open the CMOS inverter layout (sky130_inv.mag) in Magic:
 
 ```
-* After cloning the repo, navigate to the vsdstdcelldesign directory and use magic to view the sky130_inv.mag file.
-* Before opening we need magic tech file and copy the tech file in vsdstdcelldesign directority
+magic -T sky130A.tech sky130_inv.mag &
 ```
-     cp sky130A.tech /home/venkykamatham1998/Desktop/work/tools/openlane_working_dir/openlane/vsdstdcelldesign/
-```
- * To view the layout use this command 
- ```
-     magic -T sky130A.tech sky130_inv.mag &
-```
-<img width="956" alt="image" src="https://user-images.githubusercontent.com/64173714/215268906-9ec922be-924e-447f-8758-a8d5eb418157.png">
+
+<img width="1127" height="788" alt="image" src="https://github.com/user-attachments/assets/cf85453e-787a-44ef-ae6e-12725e028a03" />
+
 
 16 mask CMOS fabrication process  
 ``` 
