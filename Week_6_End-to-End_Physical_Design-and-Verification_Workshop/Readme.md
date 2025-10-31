@@ -1,4 +1,4 @@
-
+<img width="1853" height="292" alt="image" src="https://github.com/user-attachments/assets/dfd67a4e-700c-4361-93e9-56e9a9c9c790" />
 <details>
   <summary>Installation of OpenLane and Magic</summary>
   
@@ -124,18 +124,6 @@ sudo make install
 
 Sky130 Day 1 - Inception of open-source EDA, OpenLANE and Sky130 PDK
 
-<a name="tools-used"></a>
-# Tools Used
-| Tool | Descriptions |
-| --- | --- |
-| Yosys | 	Synthesis of RTL Design|
-| ABC	 | Mapping of Netlist|
-| OpenSTA |	Static Timing Analysis |
-| Magic VLSI |	Layout Tool |
-| NGSPICE	SPICE | Extraction and Simulation |
-|OpenROAD |	Floorplanning, Placement, CTS, Optimization, Routing |
-| TritonRoute |	Detailed Routing |
-| SPEF_EXTRACTOR | Generation of SPEF file from DEF file |
 
 # 1 – Inception of open-source EDA, OpenLANE and Sky130 PDK 
 
@@ -341,102 +329,438 @@ To design a **digital ASIC (Application-Specific Integrated Circuit)** using **o
 
 ![IMG-8761](https://user-images.githubusercontent.com/64173714/215446489-bdfd9f74-92c4-40db-bb70-744d06a18289.jpg)
 
-In the process of digital ASIC design
-* Synthesis is the step where the RTL code is transformed into a gate level netlist composed of components from a standard cell library.
+## 1. Synthesis
+
+**Synthesis** converts the RTL (Register Transfer Level) code into a **gate-level netlist** using components from a standard cell library.
+
 <img width="560" height="188" alt="image" src="https://github.com/user-attachments/assets/0d9115e3-d104-4781-b759-e4f6ff5ad6f2" />
 
-- standard cells have regular layout
-- cell layout with fixed height and different width
-- different views/ models (electrical , HDL, SPICE and layout[Abstract annd Detailed view])
-  
-* Floor planning and power planning involves allocating the silicon area and creating a robust power distribution network. The power network often employs thicker upper metal layers to reduce resistance and IR drop problems.
+- Standard cells have a **regular layout** with **fixed height** and **variable width**.  
+- Each standard cell has multiple **views/models**:
+  - Electrical view  
+  - HDL (Hardware Description Language) view  
+  - SPICE view  
+  - Layout views (Abstract and Detailed)
 
-- chip floorplanning : partition the chip die between different system building components and place the i/o pads
+## 2. Floor Planning & Power Planning
+
+### Floor Planning
+This step allocates silicon area and defines how different components are arranged on the chip.
+
+- **Chip Floorplanning**:  
+  Divides the chip die into regions for different system blocks and places I/O pads.
   <img width="543" height="138" alt="image" src="https://github.com/user-attachments/assets/a9c5b94b-6438-4483-938a-324bcd35b517" />
   
-- macro floorplanning : defining the dimensions, pin locations, rows definition
+- **Macro Floorplanning**:  
+  Defines block dimensions, pin locations, and placement rows.
   <img width="546" height="152" alt="image" src="https://github.com/user-attachments/assets/c425a331-4cc9-4a8d-bad6-30afd19a8aa0" />
 
-- Powerplanning : power network is contructions ring, mesh/stripes, std cell rails 
+### Power Planning
+Designs a **robust power distribution network** using:
+- **Power rings, meshes, or stripes**  
+- **Standard cell power rails**  
+- **Thicker top metal layers** to minimize resistance and IR drop issues
 
 <img width="820" height="320" alt="image" src="https://github.com/user-attachments/assets/01f1e082-68e0-46f7-8e66-4974e00d93ed" />
 
-* Placement
-  - is cells on the floorplan rowsaligned with the sites.
+
+## 3. Placement
+
+**Placement** is the process of positioning standard cells on predefined rows within the floorplan.
+
 <img width="466" height="157" alt="image" src="https://github.com/user-attachments/assets/bd35ba70-e94a-44a6-b8fb-5cd17ed5f908" />
 
 
-- Two steps
-- Global placement : to find the optimal positions for cells which may not be legal
--  Detailed placement :  to determine the actual legal positions of cells.
+### Steps:
+1. **Global Placement** – Finds approximate (but possibly illegal) cell locations for optimal performance.  
+2. **Detailed Placement** – Adjusts cells into legal positions while maintaining good performance.
+
 <img width="532" height="176" alt="image" src="https://github.com/user-attachments/assets/27641333-56d5-43d4-8eca-fb74ce8b3639" />
 
-* Clock tree synthesis
-- is the distribution of clocks to all flip flops,
-- with minimum skew
--  often structured as a tree such as an H-tree or X-tree.
+## 4. Clock Tree Synthesis (CTS)
+
+**Clock Tree Synthesis** distributes the clock signal to all flip-flops with **minimum skew**.
+
+- Common structures: **H-tree** or **X-tree**
+- Goal: Ensure consistent clock arrival times across the chip
 <img width="177" height="130" alt="image" src="https://github.com/user-attachments/assets/3b2390c2-5934-4fcc-b1ff-6fce4a56d59f" />
 
   
-* Routing involves connecting cells together using horizontal and vertical wires. The router uses information from the PDK such as thickness, pitch, width, and vias for each metal layer, with Sky130 defining 6 routing layers for both global and detailed routing.
+## 5. Routing
 
-  
-* Before sign-off, verification is crucial and includes physical verification such as DRC and LVS, and timing verification. Design Rule Checking (DRC) ensures the final layout complies with all design rules, Layout versus Schematic (LVS) checks if the final layout matches the gate level netlist from the synthesis phase, and timing verification confirms that timing constraints are met.
+**Routing** connects the placed cells using metal layers defined in the process design kit (PDK).
+
+### Routing Details:
+- **Signal Routing**: Uses multiple metal layers (horizontal and vertical) to connect signals.  
+- **Routing Grid**: A large grid defines metal tracks and via positions.  
+
+### Routing Steps:
+1. **Global Routing** – Generates routing guides for major signal paths.  
+2. **Detailed Routing** – Implements exact wiring using those guides.
+
+  <img width="1158" height="403" alt="image" src="https://github.com/user-attachments/assets/7a6f659a-112d-41be-a162-ee10a65e91c8" />
+
+> Example: The **Sky130** PDK defines **6 routing layers** for both global and detailed routing.
+
+## 6. Sign-Off
+
+The **Sign-Off** stage verifies that the final layout meets all design and manufacturing rules.
+
+### Physical Verification
+- **DRC (Design Rule Checking)** – Ensures layout complies with fabrication rules.  
+- **LVS (Layout vs Schematic)** – Confirms the layout matches the circuit schematic.
+
+### Timing Verification
+- Confirms that all **timing constraints** (setup, hold, and clock requirements) are satisfied.
+
+
 
 ### About Openlane flow
-![IMG-8762](https://user-images.githubusercontent.com/64173714/215446664-5d9da8cd-d538-4c7e-9585-98f393586e6d.jpg)
-OpenLANE is a flow that employs various open-source tools to design digital circuits from RTL to GDSII. It features the striVe family of open everything SoCs (Open PDK, Open EDA, Open RTL) and utilizes tools such as Yosys, OpenROAD, Magic, Netgen, and SPEF_Extraction. The flow has two modes of operation: Autonomous and Interactive, and is specifically optimized for the SKYWater 130nm open PDK.
 
-The flow starts with RTL synthesis, where the RTL code is processed by Yosys and translated into a logic circuit using generic components. The circuit can then be optimized and mapped to a standard cell library using the ABC tool, guided by various ABC scripts that implement different synthesis strategies.
-
-OpenLANE also includes design exploration utilities that allow the designer to test different configurations of the design and generate reports that show the number of layout violations. The flow also includes Static Timing Analysis performed by OpenSTA, as well as optional testing steps such as DFT (Scan Insertion, ATPG, Test Pattern Compaction, Fault Coverage, and Fault Simulation).
-
-The physical implementation phase is handled by the OpenROAD application, which performs PnR (FP+PP, Placement, Optimization, CTS, and Routing). The TritonRoute tool is used for detailed routing, and a Logic Equivalence Check (LEC) is performed to ensure the optimized circuit still has equivalent functionality. The fake antenna insertion step is also included to address antenna rule violations, with the Magic tool being used for antenna checking and NetGen for circuit extraction.
-
-Finally, the sign-off stage includes STA, DRC, and LVS, with interconnect RC extraction and further STA performed by OpenSTA, and DRC and LVS performed by the Magic tool.
-
-<a name="about-google-skywater-pdk"></a>
-
-## Get familiar to open-source EDA tools
-
-* Getting starting with working directory and openlane
-` cd work/tools/openlane_working_dir/openlane/ `
-* to invoke the tool type `docker` to start the docker containter
-
-<img width="960" alt="1 1" src="https://user-images.githubusercontent.com/64173714/214944909-255ca00a-78aa-43cc-98f8-6c701c297ad7.png">
-
-* Open the OpenLane in interactive mode `./flow.tcl -interactive` and Set the package required by OpenLane `package require openlane 0.9`
-
-<img width="960" alt="1 2" src="https://user-images.githubusercontent.com/64173714/215261326-176160e1-e1c7-4dae-98eb-cb6686d01e46.png">
-
-* select the design `cd designs/picorv32a`
-
-<img width="960" alt="1 3" src="https://user-images.githubusercontent.com/64173714/214944999-fd01574b-d9a6-4af4-9692-bed7e52e4a49.png">
-
-* Prepare the design `prep -design picorv32a`
+**OpenLANE** is an open-source, end-to-end flow for designing digital integrated circuits — taking designs from **RTL to GDSII**.  
+It integrates multiple open-source tools and is optimized for the **SkyWater 130nm Open PDK (SKY130)**.
 
 
-<img width="960" alt="1 4 1" src="https://user-images.githubusercontent.com/64173714/214945822-4241db5d-b2e2-413e-b7ff-56cb99b32081.png"> 
-<img width="960" alt="1 4 2" src="https://user-images.githubusercontent.com/64173714/215261392-a170e3bf-30e5-43b1-9892-70e30dd15024.png">
+OpenLANE enables users to design and tape out digital chips using only **open-source tools** and **open-source process design kits (PDKs)**.  
+It powers the **striVe family** of fully open SoCs (System-on-Chips), which follow the principles of:
+-  **Open PDK**
+-  **Open EDA**
+-  **Open RTL**
 
-* checking whether a merged file is created in the folder
+<img width="526" height="387" alt="image" src="https://github.com/user-attachments/assets/20560799-2f3b-4784-bc90-65e83692c941" />
 
-<img width="960" alt="1 4 3" src="https://user-images.githubusercontent.com/64173714/214946115-dff3b1f8-dee3-4e51-b5ba-3365aac25eef.png">
+### Core Tools Used
+| Function | Tool |
+|-----------|------|
+| RTL Synthesis | **Yosys** |
+| Logic Optimization | **ABC** |
+| Physical Design (PnR) | **OpenROAD** |
+| Detailed Routing | **TritonRoute** |
+| Timing Analysis | **OpenSTA** |
+| Layout and Verification | **Magic**, **Netgen** |
+| Parasitic Extraction | **SPEF_Extraction** |
 
-* Run the synthesis `run_synthesis`
 
-<img width="347" alt="1 5" src="https://user-images.githubusercontent.com/64173714/214946138-df3423c3-9568-463a-85a7-4040dcf9cdbf.png">
+## Modes of Operation
 
-* View the synthesis statistics
+OpenLANE supports two primary modes:
 
-<img width="960" alt="1 5 1" src="https://user-images.githubusercontent.com/64173714/215454952-d39c22e8-8706-4853-8c1d-c35dd94a9e04.png">
+1. **Autonomous Mode** – Runs the complete RTL-to-GDSII flow automatically.  
+2. **Interactive Mode** – Allows users to manually control and customize each stage for exploration and debugging.
 
-* To calculate the flop ratio 
- ` flop ration = no of d flip flops/total no of cells = 1613/18036 = 0.089 = 89% `
- 
- 
-<a name="2-understand-importance-of-good-floorplan-vs-bad-floorplan-and-introduction-to-library-cells"></a>
+##  Design Flow Stages
+
+![IMG-8762](https://user-images.githubusercontent.com/64173714/215446664-5d9da8cd-d538-4c7e-9585-98f393586e6d.jpg)  
+
+
+### 1. RTL Synthesis
+- The **Yosys** tool processes the RTL code and converts it into a **gate-level logic circuit**.
+- **ABC** performs logic optimization and maps the design to a **standard cell library**.
+- Various **ABC scripts** implement different synthesis strategies for improved timing or area efficiency.
+
+### 2. Design Exploration
+OpenLANE provides utilities for:
+- Testing different design configurations  
+- Generating **reports on layout violations**  
+- Performing **Static Timing Analysis (STA)** using **OpenSTA**  
+- Optional **DFT (Design for Test)** steps, including:
+  - Scan Insertion  
+  - ATPG (Automatic Test Pattern Generation)  
+  - Test Pattern Compaction  
+  - Fault Coverage Analysis  
+  - Fault Simulation  
+
+
+### 3. Physical Implementation
+The **OpenROAD** tool handles the entire **Place and Route (PnR)** process, which includes:
+
+| Step | Description |
+|------|--------------|
+| FP + PP | Floorplanning and Power Planning |
+| Placement | Placing standard cells |
+| Optimization | Improving timing and area |
+| CTS | Clock Tree Synthesis |
+| Routing | Connecting all signals |
+
+- **TritonRoute** performs **detailed routing**.  
+- A **Logic Equivalence Check (LEC)** ensures that the optimized circuit behaves identically to the original RTL.  
+- **Antenna Rule Checking and Fixing** are done using **Magic**, with **fake antenna insertion** when necessary.  
+- **NetGen** performs **circuit extraction** for verification.
+
+
+### 4. Sign-Off
+
+The final verification stage ensures the design is ready for tapeout.
+
+| Verification Task | Tool |
+|--------------------|------|
+| Static Timing Analysis (STA) | OpenSTA |
+| Design Rule Checking (DRC) | Magic |
+| Layout vs Schematic (LVS) | Magic / NetGen |
+| RC Extraction | SPEF Extraction + OpenSTA |
+
+
+## Step 1. Setting Up the Working Directory
+
+Navigate to your OpenLANE working directory:
+
+```bash
+cd work/tools/openlane_working_dir/openlane/
+```
+Step 2: Start the Docker Container
+Run the OpenLANE Docker environment:
+```
+docker
+```
+Step 3: Launch OpenLANE in Interactive Mode
+```
+./flow.tcl -interactive
+package require openlane 0.9
+```
+- Al the design files are in `openlane_working_dir/openlane/designs/picorv32a`
+  
+<img width="1853" height="292" alt="image" src="https://github.com/user-attachments/assets/bc90c74b-1161-4b4f-a6a8-be7f056c2f3d" />
+
+Step 4: Prepare the Design
+```
+prep -design picorv32a 
+```
+> This merges configuration files and prepares the design for synthesis. Check if a merged file was created successfully.
+
+<img width="1851" height="935" alt="image" src="https://github.com/user-attachments/assets/8b767f8e-e589-4067-a3ae-25f8b9314261" />
+
+Step 5: Review the `runs` Directory
+
+After each **OpenLANE** run, a new folder is created inside the `runs/` directory.  
+Each run contains key files that record the **progress and results** of the design flow.
+
+### Inside `runs/<run_name>/` you’ll find:
+
+- **reports/** – Detailed metrics from each step (synthesis, placement, routing, STA).  
+- **results/** – Final outputs such as **GDSII**, **DEF**, and **netlists**.  
+- **logs/** – Terminal logs for **debugging** and **tracking** the flow execution.
+
+> **Tip:** Reviewing these directories helps verify that each stage completed successfully and that your design meets timing and physical constraints.
+
+<img width="1847" height="943" alt="image" src="https://github.com/user-attachments/assets/78e21bcb-7a90-4dea-a375-2eba8b7be2e4" />
+
+Step 6: Run RTL Synthesis
+
+Converts the RTL code into a gate-level netlist.
+```
+run_synthesis
+```
+<img width="1852" height="927" alt="image" src="https://github.com/user-attachments/assets/eb84fcc6-ac49-472b-8518-bbdbd971425f" />
+
+Step 7: View Synthesis Statistics
+
+After synthesis completes, check reports in:
+
+```
+reports/synthesis/
+```
+This includes:
+ - Total cell count
+ - Number of flip-flops
+ - Logic breakdown
+ - Timing results
+
+<img width="1852" height="195" alt="image" src="https://github.com/user-attachments/assets/d1d0a5e8-3ffe-4308-ac4a-b019d8e1019f" />
+
+<table>
+  <tr>
+    <th align="center">Pre-Statistics</th>
+    <th align="center">Post-Statistics</th>
+  </tr>
+  <tr>
+    <td align="center">
+      <img width="457" height="607" alt="Pre-Statistics" src="https://github.com/user-attachments/assets/6e109a59-0417-4916-b0a3-32f97bf8008f" />
+    </td>
+    <td align="center">
+      <img width="413" height="851" alt="Post-Statistics" src="https://github.com/user-attachments/assets/b010b82b-fe4e-4877-8298-be4a8c03ab72" />
+    </td>
+  </tr>
+</table>
+
+> Chip area for module : 147712.918400
+
+Step 8: Calculate the Flop Ratio
+
+Flop Ratio Formula:
+```mathematica
+Flop Ratio = (Number of D Flip-Flops) / (Total Number of Cells)
+
+
+Flop Ratio = 1613 / 14876 = 0.108 ≈ 10.84 %
+```
+> Tip: A typical digital design has a flop ratio between 5% and 15%, depending on its complexity and architecture.
+
+<img width="1848" height="961" alt="1" src="https://github.com/user-attachments/assets/f25d5602-584b-4438-8c3c-fbe2773082fd" />
+
 # 2 - Understand importance of good floorplan vs bad floorplan and introduction to library cells
+
+## 1. Define Width and Height of Core and Die
+
+The **core and die** dimensions are determined based on the **netlist**, which defines the connectivity between all components in the circuit.
+
+   <img width="1363" height="971" alt="image" src="https://github.com/user-attachments/assets/ffd1f5ba-2b2a-4bb9-8289-b763d4d4818a" />
+
+For example: 
+
+<img width="566" height="192" alt="image" src="https://github.com/user-attachments/assets/da1dcd5a-1934-42f6-83ef-9dee4d0fbd7b" />
+
+- The **dimensions** depend on the number of **logic gates** and **flip-flops**, each having a specific length and width.  
+
+
+  <img width="1393" height="893" alt="image" src="https://github.com/user-attachments/assets/e363305d-b7b3-4382-9948-57331c64c854" />
+
+- Example:  
+  If the minimum area is **2 × 2 = 4 units**, then the chip occupies **4 units** with **100% area utilization**.
+  
+<img width="1285" height="578" alt="image" src="https://github.com/user-attachments/assets/af6244bc-eda7-46ad-91d2-6d55ef9b04f1" />
+
+### Utilization Factor
+
+> **Utilization Factor** = (Area Occupied by Netlist) / (Total Area of the Core)
+
+for example
+ Utilization = (4 × 1) / (2 × 2)
+ Utilization = 1 → No space left
+
+> In practice, designs typically target **0.6 to 0.7 utilization**  
+to allow space for routing and optimization.
+
+### Aspect Ratio
+
+> **Aspect Ratio (AR)** = Height / Width
+
+| Aspect Ratio | Shape Description |
+|---------------|------------------|
+| AR = 1 | Square Shape |
+| AR > 1 | Horizontal Rectangular Shape |
+| AR < 1 | Vertical Rectangular Shape |
+
+
+For example:
+
+<img width="1732" height="986" alt="image" src="https://github.com/user-attachments/assets/f0c59db6-a142-4af4-b8c5-c28a0e348f6c" />
+
+```mathematica
+  Utilization Factor = (Area Occupied by Netlist) / (Total Area of the Core)
+                     = (2 x 2) / (4 x 4)
+                     = 4 / 16
+                     = 0.25
+- 75% is left for place the aditional cells, routing
+
+  Aspect Ratio (AR) = Height / Width
+                    = 4 / 4
+                    = 1 (Square Shape)
+```
+
+## 2. Define the Locations of Pre-Placed Cells
+
+**Pre-placed cells** are blocks or modules whose functionality is implemented **only once** and reused across the design.
+
+### Characteristics of Pre-Placed Cells
+- These cells are **fixed in position** before automated placement and routing.    
+- They may have **extended I/O pins** to connect with other parts of the chip.
+  <img width="1602" height="997" alt="image" src="https://github.com/user-attachments/assets/bca3efdc-1295-4711-8c42-e7efc3362e9e" />
+- Often include **IP blocks** (Intellectual Property cores) or **reusable modules**.
+     <img width="583" height="191" alt="image" src="https://github.com/user-attachments/assets/182b90bd-ecff-4248-b0d0-a89c0699576e" />
+- The **arrangement of IPs** within the chip is referred to as **floorplanning**.
+
+### Pre-placement Process
+- IP blocks and other reusable cells have **user-defined locations** on the chip.  
+- These blocks are positioned **manually or semi-manually** before the automatic placement process.  
+- Once pre-placed cells are fixed, the **automated placement and routing tools** arrange the **remaining standard cells** and **logic elements** around them.
+
+## 3. Surround Pre-Placed Cells with Decoupling Capacitors
+
+###  Placement of Pre-Placed Cells
+The **location of pre-placed cells** depends on the **design scenario** and functional requirements.  
+They are strategically positioned to optimize **connectivity, performance, and power distribution**.
+
+<img width="1499" height="963" alt="image" src="https://github.com/user-attachments/assets/67058ea8-7de7-4f87-a38b-f9dea17efd5e" />
+
+### What Are Decoupling Capacitors?
+
+**Decoupling Capacitors (Decaps)** are special capacitors placed **around pre-placed cells** to stabilize the power supply during switching events.
+
+<img width="1415" height="861" alt="image" src="https://github.com/user-attachments/assets/93daad1d-a725-4faa-97b4-936d1835ba26" />
+
+### Function of Decoupling Capacitors
+
+In practical circuits, wires exhibit **resistance (R)**, **inductance (L)**, and **capacitance (C)**.  
+When a circuit switches states (from `0 → 1` or `1 → 0`), **voltage drops** can occur due to these parasitic effects.
+
+Decoupling capacitors help mitigate these effects by acting as **local charge reservoirs**.
+
+
+### Working Principle
+
+- A **decoupling capacitor** is a large capacitor pre-charged with electrical energy.  
+- During a switching event, it **supplies the required charge** to nearby logic cells, preventing sudden voltage drops.  
+- After switching, the capacitor **recharges** from the main power supply.  
+- This cycle ensures a **stable voltage level** and reduces **crosstalk** and **power noise** in the design.
+
+<img width="1290" height="970" alt="image" src="https://github.com/user-attachments/assets/f7bf7a18-f8e3-49e8-a627-3bf82a8d3670" />
+
+## 4. Power Planning
+
+### Purpose of Power Planning
+
+**Power Planning** ensures that every part of the chip receives a stable and sufficient power supply (VDD and VSS).  
+It involves designing a power distribution network that connects all major blocks (macros) and standard cells efficiently.
+
+### Example Scenario
+
+Consider a design with **4 macros**.  
+
+<img width="967" height="807" alt="image" src="https://github.com/user-attachments/assets/9f6db2ac-427a-444b-a0d8-021a192a599f" />
+
+Each macro must:
+- Receive consistent power from **VDD** (power) and **VSS** (ground).  
+- Maintain equal signal strength between the **driver** and the **load** across the chip.
+
+<img width="1308" height="995" alt="image" src="https://github.com/user-attachments/assets/86153d94-4251-4610-9941-a942a4f25a2f" />
+
+### Power Integrity Issues
+
+Assume a **16-bit bus** connected to an inverter:
+
+<img width="1448" height="880" alt="image" src="https://github.com/user-attachments/assets/d595416f-53c1-4e1f-b9e1-20e3536ceba6" />
+
+- When logic `1` (VDD) becomes logic `0`, and vice versa,  
+  the switching current passes through a **single VDD tap point**.
+- This creates a momentary voltage imbalance, leading to:
+  1. **Ground Bounce** – Increase in ground voltage at the VSS node.
+
+<img width="1474" height="886" alt="image" src="https://github.com/user-attachments/assets/7b567e75-ef9a-484a-945f-7e50d5c116ed" />
+
+ 2. **Voltage Droop** – Drop in supply voltage at the VDD node.
+    
+<img width="1435" height="333" alt="image" src="https://github.com/user-attachments/assets/e4fed4b1-dd9d-4a19-98e7-b7f319fbb2df" />
+
+These effects can cause **timing violations**, **logic instability**, and **signal noise**.
+
+
+### Solution: Multiple Power Supply Connections
+
+To minimize these effects:
+- Use **multiple power and ground connections** distributed across the chip.  
+- This reduces the current drawn from any single point, minimizing **voltage droop** and **ground bounce**.  
+- Ensures a **uniform power distribution network (PDN)** throughout the design.
+
+<img width="1899" height="986" alt="image" src="https://github.com/user-attachments/assets/b90616a9-f9ed-4e64-a97b-b8b90b7a0f3a" />
+
+ 
+> Connecting all macros to multiple **VDD** and **VSS** taps improves power integrity, reduces noise, and ensures reliable chip operation during switching events.
+
+  
+  
+
+    
+ 
 
 ### LABS 
 * floorplan in openlane `run_floorplan`
