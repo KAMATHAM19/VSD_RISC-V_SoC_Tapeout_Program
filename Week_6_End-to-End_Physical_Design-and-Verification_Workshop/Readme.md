@@ -1160,12 +1160,9 @@ t_fall = |t_80 - t_20|
 These are also referred to as **input slew** or **output slew**, depending on which pin the waveform corresponds to.
 
 
-
-
 # 3 - Design and characterize one library cell using Magic Layout tool and ngspice
 
-### Labs
-#### ioPlacer - to changes I/O pins and place around the core
+### ioPlacer - to changes I/O pins and place around the core
 
 ```
 % set ::env(FP_IO_MODE) 2
