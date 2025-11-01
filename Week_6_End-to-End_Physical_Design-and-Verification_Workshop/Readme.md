@@ -1236,27 +1236,84 @@ magic -T sky130A.tech sky130_inv.mag &
 https://www.vlsisystemdesign.com/wp-content/uploads/2017/07/16-mask-process.pdf
 
 ```
-* To view the layout press `s` for select, `z` for zoom and in `tkconl` type what cammand to see the mask layers 
+- To view the layout:
+  - Press **`s`** for *Select*
+  - Press **`z`** for *Zoom*
+- In **`tkcon`**, type the `what` command to view the **mask layers**.
 
-<img width="959" alt="3 3" src="https://user-images.githubusercontent.com/64173714/215276740-9f6fd45c-da8c-476c-a30d-2a38baef0d08.png">
 
-* We should extract the parasitics and characterise the design. We open the tkcon window and execute the following commands:
+<img width="1812" height="822" alt="image" src="https://github.com/user-attachments/assets/817b659e-62ff-4b95-9c05-c851555c9ef6" />
+
+
+- We need to **extract the parasitics** and **characterize the design**.  
+- Open the **tkcon** window and execute the following commands:
+
+```bash
+  extract all
+  ext2spice cthresh 0 rthresh 0
+  ext2spice
 ```
-extract all
-ext2spice cthresh 0 rthresh 0
-ext2spice
-```
-The extracted file 
 
-<img width="960" alt="3 4" src="https://user-images.githubusercontent.com/64173714/215278218-907c745b-a97a-4d7c-add9-a114193a6694.png">
+<img width="992" height="333" alt="image" src="https://github.com/user-attachments/assets/27d8cec4-52e3-48d9-bdba-a09a935c1179" />
 
-<img width="960" alt="spice 1" src="https://user-images.githubusercontent.com/64173714/215278228-8ab8f44d-e61c-4da2-8699-f3011548a675.png">
 
-We then modify the spice file so that we can plot a transient response:
+### Modifying the SPICE File for Transient Response
+
+To plot a **transient response**, we modify the SPICE file as follows:
+
+1. **Change the scale value**  
+   - Adjust the `.option scale` parameter according to the grid dimensions.  
+   - Example:  
+     ```spice
+     .option scale=0.01u
+     ```
+
+2. **Include the NMOS and PMOS library files**  
+   - Add the model library files for transistor definitions:  
+     ```spice
+     .include ./libs/pshort.lib
+     .include ./libs/nshort.lib
+     ```
+
+3. **Define the supply voltage**  
+   - Provide the power supply sources:  
+     ```spice
+     VDD VPWR 0 3.3V
+     VSS VGND 0 0V
+     ```
+
+4. **Add the input signal**  
+   - Define a pulse input for simulation:  
+     ```spice
+     Va A VGND PULSE(0V 3.3V 0 0.1ns 0.1ns 2ns 4ns)
+     ```
+
+5. **Include simulation commands**  
+   - Add the transient analysis and control commands:  
+     ```spice
+     .tran 1n 20n
+     .control
+     run
+     .endc
+     .end
+     ```
+6. **Check and update model names**  
+   - Open the included NMOS and PMOS library files (e.g., `pshort.lib`, `nshort.lib`)  
+   - Verify the model names defined inside these files.  
+   - Update the transistor definitions in your SPICE file to match them.  
+     Example:  
+     ```spice
+     M0 Y A VGND VGND nshort_model.0 ...
+     M1 Y A VPWR VPWR pshort_model.0 ...
+     ```
+     If the model names differ (e.g., `sky130_fd_pr__nfet_01v8` or `sky130_fd_pr__pfet_01v8`), change them accordingly.
+     
+
+
 ```
 * SPICE3 file created from sky130_inv.ext - technology: sky130A
 
-.option scale=0.01u
+.option scale=0.01u 
 .include ./libs/pshort.lib
 .include ./libs/nshort.lib
 
@@ -1284,28 +1341,132 @@ run
 .endc
 .end
 ```
-* Open the spice file by typing `ngspice sky130A_inv.spice` 
-* Generate a graph using `plot y vs time a` 
+After saving the changes, run the simulation using:  
+```bash
+ngspice sky130A_inv.spice
+```
+<img width="1856" height="676" alt="image" src="https://github.com/user-attachments/assets/f54ad3aa-ac29-4132-a158-2b3d7775dd03" />
 
-<img width="960" alt="3 0" src="https://user-images.githubusercontent.com/64173714/215286609-f27e665b-6d2e-4769-bbc8-1af19275347c.png">
-<img width="960" alt="t" src="https://user-images.githubusercontent.com/64173714/215286642-0a0bdfcf-2078-4b72-9234-6d7afe3d4a7e.png">
-* From the transient response, we will now characterise the cell's slew rate and propagation delay
 
-   * rise transiton - time taken by output waveform to transit from 20%(0.66) to 80%(2.64) of VDD(3.3 max value) = 2.19945 - 2.15722 = 0.03728 ns
-   
-<img width="316" alt="rise" src="https://user-images.githubusercontent.com/64173714/215319377-e139cefc-a69f-4a70-96f1-9db85e05fc89.png">
+plot the transient response with:
+```
+plot y vs time a
+```
 
-   * fall transition - time taken by output waveform to transit from 80% (2.64) to 20% (0.66) of VDD = 4.06716 - 4.0394 = 0.02766 ns
-   
-<img width="307" alt="fall transi" src="https://user-images.githubusercontent.com/64173714/215319388-8c9b7de9-1e7a-4ed1-8563-925744289767.png">
+<img width="1845" height="968" alt="image" src="https://github.com/user-attachments/assets/78df1369-70b6-4378-ac0f-6950d5e74337" />
 
-   *  rise cell delay - The difference between the time when output as well as input is at 50% (1.65) i.e falling at 50% of output is rising = 2.18132 - 2.14945 = 0.03187 ns
-   
-<img width="308" alt="cell rise de" src="https://user-images.githubusercontent.com/64173714/215319395-2eac9a92-c094-4e40-bec6-e8fde0e86fb8.png">
 
-   *  fall cell delay - The difference between the time when output as well as input is at 50% (1.65) i.e falling at 50% of input is rising = 4.059292 - 4.04958 = 0.009712 ns 
-   
-<img width="277" alt="cll fall delay" src="https://user-images.githubusercontent.com/64173714/215319398-47e2f33e-82e5-4527-83cc-5721f3be5836.png">
+- In the transient response **graph**, we can observe **spikes** due to a **small load capacitance (Cload)**.  
+- To reduce these spikes, **increase the load capacitance** value.
+
+Modify the capacitor line in the SPICE file as follows:
+
+```spice
+C3 Y VGND 2fF
+```
+
+<img width="1773" height="977" alt="image" src="https://github.com/user-attachments/assets/53ce66c7-d5e2-4095-8626-1616189670f0" />
+
+> The output spikes are slightly reduced compared to the previous result, leading to a smoother transient response.
+
+### Characterization of the Cell’s Slew Rate and Propagation Delay
+
+#### Slew Rate
+
+1. **Rise Transition**  
+   - Time taken by the **output waveform** to transition from **20% (0.66 V)** to **80% (2.64 V)** of **VDD (3.3 V)**  
+   - Calculation:  
+     ```
+     2.19945 ns - 2.15722 ns = 0.03728 ns
+     ```
+   - **Rise Slew Rate = 0.03728 ns**
+
+2. **Fall Transition**  
+   - Time taken by the **output waveform** to transition from **80% (2.64 V)** to **20% (0.66 V)** of **VDD**  
+   - Calculation:  
+     ```
+     4.06716 ns - 4.03940 ns = 0.02776 ns
+     ```
+   - **Fall Slew Rate = 0.02776 ns**
+
+#### Propagation Delay
+
+3. **Rise Cell Delay**  
+   - The difference between the time when both **input and output** are at **50% (1.65 V)** — i.e., output rising while input is falling  
+   - Calculation:  
+     ```
+     2.18132 ns - 2.14945 ns = 0.03187 ns
+     ```
+   - **Rise Propagation Delay = 0.03187 ns**
+
+4. **Fall Cell Delay**  
+   - The difference between the time when both **input and output** are at **50% (1.65 V)** — i.e., output falling while input is rising  
+   - Calculation:  
+     ```
+     4.059292 ns - 4.04958 ns = 0.009712 ns
+     ```
+   - **Fall Propagation Delay = 0.009712 ns**
+
+
+### Magic Tool
+Magic is an open-source **VLSI layout editor**, circuit extractor, and DRC (Design Rule Check) tool.  
+You can find detailed documentation and downloads here:  
+[Magic VLSI Layout Tool](http://opencircuitdesign.com/magic/)
+
+### SkyWater 130nm PDK
+The **SkyWater 130nm Process Design Kit (PDK)** provides the design rules, layers, and models required for layout and simulation.  
+Documentation and resources are available here:  
+[SkyWater 130nm PDK Documentation](https://skywater-pdk.readthedocs.io/en/main/index.html)
+
+You can also explore detailed **design rules** here:  
+[SkyWater 130nm Design Rules (Periphery)](https://skywater-pdk.readthedocs.io/en/main/rules/periphery.html#m3)
+
+
+#### Lab Steps
+
+To download and extract the DRC test files for Sky130 PDK:
+
+```bash
+wget http://opencircuitdesign.com/open_pdks/archive/drc_tests.tgz
+tar -xvzf drc_tests.tgz
+```
+<img width="1857" height="636" alt="image" src="https://github.com/user-attachments/assets/17e2d8f2-b7d9-49bf-85ab-03afadd52fcd" />
+
+> These files contain the design rules used for the Sky130 PDK.
+
+
+To open Magic, use the following command:
+```
+magic -d XR &
+```
+
+1.  When you open the met3.mag layout file, you may observe various DRC (Design Rule Check) violations.
+
+<img width="1833" height="1016" alt="image" src="https://github.com/user-attachments/assets/a648e64a-c544-434f-a664-edad0f47f4cf" />
+
+### Metal Layer DRC Violations
+
+#### **M3.1 – Metal Width DRC**
+- **Violation:** The metal trace width in **M3.1** is below the specified minimum width threshold.  
+- **Error:** Metal width does not meet design rules.
+
+#### **M3.2 – Metal Spacing DRC**
+- **Violation:** The distance between adjacent metal traces in **M3.2** does not meet the required spacing.  
+- **Error:** Metal spacing violation.
+
+#### **M3.5 – Via Overlapping DRC**
+- **Violation:** The vias in **M3.5** overlap with each other.  
+- **Error:** Via overlapping issue.
+
+#### **M3.6 – Minimum Area DRC**
+- **Violation:** The enclosed area within **M3.6** does not meet the specified minimum area requirement.  
+- **Error:** Minimum area violation.
+
+
+<img width="965" height="250" alt="image" src="https://github.com/user-attachments/assets/a22171f3-ed0d-431f-aabf-ee96b046bc41" />
+
+
+
 
 # 4 - Pre-layout timing analysis and importance of good clock tree
 
